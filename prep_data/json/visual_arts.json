@@ -9,7 +9,7 @@
       "ppr": false,
       "duration": "half course",
       "required": false,
-      "grades": [],
+      "grades": [9, 10, 11, 12],
       "prerequisite": [null, false]
     },
     {
@@ -20,7 +20,7 @@
       "ppr": false,
       "duration": "half course",
       "required": false,
-      "grades": [],
+      "grades": [9, 10, 11, 12],
       "prerequisite": [null, false]
     },
     {
@@ -31,7 +31,7 @@
       "ppr": false,
       "duration": "half course",
       "required": false,
-      "grades": [],
+      "grades": [9, 10, 11, 12],
       "prerequisite": [null, false]
     },
     {
@@ -42,7 +42,7 @@
       "ppr": false,
       "duration": "half course",
       "required": false,
-      "grades": [],
+      "grades": [10, 11, 12],
       "prerequisite": ["Level I in chosen medium", false]
     },
     {
@@ -53,7 +53,7 @@
       "ppr": false,
       "duration": "half course",
       "required": false,
-      "grades": [],
+      "grades": [9, 10, 11, 12],
       "prerequisite": [null, false]
     },
     {
@@ -64,7 +64,7 @@
       "ppr": false,
       "duration": "half course",
       "required": false,
-      "grades": [],
+      "grades": [10, 11, 12],
       "prerequisite": ["Ceramics I", false]
     },
     {
@@ -75,7 +75,7 @@
       "ppr": false,
       "duration": "half course",
       "required": false,
-      "grades": [],
+      "grades": [9, 10, 11, 12],
       "prerequisite": [null, false]
     },
     {
@@ -86,7 +86,7 @@
       "ppr": false,
       "duration": "half course",
       "required": false,
-      "grades": [],
+      "grades": [10, 11, 12],
       "prerequisite": ["Ceramics II or Sculpture", false]
     },
     {
@@ -97,7 +97,7 @@
       "ppr": false,
       "duration": "half course",
       "required": false,
-      "grades": [],
+      "grades": [9, 10, 11, 12],
       "prerequisite": [null, false]
     },
     {
@@ -108,7 +108,7 @@
       "ppr": false,
       "duration": "term",
       "required": false,
-      "grades": [],
+      "grades": [10, 11, 12],
       "prerequisite": ["Digital Photography I", false]
     },
     {
@@ -119,7 +119,7 @@
       "ppr": false,
       "duration": "term",
       "required": false,
-      "grades": [],
+      "grades": [10, 11, 12],
       "prerequisite": ["Digital Photography II", true]
     },
     {
@@ -130,7 +130,7 @@
       "ppr": false,
       "duration": "half course",
       "required": false,
-      "grades": [],
+      "grades": [9, 10, 11, 12],
       "prerequisite": [null, false]
     },
     {
@@ -141,7 +141,7 @@
       "ppr": false,
       "duration": "half course",
       "required": false,
-      "grades": [],
+      "grades": [9, 10, 11, 12],
       "prerequisite": [null, false]
     },
     {
@@ -152,7 +152,7 @@
       "ppr": false,
       "duration": "half course",
       "required": false,
-      "grades": [],
+      "grades": [9, 10, 11, 12],
       "prerequisite": [null, false]
     },
     {
@@ -163,7 +163,7 @@
       "ppr": false,
       "duration": "half course",
       "required": false,
-      "grades": [],
+      "grades": [9, 10, 11, 12],
       "prerequisite": [null, false]
     },
     {
@@ -174,7 +174,7 @@
       "ppr": false,
       "duration": "half course",
       "required": false,
-      "grades": [],
+      "grades": [9, 10, 11, 12],
       "prerequisite": [null, false]
     },
     {
@@ -185,7 +185,7 @@
       "ppr": false,
       "duration": "term",
       "required": false,
-      "grades": [],
+      "grades": [9, 10, 11, 12],
       "prerequisite": [null, false]
     },
     {
@@ -218,7 +218,7 @@
       "ppr": false,
       "duration": "half course",
       "required": false,
-      "grades": [],
+      "grades": [11, 12],
       "prerequisite": ["Written proposal; highest-level course in medium; Drawing I for painting/watercolor/printmaking; completion of arts requirement in visual arts", true]
     }
   ]
