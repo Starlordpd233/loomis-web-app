@@ -1,0 +1,439 @@
+{
+  "department": "Performing Arts",
+  "courses": [
+    {
+      "title": "MUSIC COMPOSITION AND THEORY I: FUNDAMENTALS",
+      "description": "Have you ever wondered how music works? How do pitch and rhythm make a melody catchy? What makes one chord sound more emotional than another chord? Beginning with the basic elements of music theory \u2014 note reading, scales and modes, key and time signatures, intervals and chords, and basic melody writing \u2014 this course works to build the musical skills necessary to read, write, and understand melodies, chord progressions and bass lines, seventh chords in inversion, and reading music over four clefs (chorale or quartet style). Students also will begin harmonic analyzation skills. In addition, this course introduces non-western approaches to harmonization and musical organization. The course emphasizes ear training, interval and chord recognition, beginning sight-singing, and melodic dictation. Students will utilize various music theory websites and will explore basic compositional techniques using electronic music notation software. By term\u2019s end, students should possess the skills needed to place out of beginning music theory at the college level. No previous theory, vocal, or keyboard skill is required.",
+      "rigor": 1,
+      "gesc": false,
+      "ppr": false,
+      "duration": "term",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "CL MUSIC COMPOSITION AND THEORY II: HARMONY AND HARMONIC ANALYSIS",
+      "description": "This course focuses on the direct application of concepts such as chord progressions, part-writing, figured bass, borrowed chords, modulation, and elements of musical form to both students\u2019 compositions and the analysis of existing musical works. Students will utilize music notation software to create their own works for solo instruments and piano as well as part-writing in four parts. In addition, classes are formatted with harmonic analysis, ear-training, keyboard instruction, sight singing and multiple clef reading. Students will engage in further discussion of non-western approaches to composition and harmonic form. Local and alumni composers are featured as guest instructors and clinicians. Students wishing to take the AP exam should plan on both CL Music Theory II and III. Prerequisite: CL Music Theory I or permission of the department",
+      "rigor": 3,
+      "gesc": false,
+      "ppr": false,
+      "duration": "term",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        "CL Music Theory I",
+        true
+      ]
+    },
+    {
+      "title": "CL MUSIC COMPOSITION AND THEORY III: FORM AND ADVANCED COMPOSITION",
+      "description": "This course is designed for students with advanced music skills and a strong interest in long-form instrumental and vocal music. Students will apply deep harmonic and form analysis of existing musical works to their own compositions. Topics include borrowed sixth chords, seventh and ninth chords, counterpoint, modulations, and part writing. Students are introduced to classic sonata form and 20th-century and contemporary western and non-western composition and harmony. Significant time is allotted to developing keen ear training and aural recognition skills. At the completion of the course, students may elect to take the AP Music Theory exam. Those students interested in sitting for the AP Music Theory exam in May will need to complete some independent work to prepare for that exam and should consult with the instructor to identify those additional topics. Prerequisite: CL Music Theory II or permission of the department",
+      "rigor": 3,
+      "gesc": false,
+      "ppr": false,
+      "duration": "term",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        "CL Music Theory II",
+        true
+      ]
+    },
+    {
+      "title": "MUSIC TECHNOLOGY AND COMPOSITION I",
+      "description": "Students enrolled in this course will learn to compose electronic music within Logic Pro, a professional digital audio workstation and music performance software. This project-based course is designed to develop musicianship and exercise an understanding of music characteristics such as rhythm, harmony, form, and timbre. Throughout the course, students will learn to produce electronic music based on the songs they listen to and enjoy. Projects will build a music production skillset that includes audio recording and editing, MIDI control, sample-based production, synthesis, and mixing. Students will learn to listen to and critically evaluate compositions, and they will learn to work in a collaborative, creative environment. Note: This class may not be repeated for credit; a second level of this class is offered.",
+      "rigor": 1,
+      "gesc": false,
+      "ppr": false,
+      "duration": "half course",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "MUSIC TECHNOLOGY AND COMPOSITION II",
+      "description": "This course focuses on building a portfolio of originally composed and mastered works (at least 2 per term) and learning effective avenues and platforms for online distribution. Each work, regardless of genre or form, will be mixed according to professional standards and will employ some basic mastering techniques. In addition, MT+C2 will expand upon MT+C1 topics and introduce new material including basic mastering techniques, music industry and distribution, advanced features such as signal routing and effect chains, and developing a custom effect plugin. Prerequisite: Music Technology and Composition I or permission of instructor",
+      "rigor": 2,
+      "gesc": false,
+      "ppr": false,
+      "duration": "half course",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        "Music Technology and Composition I or permission of instructor",
+        false
+      ]
+    },
+    {
+      "title": "MUSIC AND SOCIAL ACTION WORLDWIDE GESC",
+      "description": "Students enrolled in this course will take a wide look at both the response of musicians to current political events and social movements of the recent past and the varying courses of action musicians have taken to create and galvanize change. In addition, students will consider the question: Do efforts such as music fundraisers and collaborative politically/socially themed concerts actually affect change? Upon analyzing the impact of musicians and their music on disaster relief and political and social oppression, students will discuss the factors needed to determine value and success of such efforts. Class time will be devoted to work in conjunction with the Norton Family Center for Common Good and the Pearse Hub for Innovation to design projects to bring Music and Social Action topics, questions, and queries to the greater Loomis Chaffee community. In addition, students will meet with guest speakers and performers to better understand the role and process of creating or presenting music for social action. (Sample course topics: Lin Manuel Miranda\u2019s work for Puerto Rico, El Sistema, revolutionary folk music in Chile, the music of Sixto Rodriguez, the choral revolution in Estonia, Band Aid, and the musical Hamilton.)",
+      "rigor": 1,
+      "gesc": true,
+      "ppr": false,
+      "duration": "half course",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "MUSIC HISTORY FROM RHAPSODY TO RAP",
+      "description": "This sojourn through the history of music searches historical roots and development of both classic and popular music. With an emphasis on developing critical and discriminative listening skills, students will seek answers to questions such as: How do rap and New Age music relate to Gregorian chant? How are Smetana and Santana related? How did the song cycle influence the modern-day concept album? From Bach and Beethoven to the Beatles and Beyonc\u00e9, students will investigate political and social events that influenced musical forms, the development of musical instruments, and the ever-changing tools of music composition. Through listening sessions, student choice presentations, guest artist performances, discussions, videos, and website research, we will attempt to answer these questions and more.",
+      "rigor": 1,
+      "gesc": false,
+      "ppr": false,
+      "duration": "term",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "THE HISTORY OF BROADWAY MUSICALS",
+      "description": "This course surveys the musical shows, composers, and performing artists of Broadway\u2019s past, present, and future. Students will study the influences of burlesque, vaudeville, Gilbert and Sullivan, and Tin Pan Alley on the 20th and 21st century Broadway musical. Beginning with the development of early show writing teams and composers such as Cole Porter, Jerome Kern, Rodgers and Hammerstein, Rodgers and Hart, and Leonard Bernstein study will continue with Stephen Sondheim, Stephen Schwartz, and the contemporary teams that created shows such as Les Mis\u00e9rables and Miss Saigon, rock musicals such as Tommy and Hair, and the rock musicals of today such as Next to Normal and Waitress. Finally, the class will survey the work of composers such as Jason Robert Brown and Ana\u00efs Mitchell. In addition to viewing and listening sessions and discussions, the class will plan to attend outside and on campus performances, receive visits from local music theater artists, and tour a Connecticut theater. 49 Music Ensemble Performance Courses The following courses provide students with the opportunity to earn arts credit through performance in musical groups. All of these performance courses provide a repertoire of diverse styles and periods. Enrolled students must practice regularly, attend all scheduled rehearsals, and take part in all performances (participation in major ensemble concerts is a requirement of each course). Performance classes are open to students in all classes; ensemble performance and applied music classes may be repeated for credit. For instrumental classes, the student must indicate the instrument to be played in the \u201cNotes\u201d section of the course registration form. Students enrolled in performance classes must attend three Music Department-sponsored concerts of their choice each term to earn concert credits.",
+      "rigor": 1,
+      "gesc": false,
+      "ppr": false,
+      "duration": "half course",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "CONCERT CHOIR",
+      "description": "Concert Choir is open to all who enjoy singing and is designed to expose singers to a wide range of choral music and performance experiences. The ensemble performs music of different genres and styles, with emphasis on proper vocal technique, tone production, and reading skills. Participation in concerts is a requirement of the class.",
+      "rigor": 1,
+      "gesc": true,
+      "ppr": false,
+      "duration": "full-year",
+      "required": false,
+      "grades": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "CHAMBER SINGERS",
+      "description": "Chamber Singers is a select vocal ensemble for experienced singers who demonstrate advanced musicianship, vocal independence, and part-singing ability. The group performs challenging repertoire and collaborates on concerts throughout the year. Regular attendance and participation in scheduled performances are required.",
+      "rigor": 2,
+      "gesc": true,
+      "ppr": false,
+      "duration": "full-year",
+      "required": false,
+      "grades": [
+        10,
+        11,
+        12
+      ],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "WIND ENSEMBLE",
+      "description": "The Wind Ensemble consists of woodwind, brass, and percussion students and is the primary instrumental ensemble for these players. Repertoire covers classical and contemporary works with a focus on technique, tone, and ensemble precision. Students are required to participate in scheduled concerts during the academic year.",
+      "rigor": 1,
+      "gesc": true,
+      "ppr": false,
+      "duration": "full-year",
+      "required": false,
+      "grades": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "JAZZ BAND",
+      "description": "Jazz Band is an advanced instrumental group that explores jazz styles such as swing, Latin, funk, and fusion. Students learn improvisation, jazz harmony, and ensemble performance techniques. Rhythm section and horn players collaborate to perform in concerts and events throughout the year.",
+      "rigor": 2,
+      "gesc": false,
+      "ppr": false,
+      "duration": "full-year",
+      "required": false,
+      "grades": [
+        10,
+        11,
+        12
+      ],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "ORCHESTRA",
+      "description": "The Orchestra is comprised of violins, violas, cellos, and double basses and is designed to expose players to a variety of music. Repertoire is chosen from genres from the Baroque to Contemporary eras and may feature solo student musicians. Wind, brass, and percussion students from the Wind Ensemble may join the strings in larger orchestral works. On occasion, the ensemble collaborates with the Concert Choir and faculty singers. The Orchestra performs in at least two major concerts each year. Seating auditions for strings are held in the fall term. A background on your instrument that includes private instruction or previous orchestra experience is expected. Participation in major ensemble concerts is a requirement of the class.",
+      "rigor": 1,
+      "gesc": true,
+      "ppr": false,
+      "duration": "full-year",
+      "required": false,
+      "grades": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "prerequisite": [
+        "Background on instrument with private instruction or previous orchestra experience expected",
+        false
+      ]
+    },
+    {
+      "title": "CHAMBER MUSIC",
+      "description": "Chamber Music offers advanced instrumentalists the opportunity to play in small ensembles, focusing on independence, communication, and musical interpretation. Students prepare and perform works from a variety of styles and periods. Regular coaching sessions and performances are integral to the class.",
+      "rigor": 2,
+      "gesc": false,
+      "ppr": false,
+      "duration": "half course",
+      "required": false,
+      "grades": [
+        10,
+        11,
+        12
+      ],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "PERCUSSION ENSEMBLE",
+      "description": "Percussion Ensemble is for students interested in developing percussion techniques and performing percussion ensemble literature. The course emphasizes rhythmic precision, coordination, and ensemble awareness. Students will perform works for percussion alone and may also collaborate with other large ensembles.",
+      "rigor": 1,
+      "gesc": true,
+      "ppr": false,
+      "duration": "half course",
+      "required": false,
+      "grades": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "GUITAR ENSEMBLE",
+      "description": "Guitar Ensemble is designed for students who have prior experience on guitar and want to develop ensemble skills. Repertoire includes classical and contemporary works. Students learn to blend tone, maintain rhythmic accuracy, and interpret music collaboratively. Performances are scheduled throughout the year.",
+      "rigor": 1,
+      "gesc": true,
+      "ppr": false,
+      "duration": "half course",
+      "required": false,
+      "grades": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "ACTING I: INTRODUCTION TO ACTING",
+      "description": "And half course in an effort to enhance confidence in a non-judgmental atmosphere, introduction to acting engages its students with highly improvisational theater games and exercises. over the course of the term or year, students work to discover greater on-stage comfort levels and to decrease stage fright. typical exercises emphasize movement, speech, creativity, originality, and spontaneity, and prepare students for the more traditional acting theory offered in fundamentals of acting. the term course option may be taken as a sixth course.",
+      "rigor": 1,
+      "gesc": false,
+      "ppr": false,
+      "duration": "half course",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "ACTING FOR THE CAMERA",
+      "description": "This course prepares the acting student with techniques and skills for performing on camera. classes will provide opportunities for on-camera acting experience in scripted and improvised scene work, shot framing, and story boarding. performers looking to learn in-depth about meeting the challenges involved in on-camera acting will appreciate and enjoy this course. the course also exposes students to hands-on experience in technical aspects of the behind-the-camera process in capturing the actor\u2019s on-screen performance. this course will help students unlock proven techniques of film making for building their own audition tapes, acting reels, short film, and web-series. students will take turns acting in scenes and working behind the camera. this course may be taken as a sixth course. prerequisite: acting i or permission of the department.",
+      "rigor": 1,
+      "gesc": false,
+      "ppr": false,
+      "duration": "half course",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        "Acting I or",
+        true
+      ]
+    },
+    {
+      "title": "ACTING: IMPROVISATION",
+      "description": "Improvisation class will challenge the acting students to think on their feet while building strong communication and listening skills. performance improvisation requires the actor to work moment-to-moment establishing settings, relationships, situations, and conclusions to both comedic and dramatic story telling. the class will also explore masks to improvise through physical story telling. the class will further challenge the acting student to rid themselves of theatrical self-censorship allowing them to make intelligent, informed, and exciting choices for the stage. this course may be taken as a sixth course. prerequisite: acting i or permission of the department",
+      "rigor": 1,
+      "gesc": false,
+      "ppr": false,
+      "duration": "half course",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        "Acting I or",
+        true
+      ]
+    },
+    {
+      "title": "ACTING: STAGE COMBAT",
+      "description": "Stage combat is the illusion of violence for stage or screen. this course is an introduction and exploration of technical and aesthetic aspects of stage combat. the goals are for the students to develop the ability to safely portray violence onstage within the context of a play with specificity and dramatic power as well as to understand how stage combat fits into the practice of theater as a whole. understanding the techniques of safe and effective performance combat is a primary objective. the students will build a strong foundation of footwork, attacks, and defenses, and explore movement and partnering techniques specifically for stage combat. other aspects of the class include the development of strength, flexibility, hand/eye coordination, and the understanding and application of principles of safety in working with a partner and in ensemble. this course may be taken as a sixth course. prerequisite: acting i or permission of the department",
+      "rigor": 1,
+      "gesc": false,
+      "ppr": false,
+      "duration": "half course",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        "Acting I",
+        true
+      ]
+    },
+    {
+      "title": "ACTING II: FUNDAMENTALS OF ACTING",
+      "description": "This course emphasizes the philosophical basis and techniques necessary for acting in modern comedy and drama. students improve their acting, improvisation, and audition skills by studying naturalistic, objective-based, moment-to-moment acting techniques. the class stresses audition pieces, monologues, and scene study from contemporary plays. viewing of selected film scenes and visits to professional theaters in new york and connecticut complement the course. this course may be taken as a sixth course. prerequisite: introduction to acting or permission of the department",
+      "rigor": 2,
+      "gesc": false,
+      "ppr": false,
+      "duration": "half course",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        "Introduction to Acting",
+        true
+      ]
+    },
+    {
+      "title": "ACTING: SHAKESPEARE",
+      "description": "This course is designed to make shakespeare accessible to the performer by learning techniques for acting the text while experiencing the delights and challenges of these classic plays, which take place in a multitude of historical times and places. shakespeare\u2019s works have been globally translated into more than 80 languages and have been performed throughout the world in over 70 nations. his plays (comedies, tragedies, and history plays) tell surprising but recognizable tales of human nature, relationships, conflict, love, war, and the human condition. students will study and perform shakespeare\u2019s plays in a variety of cultural contexts to discover and determine how context affects storytelling in our modern and globalized society. by studying and playing shakespeare\u2019s characters through scene work and individual soliloquies the students will explore the sharing of common stories across cultures. while honing their performance skills the students will develop their communication, critical thinking and problem-solving skills while holding a lens up to current world affairs through shakespeare\u2019s words that offer insight, liberate, inform, and inspire. prerequisite: acting i or permission of the department. 52 course offerings & descriptions 2025\u201326",
+      "rigor": 1,
+      "gesc": true,
+      "ppr": false,
+      "duration": "half course",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        "Acting I",
+        true
+      ]
+    },
+    {
+      "title": "ART OF DANCE",
+      "description": "This course introduces students to dance by engaging with the multiple purposes of the art form through hands-on experiences, by learning physical dance technique, & by exploring the history and current state of dance as a form of creative expression and social and cultural practice. students will learn about ballet, modern, and jazz dance through technique classes, readings, discussions, videos, written responses, and collaborative projects. by examining dance in both global and local contexts, we will move toward a fuller appreciation and understanding of the influence of dance in our everyday lives as well as an embodied reflection 53 and expression of the world in which we live. this half-course is open to all students, with no previous dance experience necessary. there is no required performance aspect to this course. for those interested in performing in the fall and spring dance shows, this course should be taken in conjunction with the dance performance ensemble half-course which meets in the same time block on alternating days.",
+      "rigor": 1,
+      "gesc": true,
+      "ppr": false,
+      "duration": "half course",
+      "required": false,
+      "grades": [
+        9,
+        10,
+        11,
+        12
+      ],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "DANCE PERFORMANCE ENSEMBLE",
+      "description": "This course is for students with intermediate to advanced dance experience. dance performance ensemble students will learn choreography for performance in the fall dance showcase, mlk day, and spring dance revue. students will also work collaboratively with the instructor and each other to research and explore the themes of each piece of choreography. prerequisite: art of dance or permission of the instructor; art of dance may be taken concurrently. students who wish to audition for dance company (after school, fulfills the physical education requirement) are strongly encouraged to first enroll in art of dance and dance performance ensemble (half courses).",
+      "rigor": 1,
+      "gesc": true,
+      "ppr": false,
+      "duration": "half course",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        "Art of Dance or permission of the instructor",
+        false
+      ]
+    },
+    {
+      "title": "MAKING DANCE: CHOREOGRAPHY",
+      "description": "",
+      "rigor": 1,
+      "gesc": false,
+      "ppr": false,
+      "duration": "term",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "HIP-HOP DANCE",
+      "description": "This energetic and upbeat class studies various hip-hop and street-dance originated styles that are performed to popular music. the class explores hip-hop and funk dance as a means of expression and art. instruction includes strengthening warm-up, technique exercises, and choreography combinations and emphasizes rhythm, self-expression, and developing personal style through freestyle improvisation and movement exploration. no previous experience is required; the class is open to students of all levels looking to build confidence and coordination through dynamic and fun routines. there is an optional performance opportunity in the spring dance revue for students in this class. hip-hop dance is taught by a visiting guest teacher.",
+      "rigor": 1,
+      "gesc": false,
+      "ppr": false,
+      "duration": "term",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "JAZZ DANCE TECHNIQUE",
+      "description": "In this up-beat dance class, students are introduced to traditional american jazz dance, contemporary jazz, and jazz-fusion styles. participants improve their strength, flexibility, coordination, and musicality through warm-ups, technique exercises, and dance choreography set to popular music of the past and present. there is an optional performance opportunity in the spring dance revue for students in this class.",
+      "rigor": 1,
+      "gesc": false,
+      "ppr": false,
+      "duration": "term",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        null,
+        false
+      ]
+    },
+    {
+      "title": "DANCE COMPANY",
+      "description": "Dance company is the elite dance performance group on campus and is for advanced dancers who wish to dedicate their after-school time and energy to dance, choreography, and performance. students must audition in the fall to be considered for dance company. in addition to maintaining and improving various techniques, this course focuses heavily on learning and making repertory dances that are performed at school activities, in the fall dance showcase, and in the spring dance revue. students will learn choreography and also choreographic theory and methodology. students often collaborate with the instructor and each other in the creation of dances. methods of generating movement and building choreography are also addressed, and students\u2019 choreography is included in some pieces. a visiting guest teacher is brought in during the winter term to give students a broader dance experience. students who wish to dance and perform but who are not cast in dance company or are unable to commit to the full year of after-school rehearsals for dance company are strongly encouraged to sign up for the art of dance and dance performance ensemble daytime classes. note: dance company is cast by audition. auditions are held at the start of the fall term.",
+      "rigor": 1,
+      "gesc": false,
+      "ppr": false,
+      "duration": "full-year",
+      "required": false,
+      "grades": [],
+      "prerequisite": [
+        "Audition required",
+        false
+      ]
+    }
+  ]
+}
