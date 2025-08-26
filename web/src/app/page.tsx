@@ -226,6 +226,61 @@ export default function Home() {
     setPlan((prev) => prev.filter((_, idx) => idx !== i));
   }
 
+function printPlan(): void {
+  if (typeof window === 'undefined') return;
+  
+  const planElement = document.getElementById('plan');
+  if (!planElement) return;
+  
+  // Create a new window for printing
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) return;
+  
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>My Plan</title>
+        <style>
+          @page {
+            size: A4;
+            margin: 0.5in;
+          }
+          body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.3;
+            margin: 0;
+            padding: 20px;
+            max-height: calc(11in - 1in);
+            overflow: hidden;
+          }
+          .plan-item {
+            margin-bottom: 8px;
+            padding: 4px 0;
+            border-bottom: 1px solid #eee;
+          }
+          button { display: none; }
+        </style>
+      </head>
+      <body>
+        <h2>My Plan</h2>
+        <div class="plan-content">
+          ${Array.from(planElement.children).map((item: Element) => {
+            const titleElement = item.querySelector('span');
+            const title = titleElement?.textContent || '';
+            return `<div class="plan-item">${title}</div>`;
+          }).join('')}
+        </div>
+      </body>
+    </html>
+  `);
+  
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.close();
+}
+
   return (
     <div className={styles.container}>
       <div>
@@ -297,7 +352,7 @@ export default function Home() {
 
       <div>
         <h2 className={styles.heading}>My Plan</h2>
-        <div className={styles.planGrid}>
+        <div id="plan" className={styles.planGrid}>
           {plan.map((p, i) => (
             <div key={i} className={styles.planItem}>
               <span>{p.title}</span>
@@ -305,7 +360,7 @@ export default function Home() {
             </div>
           ))}
         </div>
-        <button className={styles.printButton} onClick={() => window.print()}>Print / Save PDF</button>
+        <button className={styles.printButton} onClick={printPlan}>Print / Save PDF</button>
       </div>
     </div>
   );
