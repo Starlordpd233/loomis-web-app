@@ -40,21 +40,20 @@
   background: linear-gradient(135deg, rgba(139, 35, 35, 0.02) 0%, transparent 100%);
 }
 
+
 .logoBox {
-  width: 200px;
-  height: 250px;
-  background: rgba(139, 35, 35, 0.05);
-  border: 2px dashed rgba(139, 35, 35, 0.2);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 2rem;
-  color: rgba(139, 35, 35, 0.5);
-  animation: fadeInScale 0.8s ease;
-  transition: transform 0.3s ease, background 0.3s ease;
-}
-.logoBox:hover { transform: scale(1.02); background: rgba(139, 35, 35, 0.08); }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    background: transparent;
+    border: 0;
+    width: auto;
+    height: auto;
+    transition: none;
+  }
+  .logoBox:hover { transform: none; background: transparent; }
+  
 
 .motto { text-align: center; animation: fadeInUp 0.8s ease 0.2s both; }
 .mottoLatin {
