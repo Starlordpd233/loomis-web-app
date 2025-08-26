@@ -2,19 +2,29 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-type Prereq = { title?: string; timing?: 'BEFORE' | 'CONCURRENT' | 'WAIVABLE' | 'PERMISSION' };
+type RawCourse = {
+  title: string;
+  description?: string;
+  department?: string;
+  rigor?: number;         // 1,2,3
+  gesc?: boolean;
+  ppr?: boolean;
+  term?: string;          // e.g., "year course", "term course"
+  duration?: string;      // e.g., "full-year", "term", "two terms", "half course"
+  grades?: number[];
+  offered_in_25?: boolean;
+  prerequisite?: [string | null, boolean]; // [text, permissionRequired]
+};
+
 type Course = {
   title: string;
-  department?: string;
   description?: string;
-  term?: string;
-  termPattern?: 'FULL_YEAR' | 'TRIMESTER' | 'MULTI_TRIMESTER';
-  termOfferings?: ('FALL'|'WINTER'|'SPRING')[];
-  gradeLevels?: number[];
-  tags?: string[];
-  level?: string;
-  prerequisites?: Prereq[];
+  department?: string;
+  tags: string[];         // derived
+  level?: string;         // "CL" | "ADV" | undefined
+  grades?: number[];
   permissionRequired?: boolean;
+  termLabel?: string;     // "Full year" / "Term" / etc
 };
 
 type PlanItem = { title: string };
@@ -24,6 +34,120 @@ async function fetchFirst<T>(paths: string[]): Promise<T | null> {
     try { const r = await fetch(p); if (r.ok) return (await r.json()) as T; } catch {}
   }
   return null;
+}
+
+// --- helpers to derive tags/labels from your schema ---
+function normalizeTerm(raw?: string, duration?: string): { termLabel?: string; termTags: string[] } {
+  const s = `${(raw || '').toLowerCase()} ${(duration || '').toLowerCase()}`.trim();
+  if (s.includes('year')) return { termLabel: 'Full year', termTags: ['YEAR'] };
+  if (s.includes('two terms')) return { termLabel: 'Two terms', termTags: ['TWO-TERM'] };
+  if (s.includes('half')) return { termLabel: 'Half course', termTags: ['HALF'] };
+  if (s.includes('term')) return { termLabel: 'Term', termTags: ['TERM'] };
+  return { termLabel: undefined, termTags: [] };
+}
+
+function deriveTags(c: RawCourse): { tags: string[]; level?: string } {
+  const tags: string[] = [];
+  if (c.gesc) tags.push('GESC');
+  if (c.ppr) tags.push('PPR');
+
+  // level / rigor
+  let level: string | undefined;
+  const titleCL = (c.title || '').trim().toUpperCase().startsWith('CL ');
+  if (titleCL || (c.rigor ?? 1) >= 3) { tags.push('CL'); level = 'CL'; }
+  else if ((c.rigor ?? 1) === 2) { tags.push('ADV'); level = 'ADV'; }
+
+  // duration/term tags
+  const { termLabel, termTags } = normalizeTerm(c.term, c.duration);
+  tags.push(...termTags);
+
+  return { tags: Array.from(new Set(tags)), level };
+}
+
+// flatten your DB into a simple course array
+function flattenDatabase(db: any): Course[] {
+  const out: Course[] = [];
+
+  // case: { departments: [ { department, courses }, ... ] }
+  if (db && Array.isArray(db.departments)) {
+    for (const deptBlock of db.departments) {
+      const deptName: string | undefined = deptBlock.department;
+
+      // courses can be an array OR an object (Languages has { Arabic: [...], ... })
+      const courses = deptBlock.courses;
+      if (Array.isArray(courses)) {
+        for (const rc of courses as RawCourse[]) {
+          const { tags, level } = deriveTags(rc);
+          const { termLabel } = normalizeTerm(rc.term, rc.duration);
+          out.push({
+            title: rc.title,
+            description: rc.description,
+            department: rc.department || deptName,
+            tags,
+            level,
+            grades: rc.grades,
+            permissionRequired: Array.isArray(rc.prerequisite) ? !!rc.prerequisite[1] : undefined,
+            termLabel
+          });
+        }
+      } else if (courses && typeof courses === 'object') {
+        // object keyed by sub-language/category
+        for (const key of Object.keys(courses)) {
+          const list: RawCourse[] = courses[key];
+          if (!Array.isArray(list)) continue;
+          for (const rc of list) {
+            const { tags, level } = deriveTags(rc);
+            const { termLabel } = normalizeTerm(rc.term, rc.duration);
+            out.push({
+              title: rc.title,
+              description: rc.description,
+              department: rc.department || deptName || key,
+              tags,
+              level,
+              grades: rc.grades,
+              permissionRequired: Array.isArray(rc.prerequisite) ? !!rc.prerequisite[1] : undefined,
+              termLabel
+            });
+          }
+        }
+      }
+    }
+    return out;
+  }
+
+  // fallback: simple arrays you used earlier
+  if (Array.isArray(db)) {
+    return (db as RawCourse[]).map((rc) => {
+      const { tags, level } = deriveTags(rc);
+      const { termLabel } = normalizeTerm(rc.term, rc.duration);
+      return {
+        title: rc.title,
+        description: rc.description,
+        department: rc.department,
+        tags,
+        level,
+        grades: rc.grades,
+        permissionRequired: Array.isArray(rc.prerequisite) ? !!rc.prerequisite[1] : undefined,
+        termLabel
+      };
+    });
+  }
+
+  const arr = Array.isArray(db?.courses) ? db.courses : [];
+  return arr.map((rc: RawCourse) => {
+    const { tags, level } = deriveTags(rc);
+    const { termLabel } = normalizeTerm(rc.term, rc.duration);
+    return {
+      title: rc.title,
+      description: rc.description,
+      department: rc.department,
+      tags,
+      level,
+      grades: rc.grades,
+      permissionRequired: Array.isArray(rc.prerequisite) ? !!rc.prerequisite[1] : undefined,
+      termLabel
+    };
+  });
 }
 
 export default function Home() {
@@ -37,17 +161,21 @@ export default function Home() {
     try { return JSON.parse(localStorage.getItem('plan') || '[]'); } catch { return []; }
   });
 
+  // NEW: tag filter state (simple checkboxes)
+  const [tagGESC, setTagGESC] = useState(false);
+  const [tagPPR, setTagPPR] = useState(false);
+  const [tagCL, setTagCL] = useState(false);
+
   useEffect(() => {
     (async () => {
       const data = await fetchFirst<any>([
         '/catalog.json',
-        '/course_catalog_minimal.json',
+        '/catalogdbfinal.json',
         '/course_catalog_full.json'
       ]);
-      if (!data) { setError('Could not load catalog.json from /public'); return; }
-      const arr = Array.isArray(data) ? data : (data.courses || []);
-      if (!Array.isArray(arr)) { setError('Catalog must be an array of courses'); return; }
-      setCourses(arr);
+      if (!data) { setError('Could not load catalog from /public'); return; }
+      const flat = flattenDatabase(data);
+      setCourses(flat);
     })();
   }, []);
 
@@ -61,32 +189,35 @@ export default function Home() {
     return ['All', ...Array.from(set).sort()];
   }, [courses]);
 
-  function termLabel(c: Course) {
-    if (c.termPattern === 'FULL_YEAR') return 'Full year';
-    if (c.termOfferings && c.termOfferings.length) return c.termOfferings.join(' / ');
-    return c.term || '';
-  }
-  function gradeLabel(c: Course) {
-    return c.gradeLevels?.length ? `Grades ${c.gradeLevels.join(', ')}` : '';
-  }
+  const tagsAvailable = useMemo(() => {
+    const set = new Set<string>();
+    courses.forEach(c => c.tags?.forEach(t => set.add(t)));
+    return Array.from(set).sort();
+  }, [courses]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const needTag = (c: Course) => {
+      if (tagGESC && !c.tags?.includes('GESC')) return false;
+      if (tagPPR && !c.tags?.includes('PPR')) return false;
+      if (tagCL && !c.tags?.includes('CL')) return false;
+      return true;
+    };
     return courses.filter(c => {
-      const matchesDept =
-        deptFilter === 'All' ||
-        (c.department || '').toLowerCase() === deptFilter.toLowerCase();
-
+      // dept filter
+      const matchesDept = deptFilter === 'All' || (c.department || '').toLowerCase() === deptFilter.toLowerCase();
+      // tag filters
+      const matchesTags = needTag(c);
+      // text search (title + department; descriptions optional)
       const haystacks = [
         (c.title || '').toLowerCase(),
         (c.department || '').toLowerCase(),
         ...(includeDescriptions ? [(c.description || '').toLowerCase()] : [])
       ];
       const matchesQuery = q === '' || haystacks.some(h => h.includes(q));
-
-      return matchesDept && matchesQuery;
+      return matchesDept && matchesTags && matchesQuery;
     });
-  }, [courses, query, includeDescriptions, deptFilter]);
+  }, [courses, query, includeDescriptions, deptFilter, tagGESC, tagPPR, tagCL]);
 
   function addToPlan(c: Course) { setPlan(prev => [...prev, { title: c.title }]); }
   function removeFromPlan(i: number) { setPlan(prev => prev.filter((_, idx) => idx !== i)); }
@@ -101,24 +232,45 @@ export default function Home() {
             {error}
           </div>
         )}
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
-          <input
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder="search title or department (e.g., English)"
-            style={{ flex: 1, padding: 8 }}
-          />
-          <label style={{ display: 'flex', gap: 6, fontSize: 12 }}>
+
+        {/* Filters */}
+        <div style={{ display: 'grid', gap: 8, marginBottom: 8 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <input
-              type="checkbox"
-              checked={includeDescriptions}
-              onChange={e => setIncludeDescriptions(e.target.checked)}
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder="search title or department"
+              style={{ flex: 1, padding: 8 }}
             />
-            search descriptions
-          </label>
-          <select value={deptFilter} onChange={e => setDeptFilter(e.target.value)} style={{ padding: 8 }}>
-            {departments.map(d => <option key={d} value={d}>{d}</option>)}
-          </select>
+            <label style={{ display: 'flex', gap: 6, fontSize: 12 }}>
+              <input
+                type="checkbox"
+                checked={includeDescriptions}
+                onChange={e => setIncludeDescriptions(e.target.checked)}
+              />
+              search descriptions
+            </label>
+            <select value={deptFilter} onChange={e => setDeptFilter(e.target.value)} style={{ padding: 8 }}>
+              {departments.map(d => <option key={d} value={d}>{d}</option>)}
+            </select>
+          </div>
+
+          {/* Tag filters */}
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 12, opacity: 0.8 }}>Tags:</span>
+            <label style={{ display: 'flex', gap: 6, fontSize: 12 }}>
+              <input type="checkbox" checked={tagGESC} onChange={e => setTagGESC(e.target.checked)} /> GESC
+            </label>
+            <label style={{ display: 'flex', gap: 6, fontSize: 12 }}>
+              <input type="checkbox" checked={tagPPR} onChange={e => setTagPPR(e.target.checked)} /> PPR
+            </label>
+            <label style={{ display: 'flex', gap: 6, fontSize: 12 }}>
+              <input type="checkbox" checked={tagCL} onChange={e => setTagCL(e.target.checked)} /> CL
+            </label>
+            <span style={{ fontSize: 12, opacity: 0.6 }}>
+              ({tagsAvailable.length} tag types found)
+            </span>
+          </div>
         </div>
 
         <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 8 }}>
@@ -134,18 +286,21 @@ export default function Home() {
               </div>
               <div style={{ fontSize: 12, opacity: 0.8 }}>
                 <span>{c.department || '—'}</span>
-                {' • '}
-                <span>{termLabel(c)}</span>
+                {c.termLabel ? <> {' • '}<span>{c.termLabel}</span></> : null}
                 {c.level ? <> {' • '}<span>{c.level}</span></> : null}
-                {c.tags?.length ? <> {' • '}<span>{c.tags.join(', ')}</span></> : null}
-                {c.permissionRequired ? <> {' • '}<span>permission</span></> : null}
               </div>
-              {gradeLabel(c) && <div style={{ fontSize: 12, opacity: 0.8, marginTop: 2 }}>{gradeLabel(c)}</div>}
-              {c.prerequisites?.length ? (
-                <div style={{ fontSize: 12, marginTop: 6 }}>
-                  <em>Prerequisite: {c.prerequisites.map(p => p.title).filter(Boolean).join(' or ')}</em>
+
+              {/* tag chips */}
+              {c.tags?.length ? (
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+                  {c.tags.map(tag => (
+                    <span key={tag} style={{ fontSize: 11, border: '1px solid #ccc', borderRadius: 999, padding: '2px 8px' }}>
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               ) : null}
+
               {c.description && <p style={{ marginTop: 8 }}>{c.description}</p>}
             </div>
           ))}
