@@ -24,6 +24,30 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Simple fixed header with wordmark top-left */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  z-index: 1000;
+  /* use transparent so it overlays existing UIs without altering themes */
+  background: transparent;
+}
+
+.site-wordmark {
+  height: 28px;
+  width: auto;
+}
+
+/* add small top padding to avoid overlap if a page has content flush to top */
+html body > div:first-child, html body > main:first-child {
+  padding-top: 40px;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
