@@ -7,35 +7,33 @@ type RawCourse = {
   title: string;
   description?: string;
   department?: string;
-  rigor?: number;
+  rigor?: number;         // 1,2,3
   gesc?: boolean;
   ppr?: boolean;
-  term?: string;
-  duration?: string;
+  term?: string;          // "year course", "term course"
+  duration?: string;      // "full-year", "term", "two terms", "half course"
   grades?: number[];
   offered_in_25?: boolean;
-  prerequisite?: [string | null, boolean];
+  prerequisite?: [string | null, boolean]; // [text, permissionRequired]
 };
 
 type Course = {
   title: string;
   description?: string;
   department?: string;
-  tags: string[];
-  level?: string;
+  tags: string[];         // derived
+  level?: string;         // "CL" | "ADV" | undefined
   grades?: number[];
   permissionRequired?: boolean;
-  termLabel?: string;
+  termLabel?: string;     // "Full year" / "Term" / etc
+  prerequisiteText?: string; // NEW: shown in red banner
 };
 
 type PlanItem = { title: string };
 
 async function fetchFirst<T>(paths: string[]): Promise<T | null> {
   for (const p of paths) {
-    try {
-      const r = await fetch(p);
-      if (r.ok) return (await r.json()) as T;
-    } catch {}
+    try { const r = await fetch(p); if (r.ok) return (await r.json()) as T; } catch {}
   }
   return null;
 }
@@ -57,11 +55,9 @@ function deriveTags(c: RawCourse): { tags: string[]; level?: string } {
   let level: string | undefined;
   const titleCL = (c.title || '').trim().toUpperCase().startsWith('CL ');
   if (titleCL || (c.rigor ?? 1) >= 3) {
-    tags.push('CL');
-    level = 'CL';
+    tags.push('CL'); level = 'CL';
   } else if ((c.rigor ?? 1) === 2) {
-    tags.push('ADV');
-    level = 'ADV';
+    tags.push('ADV'); level = 'ADV';
   }
 
   const { termLabel, termTags } = normalizeTerm(c.term, c.duration);
@@ -70,53 +66,46 @@ function deriveTags(c: RawCourse): { tags: string[]; level?: string } {
   return { tags: Array.from(new Set(tags)), level };
 }
 
+// flatten your DB into a simple course array
 function flattenDatabase(db: any): Course[] {
   const out: Course[] = [];
 
+  const pushCourse = (rc: RawCourse, deptName?: string) => {
+    const { tags, level } = deriveTags(rc);
+    const { termLabel } = normalizeTerm(rc.term, rc.duration);
+    out.push({
+      title: rc.title,
+      description: rc.description,
+      department: rc.department || deptName,
+      tags,
+      level,
+      grades: rc.grades,
+      permissionRequired: Array.isArray(rc.prerequisite) ? !!rc.prerequisite[1] : undefined,
+      termLabel,
+      prerequisiteText: Array.isArray(rc.prerequisite) ? (rc.prerequisite[0] || '') : ''
+    });
+  };
+
+  // case: { departments: [ { department, courses }, ... ] }
   if (db && Array.isArray(db.departments)) {
     for (const deptBlock of db.departments) {
       const deptName: string | undefined = deptBlock.department;
       const courses = deptBlock.courses;
 
       if (Array.isArray(courses)) {
-        for (const rc of courses as RawCourse[]) {
-          const { tags, level } = deriveTags(rc);
-          const { termLabel } = normalizeTerm(rc.term, rc.duration);
-          out.push({
-            title: rc.title,
-            description: rc.description,
-            department: rc.department || deptName,
-            tags,
-            level,
-            grades: rc.grades,
-            permissionRequired: Array.isArray(rc.prerequisite) ? !!rc.prerequisite[1] : undefined,
-            termLabel
-          });
-        }
+        for (const rc of courses as RawCourse[]) pushCourse(rc, deptName);
       } else if (courses && typeof courses === 'object') {
         for (const key of Object.keys(courses)) {
           const list: RawCourse[] = courses[key];
           if (!Array.isArray(list)) continue;
-          for (const rc of list) {
-            const { tags, level } = deriveTags(rc);
-            const { termLabel } = normalizeTerm(rc.term, rc.duration);
-            out.push({
-              title: rc.title,
-              description: rc.description,
-              department: rc.department || deptName || key,
-              tags,
-              level,
-              grades: rc.grades,
-              permissionRequired: Array.isArray(rc.prerequisite) ? !!rc.prerequisite[1] : undefined,
-              termLabel
-            });
-          }
+          for (const rc of list) pushCourse(rc, deptName || key);
         }
       }
     }
     return out;
   }
 
+  // fallback: simple arrays
   if (Array.isArray(db)) {
     return (db as RawCourse[]).map((rc) => {
       const { tags, level } = deriveTags(rc);
@@ -129,11 +118,13 @@ function flattenDatabase(db: any): Course[] {
         level,
         grades: rc.grades,
         permissionRequired: Array.isArray(rc.prerequisite) ? !!rc.prerequisite[1] : undefined,
-        termLabel
+        termLabel,
+        prerequisiteText: Array.isArray(rc.prerequisite) ? (rc.prerequisite[0] || '') : ''
       };
     });
   }
 
+  // { courses: [...] }
   const arr = Array.isArray(db?.courses) ? db.courses : [];
   return arr.map((rc: RawCourse) => {
     const { tags, level } = deriveTags(rc);
@@ -146,12 +137,13 @@ function flattenDatabase(db: any): Course[] {
       level,
       grades: rc.grades,
       permissionRequired: Array.isArray(rc.prerequisite) ? !!rc.prerequisite[1] : undefined,
-      termLabel
+      termLabel,
+      prerequisiteText: Array.isArray(rc.prerequisite) ? (rc.prerequisite[0] || '') : ''
     };
   });
 }
 
-export default function Home() {
+export default function Page() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [query, setQuery] = useState('');
   const [includeDescriptions, setIncludeDescriptions] = useState(false);
@@ -159,24 +151,22 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [plan, setPlan] = useState<PlanItem[]>(() => {
     if (typeof window === 'undefined') return [];
-    try {
-      return JSON.parse(localStorage.getItem('plan') || '[]');
-    } catch {
-      return [];
-    }
+    try { return JSON.parse(localStorage.getItem('plan') || '[]'); } catch { return []; }
   });
 
+  // tag filters
   const [tagGESC, setTagGESC] = useState(false);
   const [tagPPR, setTagPPR] = useState(false);
   const [tagCL, setTagCL] = useState(false);
 
   useEffect(() => {
     (async () => {
-      const data = await fetchFirst<any>(['/catalog.json', '/catalogdbfinal.json', '/course_catalog_full.json']);
-      if (!data) {
-        setError('Could not load catalog from /public');
-        return;
-      }
+      const data = await fetchFirst<any>([
+        '/catalog.json',
+        '/catalogdbfinal.json',
+        '/course_catalog_full.json'
+      ]);
+      if (!data) { setError('Could not load catalog from /public'); return; }
       const flat = flattenDatabase(data);
       setCourses(flat);
     })();
@@ -188,13 +178,13 @@ export default function Home() {
 
   const departments = useMemo(() => {
     const set = new Set<string>();
-    courses.forEach((c) => c.department && set.add(c.department));
+    courses.forEach(c => c.department && set.add(c.department));
     return ['All', ...Array.from(set).sort()];
   }, [courses]);
 
   const tagsAvailable = useMemo(() => {
     const set = new Set<string>();
-    courses.forEach((c) => c.tags?.forEach((t) => set.add(t)));
+    courses.forEach(c => c.tags?.forEach(t => set.add(t)));
     return Array.from(set).sort();
   }, [courses]);
 
@@ -206,7 +196,7 @@ export default function Home() {
       if (tagCL && !c.tags?.includes('CL')) return false;
       return true;
     };
-    return courses.filter((c) => {
+    return courses.filter(c => {
       const matchesDept = deptFilter === 'All' || (c.department || '').toLowerCase() === deptFilter.toLowerCase();
       const matchesTags = needTag(c);
       const haystacks = [
@@ -214,99 +204,171 @@ export default function Home() {
         (c.department || '').toLowerCase(),
         ...(includeDescriptions ? [(c.description || '').toLowerCase()] : [])
       ];
-      const matchesQuery = q === '' || haystacks.some((h) => h.includes(q));
+      const matchesQuery = q === '' || haystacks.some(h => h.includes(q));
       return matchesDept && matchesTags && matchesQuery;
     });
   }, [courses, query, includeDescriptions, deptFilter, tagGESC, tagPPR, tagCL]);
 
-  function addToPlan(c: Course) {
-    setPlan((prev) => [...prev, { title: c.title }]);
-  }
-  function removeFromPlan(i: number) {
-    setPlan((prev) => prev.filter((_, idx) => idx !== i));
-  }
+  function addToPlan(c: Course) { setPlan(prev => [...prev, { title: c.title }]); }
+  function removeFromPlan(i: number) { setPlan(prev => prev.filter((_, idx) => idx !== i)); }
+  function printPlan(): void {
+  if (typeof window === 'undefined') return;
+  
+  const planElement = document.getElementById('plan');
+  if (!planElement) return;
+  
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) return;
+  
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>My Plan</title>
+        <style>
+          @page {
+            size: A4;
+            margin: 0.5in;
+          }
+          body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.3;
+            margin: 0;
+            padding: 20px;
+            max-height: calc(11in - 1in);
+            overflow: hidden;
+          }
+          .plan-item {
+            margin-bottom: 8px;
+            padding: 4px 0;
+            border-bottom: 1px solid #eee;
+          }
+          button { display: none; }
+        </style>
+      </head>
+      <body>
+        <h2>My Plan</h2>
+        <div class="plan-content">
+          ${Array.from(planElement.children).map((item: Element) => {
+            const titleElement = item.querySelector('span');
+            const title = titleElement?.textContent || '';
+            return `<div class="plan-item">${title}</div>`;
+          }).join('')}
+        </div>
+      </body>
+    </html>
+  `);
+  
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
+  printWindow.close();
+}
 
   return (
-    <div className={styles.container}>
-      <div>
-        <h1 className={styles.heading}>Course Browser</h1>
-        {error && <div className={styles.error}>{error}</div>}
+    <>
+      {/* Top bar 1920x126 with left-aligned logo */}
+      <header className={styles.topBar}>
+        <div className={styles.topBarInner}>
+          <img src="/logo.svg" alt="Logo" className={styles.logo} />
+        </div>
+      </header>
 
-        <div className={styles.filters}>
-          <div className={styles.searchRow}>
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search title or department"
-              className={styles.input}
-            />
-            <label className={styles.checkboxLabel}>
-              <input type="checkbox" checked={includeDescriptions} onChange={(e) => setIncludeDescriptions(e.target.checked)} />
-              Search descriptions
-            </label>
-            <select value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)} className={styles.select}>
-              {departments.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
+      {/* Main content */}
+      <div className={styles.container}>
+        {/* Left: Browser */}
+        <div>
+          <h1 className={styles.heading}>Course Browser</h1>
+          {error && <div className={styles.error}>{error}</div>}
+
+          {/* Filters */}
+          <div className={styles.filters}>
+            <div className={styles.searchRow}>
+              <input
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Search title or department"
+                className={styles.input}
+              />
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={includeDescriptions}
+                  onChange={e => setIncludeDescriptions(e.target.checked)}
+                />
+                Search descriptions
+              </label>
+              <select value={deptFilter} onChange={e => setDeptFilter(e.target.value)} className={styles.select}>
+                {departments.map(d => <option key={d} value={d}>{d}</option>)}
+              </select>
+            </div>
+
+            {/* Tag filters */}
+            <div className={styles.tagRow}>
+              <span>Tags:</span>
+              <label><input type="checkbox" checked={tagGESC} onChange={e => setTagGESC(e.target.checked)} /> GESC</label>
+              <label><input type="checkbox" checked={tagPPR} onChange={e => setTagPPR(e.target.checked)} /> PPR</label>
+              <label><input type="checkbox" checked={tagCL} onChange={e => setTagCL(e.target.checked)} /> CL</label>
+              <span className={styles.tagInfo}>({tagsAvailable.length} tag types found)</span>
+            </div>
           </div>
 
-          <div className={styles.tagRow}>
-            <span>Tags:</span>
-            <label><input type="checkbox" checked={tagGESC} onChange={(e) => setTagGESC(e.target.checked)} /> GESC</label>
-            <label><input type="checkbox" checked={tagPPR} onChange={(e) => setTagPPR(e.target.checked)} /> PPR</label>
-            <label><input type="checkbox" checked={tagCL} onChange={(e) => setTagCL(e.target.checked)} /> CL</label>
-            <span className={styles.tagInfo}>({tagsAvailable.length} tag types found)</span>
+          <div className={styles.resultInfo}>
+            Showing {filtered.length} of {courses.length} courses
           </div>
-        </div>
 
-        <div className={styles.resultInfo}>
-          Showing {filtered.length} of {courses.length} courses
-        </div>
-
-        <div className={styles.cardGrid}>
-          {filtered.map((c, i) => (
-            <div key={c.title + i} className={styles.card}>
-              <div className={styles.cardHeader}>
-                <strong>{c.title}</strong>
-                <button className={styles.addButton} onClick={() => addToPlan(c)}>Add</button>
-              </div>
-              <div className={styles.cardMeta}>
-                <span>{c.department || '—'}</span>
-                {c.termLabel ? <> • <span>{c.termLabel}</span></> : null}
-                {c.level ? <> • <span>{c.level}</span></> : null}
-              </div>
-
-              {c.tags?.length ? (
-                <div className={styles.tagContainer}>
-                  {c.tags.map((tag) => (
-                    <span key={tag} className={styles.tagChip}>
-                      {tag}
-                    </span>
-                  ))}
+          <div className={styles.cardGrid}>
+            {filtered.map((c, i) => (
+              <div key={c.title + i} className={styles.card}>
+                <div className={styles.cardHeader}>
+                  <strong>{c.title}</strong>
+                  <button className={styles.addButton} onClick={() => addToPlan(c)}>Add</button>
                 </div>
-              ) : null}
+                <div className={styles.cardMeta}>
+                  <span>{c.department || '—'}</span>
+                  {c.termLabel ? <> • <span>{c.termLabel}</span></> : null}
+                  {c.level ? <> • <span>{c.level}</span></> : null}
+                </div>
 
-              {c.description && <p className={styles.description}>{c.description}</p>}
-            </div>
-          ))}
+                {/* tag chips */}
+                {c.tags?.length ? (
+                  <div className={styles.tagContainer}>
+                    {c.tags.map(tag => (
+                      <span key={tag} className={styles.tagChip}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+
+                {c.description && <p className={styles.description}>{c.description}</p>}
+
+                {/* Prereq / Permission banner */}
+                {(c.prerequisiteText || c.permissionRequired) && (
+                  <div className={styles.prereqBanner}>
+                    {c.prerequisiteText ? <span>{c.prerequisiteText}</span> : null}
+                    {c.permissionRequired ? <span>Permission of Department Required</span> : null}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: Plan */}
+        <div>
+          <h2 className={styles.heading}>My Plan</h2>
+          <div id="plan" className={styles.planGrid}>
+            {plan.map((p, i) => (
+              <div key={i} className={styles.planItem}>
+                <span>{p.title}</span>
+                <button className={styles.removeButton} onClick={() => removeFromPlan(i)}>Remove</button>
+              </div>
+            ))}
+          </div>
+          <button className={styles.printButton} onClick={printPlan}>Print / Save PDF</button>
         </div>
       </div>
-
-      <div>
-        <h2 className={styles.heading}>My Plan</h2>
-        <div className={styles.planGrid}>
-          {plan.map((p, i) => (
-            <div key={i} className={styles.planItem}>
-              <span>{p.title}</span>
-              <button className={styles.removeButton} onClick={() => removeFromPlan(i)}>Remove</button>
-            </div>
-          ))}
-        </div>
-        <button className={styles.printButton} onClick={() => window.print()}>Print / Save PDF</button>
-      </div>
-    </div>
+    </>
   );
 }

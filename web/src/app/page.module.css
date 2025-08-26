@@ -1,3 +1,59 @@
+/* ===== Proxima Nova Font (from /public/fonts) ===== */
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('/fonts/proximanova_regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===== Base ===== */
+:root {
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --primary: #0070f3;
+  --primary-hover: #005ec2;
+  --danger: #98252b;
+  --danger-hover: #c53030;
+  --success: #4caf50;
+  --success-hover: #388e3c;
+}
+
+body {
+  font-family: 'Proxima Nova', sans-serif;
+}
+
+/* ===== Top Bar ===== */
+.topBar {
+  width: 100%;
+  height: 126px;
+  background: #323E48;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: var(--shadow-sm);
+  position: sticky; /* remove if you don't want it to stick */
+  top: 0;
+  z-index: 50;
+}
+
+.topBarInner {
+  max-width: 1920px; /* requested width */
+  margin: 0 auto;
+  height: 100%;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;     /* vertical centering */
+  justify-content: flex-start; /* left align content */
+}
+
+.logo {
+  height: 36px; /* adjust as needed */
+  width: auto;
+  display: block;
+}
+
+/* ===== Main Layout ===== */
 .container {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -5,7 +61,7 @@
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Proxima Nova', sans-serif;
 }
 
 .heading {
@@ -18,10 +74,11 @@
   background: #fff3cd;
   border: 1px solid #ffeeba;
   padding: 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   margin-bottom: 10px;
 }
 
+/* ===== Filters ===== */
 .filters {
   display: grid;
   gap: 12px;
@@ -34,11 +91,13 @@
   align-items: center;
 }
 
-.input, .select {
+.input,
+.select {
   padding: 8px;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   flex: 1;
+  font-family: inherit;
 }
 
 .checkboxLabel {
@@ -64,6 +123,7 @@
   margin-bottom: 12px;
 }
 
+/* ===== Cards ===== */
 .cardGrid {
   display: grid;
   gap: 14px;
@@ -72,15 +132,16 @@
 .card {
   background: #fff;
   border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius);
+  padding: 16px 16px 0;        /* keep side padding; 0 bottom so banner sits flush */
+  box-shadow: var(--shadow-sm);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;            /* required so the rounded corners clip the banner */
 }
 
 .card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .cardHeader {
@@ -112,44 +173,56 @@
 .description {
   margin-top: 8px;
   font-size: 0.9rem;
+  padding-bottom: 12px; /* keep space above banner */
 }
 
-.addButton, .removeButton, .printButton {
+/* Red banner for prerequisite / permission */
+.prereqBanner {
+  background: var(--danger);
+  color: #fff;
+  padding: 12px 16px;          /* match card side padding */
+  margin: 12px -16px 0;        /* <-- full-bleed: cancel card’s side padding */
+  border-top: 1px solid rgba(255,255,255,0.25);
+  border-radius: 0 0 var(--radius) var(--radius); /* rounded bottom */
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ===== Buttons ===== */
+.addButton,
+.removeButton,
+.printButton {
   padding: 6px 10px;
   font-size: 0.8rem;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
+  font-family: inherit;
 }
 
 .addButton {
-  background: #0070f3;
+  background: var(--primary);
   color: #fff;
 }
-
-.addButton:hover {
-  background: #005ec2;
-}
+.addButton:hover { background: var(--primary-hover); }
 
 .removeButton {
-  background: #e53e3e;
+  background: var(--danger);
   color: #fff;
 }
-
-.removeButton:hover {
-  background: #c53030;
-}
+.removeButton:hover { background: var(--danger-hover); }
 
 .printButton {
   margin-top: 12px;
-  background: #4caf50;
+  background: var(--success);
   color: #fff;
 }
+.printButton:hover { background: var(--success-hover); }
 
-.printButton:hover {
-  background: #388e3c;
-}
-
+/* ===== Plan ===== */
 .planGrid {
   display: grid;
   gap: 8px;
@@ -157,7 +230,7 @@
 
 .planItem {
   border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 8px;
   display: flex;
   justify-content: space-between;
