@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './page.module.css';
 
 type RawCourse = {
@@ -26,7 +26,7 @@ type Course = {
   grades?: number[];
   permissionRequired?: boolean;
   termLabel?: string;     // "Full year" / "Term" / etc
-  prerequisiteText?: string; // NEW: shown in red banner
+  prerequisiteText?: string;
 };
 
 type PlanItem = { title: string };
@@ -54,19 +54,15 @@ function deriveTags(c: RawCourse): { tags: string[]; level?: string } {
 
   let level: string | undefined;
   const titleCL = (c.title || '').trim().toUpperCase().startsWith('CL ');
-  if (titleCL || (c.rigor ?? 1) >= 3) {
-    tags.push('CL'); level = 'CL';
-  } else if ((c.rigor ?? 1) === 2) {
-    tags.push('ADV'); level = 'ADV';
-  }
+  if (titleCL || (c.rigor ?? 1) >= 3) { tags.push('CL'); level = 'CL'; }
+  else if ((c.rigor ?? 1) === 2) { tags.push('ADV'); level = 'ADV'; }
 
-  const { termLabel, termTags } = normalizeTerm(c.term, c.duration);
+  const { termTags } = normalizeTerm(c.term, c.duration);
   tags.push(...termTags);
 
   return { tags: Array.from(new Set(tags)), level };
 }
 
-// flatten your DB into a simple course array
 function flattenDatabase(db: any): Course[] {
   const out: Course[] = [];
 
@@ -86,7 +82,6 @@ function flattenDatabase(db: any): Course[] {
     });
   };
 
-  // case: { departments: [ { department, courses }, ... ] }
   if (db && Array.isArray(db.departments)) {
     for (const deptBlock of db.departments) {
       const deptName: string | undefined = deptBlock.department;
@@ -105,7 +100,6 @@ function flattenDatabase(db: any): Course[] {
     return out;
   }
 
-  // fallback: simple arrays
   if (Array.isArray(db)) {
     return (db as RawCourse[]).map((rc) => {
       const { tags, level } = deriveTags(rc);
@@ -124,7 +118,6 @@ function flattenDatabase(db: any): Course[] {
     });
   }
 
-  // { courses: [...] }
   const arr = Array.isArray(db?.courses) ? db.courses : [];
   return arr.map((rc: RawCourse) => {
     const { tags, level } = deriveTags(rc);
@@ -159,6 +152,14 @@ export default function Page() {
   const [tagPPR, setTagPPR] = useState(false);
   const [tagCL, setTagCL] = useState(false);
 
+  // Scroll plumbing (wrapper + scroller + ghost)
+  const courseWrapRef = useRef<HTMLDivElement>(null);    // wrapper (positioned)
+  const scrollRef = useRef<HTMLDivElement>(null);        // scroller (overflow)
+  const cardGridRef = useRef<HTMLDivElement>(null);      // content we observe
+  const ghostThumbRef = useRef<HTMLDivElement>(null);    // visual thumb
+  const [scrollActive, setScrollActive] = useState(false);
+
+  // Load data
   useEffect(() => {
     (async () => {
       const data = await fetchFirst<any>([
@@ -167,8 +168,7 @@ export default function Page() {
         '/course_catalog_full.json'
       ]);
       if (!data) { setError('Could not load catalog from /public'); return; }
-      const flat = flattenDatabase(data);
-      setCourses(flat);
+      setCourses(flattenDatabase(data));
     })();
   }, []);
 
@@ -176,6 +176,76 @@ export default function Page() {
     localStorage.setItem('plan', JSON.stringify(plan));
   }, [plan]);
 
+  // Ghost scrollbar math
+  const updateGhost = () => {
+    const scroller = scrollRef.current;
+    const thumb = ghostThumbRef.current;
+    const wrap = courseWrapRef.current;
+    if (!scroller || !thumb || !wrap) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = scroller;
+
+    // Track height = wrapper’s inner box
+    const trackH = wrap.clientHeight; // wrapper is not scrolling; stable
+    const ratio = clientHeight / Math.max(scrollHeight, 1);
+    const thumbH = Math.max(24, Math.round(trackH * ratio));
+    const maxTop = Math.max(trackH - thumbH, 0);
+    const top = Math.min(
+      maxTop,
+      Math.round((scrollTop / Math.max(scrollHeight - clientHeight, 1)) * maxTop)
+    );
+
+    thumb.style.height = `${thumbH}px`;
+    thumb.style.transform = `translateY(${top}px)`;
+  };
+
+  const showThenFade = (ms = 1500) => {
+    setScrollActive(true);
+    window.clearTimeout((showThenFade as any).__t);
+    (showThenFade as any).__t = window.setTimeout(() => setScrollActive(false), ms);
+  };
+
+  // Listeners + observers
+  useEffect(() => {
+    const scroller = scrollRef.current;
+    if (!scroller) return;
+
+    const onScroll = () => { updateGhost(); showThenFade(); };
+    const onWheel = () => { updateGhost(); showThenFade(); };
+    const onTouch = () => { updateGhost(); showThenFade(); };
+    const onEnter = () => { updateGhost(); showThenFade(); };
+    const onResize = () => { updateGhost(); };
+
+    scroller.addEventListener('scroll', onScroll, { passive: true });
+    scroller.addEventListener('wheel', onWheel, { passive: true });
+    scroller.addEventListener('touchstart', onTouch, { passive: true });
+    scroller.addEventListener('mouseenter', onEnter);
+    window.addEventListener('resize', onResize);
+
+    // Observe content height changes
+    const ro = new ResizeObserver(() => updateGhost());
+    const mo = new MutationObserver(() => updateGhost());
+    if (cardGridRef.current) {
+      ro.observe(cardGridRef.current);
+      mo.observe(cardGridRef.current, { childList: true, subtree: true });
+    }
+
+    // Initial paint
+    requestAnimationFrame(() => { updateGhost(); showThenFade(); });
+
+    return () => {
+      scroller.removeEventListener('scroll', onScroll);
+      scroller.removeEventListener('wheel', onWheel);
+      scroller.removeEventListener('touchstart', onTouch);
+      scroller.removeEventListener('mouseenter', onEnter);
+      window.removeEventListener('resize', onResize);
+      ro.disconnect();
+      mo.disconnect();
+      window.clearTimeout((showThenFade as any).__t);
+    };
+  }, []);
+
+  // Recalc when filter results count changes
   const departments = useMemo(() => {
     const set = new Set<string>();
     courses.forEach(c => c.department && set.add(c.department));
@@ -209,65 +279,16 @@ export default function Page() {
     });
   }, [courses, query, includeDescriptions, deptFilter, tagGESC, tagPPR, tagCL]);
 
+  useEffect(() => {
+    requestAnimationFrame(updateGhost);
+  }, [filtered.length]);
+
   function addToPlan(c: Course) { setPlan(prev => [...prev, { title: c.title }]); }
   function removeFromPlan(i: number) { setPlan(prev => prev.filter((_, idx) => idx !== i)); }
-  function printPlan(): void {
-  if (typeof window === 'undefined') return;
-  
-  const planElement = document.getElementById('plan');
-  if (!planElement) return;
-  
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) return;
-  
-  printWindow.document.write(`
-    <html>
-      <head>
-        <title>My Plan</title>
-        <style>
-          @page {
-            size: A4;
-            margin: 0.5in;
-          }
-          body {
-            font-family: Arial, sans-serif;
-            font-size: 12px;
-            line-height: 1.3;
-            margin: 0;
-            padding: 20px;
-            max-height: calc(11in - 1in);
-            overflow: hidden;
-          }
-          .plan-item {
-            margin-bottom: 8px;
-            padding: 4px 0;
-            border-bottom: 1px solid #eee;
-          }
-          button { display: none; }
-        </style>
-      </head>
-      <body>
-        <h2>My Plan</h2>
-        <div class="plan-content">
-          ${Array.from(planElement.children).map((item: Element) => {
-            const titleElement = item.querySelector('span');
-            const title = titleElement?.textContent || '';
-            return `<div class="plan-item">${title}</div>`;
-          }).join('')}
-        </div>
-      </body>
-    </html>
-  `);
-  
-  printWindow.document.close();
-  printWindow.focus();
-  printWindow.print();
-  printWindow.close();
-}
 
   return (
     <>
-      {/* Top bar 1920x126 with left-aligned logo */}
+      {/* Top bar with left-aligned logo */}
       <header className={styles.topBar}>
         <div className={styles.topBarInner}>
           <img src="/logo.svg" alt="Logo" className={styles.logo} />
@@ -277,7 +298,7 @@ export default function Page() {
       {/* Main content */}
       <div className={styles.container}>
         {/* Left: Browser */}
-        <div>
+        <div className={styles.leftPane}>
           <h1 className={styles.heading}>Course Browser</h1>
           {error && <div className={styles.error}>{error}</div>}
 
@@ -317,48 +338,56 @@ export default function Page() {
             Showing {filtered.length} of {courses.length} courses
           </div>
 
-          <div className={styles.cardGrid}>
-            {filtered.map((c, i) => (
-              <div key={c.title + i} className={styles.card}>
-                <div className={styles.cardHeader}>
-                  <strong>{c.title}</strong>
-                  <button className={styles.addButton} onClick={() => addToPlan(c)}>Add</button>
-                </div>
-                <div className={styles.cardMeta}>
-                  <span>{c.department || '—'}</span>
-                  {c.termLabel ? <> • <span>{c.termLabel}</span></> : null}
-                  {c.level ? <> • <span>{c.level}</span></> : null}
-                </div>
+          {/* Scrollable list with left overlay scrollbar */}
+          <div ref={courseWrapRef} className={styles.courseListWrap}>
+            <div ref={scrollRef} className={styles.courseList}>
+              <div ref={cardGridRef} className={styles.cardGrid}>
+                {filtered.map((c, i) => (
+                  <div key={c.title + i} className={styles.card}>
+                    <div className={styles.cardHeader}>
+                      <strong>{c.title}</strong>
+                      <button className={styles.addButton} onClick={() => addToPlan(c)}>Add</button>
+                    </div>
+                    <div className={styles.cardMeta}>
+                      <span>{c.department || '—'}</span>
+                      {c.termLabel ? <> • <span>{c.termLabel}</span></> : null}
+                      {c.level ? <> • <span>{c.level}</span></> : null}
+                    </div>
 
-                {/* tag chips */}
-                {c.tags?.length ? (
-                  <div className={styles.tagContainer}>
-                    {c.tags.map(tag => (
-                      <span key={tag} className={styles.tagChip}>
-                        {tag}
-                      </span>
-                    ))}
+                    {c.tags?.length ? (
+                      <div className={styles.tagContainer}>
+                        {c.tags.map(tag => (
+                          <span key={tag} className={styles.tagChip}>
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+
+                    {c.description && <p className={styles.description}>{c.description}</p>}
+
+                    {(c.prerequisiteText || c.permissionRequired) && (
+                      <div className={styles.prereqBanner}>
+                        {c.prerequisiteText ? <span>{c.prerequisiteText}</span> : null}
+                        {c.permissionRequired ? <span>Permission of Department Required</span> : null}
+                      </div>
+                    )}
                   </div>
-                ) : null}
-
-                {c.description && <p className={styles.description}>{c.description}</p>}
-
-                {/* Prereq / Permission banner */}
-                {(c.prerequisiteText || c.permissionRequired) && (
-                  <div className={styles.prereqBanner}>
-                    {c.prerequisiteText ? <span>{c.prerequisiteText}</span> : null}
-                    {c.permissionRequired ? <span>Permission of Department Required</span> : null}
-                  </div>
-                )}
+                ))}
               </div>
-            ))}
+            </div>
+
+            {/* Left ghost scrollbar (sibling; doesn't scroll with content) */}
+            <div className={`${styles.scrollGhost} ${scrollActive ? styles.scrollGhostVisible : ''}`} aria-hidden="true">
+              <div ref={ghostThumbRef} className={styles.scrollGhostThumb} />
+            </div>
           </div>
         </div>
 
         {/* Right: Plan */}
         <div>
           <h2 className={styles.heading}>My Plan</h2>
-          <div id="plan" className={styles.planGrid}>
+          <div className={styles.planGrid}>
             {plan.map((p, i) => (
               <div key={i} className={styles.planItem}>
                 <span>{p.title}</span>
@@ -366,7 +395,7 @@ export default function Page() {
               </div>
             ))}
           </div>
-          <button className={styles.printButton} onClick={printPlan}>Print / Save PDF</button>
+          <button className={styles.printButton} onClick={() => window.print()}>Print / Save PDF</button>
         </div>
       </div>
     </>

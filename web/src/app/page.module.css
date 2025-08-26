@@ -19,11 +19,12 @@
   --danger-hover: #c53030;
   --success: #4caf50;
   --success-hover: #388e3c;
+
+  --scroll-thumb: rgba(0,0,0,0.35);
+  --scroll-thumb-hover: rgba(0,0,0,0.5);
 }
 
-body {
-  font-family: 'Proxima Nova', sans-serif;
-}
+body { font-family: 'Proxima Nova', sans-serif; }
 
 /* ===== Top Bar ===== */
 .topBar {
@@ -32,28 +33,24 @@ body {
   background: #323E48;
   border-bottom: 1px solid #e5e7eb;
   box-shadow: var(--shadow-sm);
-  position: sticky; /* remove if you don't want it to stick */
+  position: sticky;
   top: 0;
   z-index: 50;
 }
 
 .topBarInner {
-  max-width: 1920px; /* requested width */
+  max-width: 1920px;
   margin: 0 auto;
   height: 100%;
   padding: 0 20px;
   display: flex;
-  align-items: center;     /* vertical centering */
-  justify-content: flex-start; /* left align content */
+  align-items: center;
+  justify-content: flex-start;
 }
 
-.logo {
-  height: 36px; /* adjust as needed */
-  width: auto;
-  display: block;
-}
+.logo { height: 36px; width: auto; }
 
-/* ===== Main Layout ===== */
+/* ===== Layout ===== */
 .container {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -64,11 +61,13 @@ body {
   font-family: 'Proxima Nova', sans-serif;
 }
 
-.heading {
-  font-size: 1.8rem;
-  margin-bottom: 12px;
-  font-weight: 600;
+.leftPane {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 126px - 40px);
 }
+
+.heading { font-size: 1.8rem; margin-bottom: 12px; font-weight: 600; }
 
 .error {
   background: #fff3cd;
@@ -79,20 +78,11 @@ body {
 }
 
 /* ===== Filters ===== */
-.filters {
-  display: grid;
-  gap: 12px;
-  margin-bottom: 12px;
-}
+.filters { display: grid; gap: 12px; margin-bottom: 12px; }
 
-.searchRow {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
+.searchRow { display: flex; gap: 10px; align-items: center; }
 
-.input,
-.select {
+.input, .select {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: var(--radius-sm);
@@ -100,90 +90,95 @@ body {
   font-family: inherit;
 }
 
-.checkboxLabel {
-  font-size: 0.85rem;
-  display: flex;
-  gap: 6px;
+.checkboxLabel { font-size: 0.85rem; display: flex; gap: 6px; }
+
+.tagRow { display: flex; gap: 10px; font-size: 0.85rem; flex-wrap: wrap; }
+
+.tagInfo { opacity: 0.6; }
+
+.resultInfo { font-size: 0.9rem; opacity: 0.7; margin-bottom: 12px; }
+
+/* ===== Scrollable Course List ===== */
+/* Wrapper provides a stationary positioning context for the overlay scrollbar */
+.courseListWrap {
+  position: relative;
+  margin-top: 8px;
+  flex: 1;
+  min-height: 0; /* allow flex child scroller to actually shrink */
 }
 
-.tagRow {
-  display: flex;
-  gap: 10px;
-  font-size: 0.85rem;
-  flex-wrap: wrap;
+/* Scroller: hides native scrollbar, no layout shift */
+.courseList {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  scrollbar-width: none;   /* Firefox hide */
+  -ms-overflow-style: none;/* legacy Edge/IE hide */
 }
+.courseList::-webkit-scrollbar { width: 0; height: 0; } /* WebKit hide */
 
-.tagInfo {
-  opacity: 0.6;
+/* Left overlay (ghost) scrollbar — sibling of scroller so it never scrolls away */
+.scrollGhost {
+  position: absolute;
+  top: 2px;
+  bottom: 3px;
+  left: -10;                 /* LEFT side */
+  width: 8px;
+  border-radius: 999px;
+  pointer-events: none;    /* never intercept clicks */
+  opacity: 0;
+  z-index: 2;              /* above the cards */
+  transition: opacity 0.35s ease;
 }
+.scrollGhostVisible { opacity: 1; }
 
-.resultInfo {
-  font-size: 0.9rem;
-  opacity: 0.7;
-  margin-bottom: 12px;
+.scrollGhostThumb {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 40px;            /* JS sets real size */
+  border-radius: 999px;
+  background: var(--scroll-thumb);
+  transform: translateY(0);
+  will-change: transform, height;
 }
+.scrollGhostThumb:hover { background: var(--scroll-thumb-hover); }
 
 /* ===== Cards ===== */
-.cardGrid {
-  display: grid;
-  gap: 14px;
-}
+.cardGrid { display: grid; gap: 14px; padding-bottom: 8px; }
 
 .card {
   background: #fff;
   border: 1px solid #e0e0e0;
   border-radius: var(--radius);
-  padding: 16px 16px 0;        /* keep side padding; 0 bottom so banner sits flush */
+  padding: 16px 16px 0;       /* bottom 0 so banner sits flush */
   box-shadow: var(--shadow-sm);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden;            /* required so the rounded corners clip the banner */
+  overflow: hidden;           /* banner clips to rounded corners */
 }
 
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
+.card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 8px;
-}
+.cardHeader { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
 
-.cardMeta {
-  font-size: 0.85rem;
-  opacity: 0.8;
-}
+.cardMeta { font-size: 0.85rem; opacity: 0.8; }
 
-.tagContainer {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 6px;
-}
+.tagContainer { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
 
-.tagChip {
-  font-size: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 999px;
-  padding: 2px 8px;
-}
+.tagChip { font-size: 0.75rem; border: 1px solid #ccc; border-radius: 999px; padding: 2px 8px; }
 
-.description {
-  margin-top: 8px;
-  font-size: 0.9rem;
-  padding-bottom: 12px; /* keep space above banner */
-}
+.description { margin-top: 8px; font-size: 0.9rem; padding-bottom: 12px; }
 
-/* Red banner for prerequisite / permission */
+/* Red banner for prerequisite / permission — full-bleed */
 .prereqBanner {
   background: var(--danger);
   color: #fff;
-  padding: 12px 16px;          /* match card side padding */
-  margin: 12px -16px 0;        /* <-- full-bleed: cancel card’s side padding */
+  padding: 12px 16px;
+  margin: 12px -16px 0;
   border-top: 1px solid rgba(255,255,255,0.25);
-  border-radius: 0 0 var(--radius) var(--radius); /* rounded bottom */
+  border-radius: 0 0 var(--radius) var(--radius);
   font-size: 0.9rem;
   font-weight: 700;
   display: flex;
@@ -192,9 +187,7 @@ body {
 }
 
 /* ===== Buttons ===== */
-.addButton,
-.removeButton,
-.printButton {
+.addButton, .removeButton, .printButton {
   padding: 6px 10px;
   font-size: 0.8rem;
   border: none;
@@ -203,30 +196,17 @@ body {
   font-family: inherit;
 }
 
-.addButton {
-  background: var(--primary);
-  color: #fff;
-}
+.addButton { background: var(--primary); color: #fff; }
 .addButton:hover { background: var(--primary-hover); }
 
-.removeButton {
-  background: var(--danger);
-  color: #fff;
-}
+.removeButton { background: var(--danger); color: #fff; }
 .removeButton:hover { background: var(--danger-hover); }
 
-.printButton {
-  margin-top: 12px;
-  background: var(--success);
-  color: #fff;
-}
+.printButton { margin-top: 12px; background: var(--success); color: #fff; }
 .printButton:hover { background: var(--success-hover); }
 
 /* ===== Plan ===== */
-.planGrid {
-  display: grid;
-  gap: 8px;
-}
+.planGrid { display: grid; gap: 8px; }
 
 .planItem {
   border: 1px solid #ddd;
