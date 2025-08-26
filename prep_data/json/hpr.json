@@ -307,7 +307,7 @@
       "duration": "term",
       "required": false,
       "grades": [12],
-      "prerequisite": ["Fulfilled History and PPR diploma requirements; written proposal; approvals (advisor/department/dean)", false]
+      "prerequisite": ["Fulfilled History and PPR diploma requirements; written proposal; approvals (advisor/department/dean)", true]
     }
   ]
 }
