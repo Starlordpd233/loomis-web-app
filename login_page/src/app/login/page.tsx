@@ -55,7 +55,7 @@ export default function LoginPage() {
 
           <div className={styles.mottoWrap}>
             <div className={`${styles.ticker} ${styles.toRight} ${styles.tickerLatin}`}>
-              <div className={styles.tickerTrack} style={{ ['--latin-speed' as any]: '22s' }}>
+              <div className={styles.tickerTrack} style={{ ['--latin-speed' as any]: '35s' }}>
                 <div className={styles.tickerInner}>
                   <span>Ne cede malis.</span><span>Ne cede malis.</span><span>Ne cede malis.</span>
                   <span>Ne cede malis.</span><span>Ne cede malis.</span><span>Ne cede malis.</span>
@@ -68,7 +68,7 @@ export default function LoginPage() {
             </div>
 
             <div className={`${styles.ticker} ${styles.toLeft} ${styles.tickerEnglish}`}>
-              <div className={styles.tickerTrack} style={{ ['--english-speed' as any]: '20s' }}>
+              <div className={styles.tickerTrack} style={{ ['--english-speed' as any]: '30s' }}>
                 <div className={styles.tickerInner}>
                   <span>Yield not to adversity.</span><span>Yield not to adversity.</span><span>Yield not to adversity.</span>
                   <span>Yield not to adversity.</span><span>Yield not to adversity.</span><span>Yield not to adversity.</span>
