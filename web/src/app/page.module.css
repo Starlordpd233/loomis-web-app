@@ -1,37 +1,28 @@
-/* ===== Proxima Nova Font (from /public/fonts) ===== */
+/* ===== Fonts (put the font files in /public/fonts) =====
+   If your filenames differ, update the URLs below. */
 @font-face {
-  font-family: 'Proxima Nova';
-  src: url('/fonts/proximanova_regular.ttf') format('truetype');
+  font-family: 'Caslon Pro';
+  src: url('/fonts/Adobe Caslon Pro Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
-
-/* ===== Variables ===== */
-:root {
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-  --primary: #98252b;
-  --primary-hover: #005ec2;
-  --danger: #98252b;
-  --danger-hover: #c53030;
-  --success: #4caf50;
-  --success-hover: #388e3c;
-
-  --sb-width: 10px;
-  --sb-thumb: rgba(0,0,0,0.35);
-  --sb-thumb-hover: rgba(0,0,0,0.5);
-  --sb-track: transparent;
-
-  --topbar-h: 126px;
-  --drawer-w: 800px; /* width of the left drawer */
+@font-face {
+  font-family: 'Gotham Narrow';
+  src: url('/fonts/Gotham Narrow Bold.otf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
-body { font-family: 'Proxima Nova', sans-serif; }
+/* ===== Theme Vars ===== */
+:root{
+  --lc-red: #98252b;
+  --topbar-h: 126px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.12);
+}
 
-/* ===== Top Bar ===== */
+/* ===== Top Bar (same as browser) ===== */
 .topBar {
   width: 100%;
   height: var(--topbar-h);
@@ -41,6 +32,8 @@ body { font-family: 'Proxima Nova', sans-serif; }
   position: sticky;
   top: 0;
   z-index: 50;
+  border-bottom: none !important;
+  box-shadow: none !important;
 }
 
 .topBarInner {
@@ -55,196 +48,102 @@ body { font-family: 'Proxima Nova', sans-serif; }
 
 .logo { height: 36px; width: auto; }
 
-/* ===== Drawer Toggle Button ===== */
-.drawerToggle {
-  position: fixed;
-  top: calc(var(--topbar-h) + 540px);
-  left: 8px;
-  z-index: 70;
-  width: 44px;
-  height: 44px;
-  border-radius: 999px;
-  border: 1px solid #e5e7eb;
-  background: #323E48;
-  box-shadow: var(--shadow-sm);
+/* ===== Hero ===== */
+.hero{
+  position: relative;
+  height: calc(100vh - var(--topbar-h));
+  isolation: isolate; /* overlay stacking */
   display: grid;
   place-items: center;
-  cursor: pointer;
-  transition: left 0.3s ease, box-shadow 0.2s ease, transform 0.2s ease;
-  color:#ffffff
-}
-.drawerToggle:hover { box-shadow: var(--shadow-md); transform: translateX(1px); }
-
-/* When drawer is open, move the toggle to sit near the drawer edge */
-.drawerToggleOpen { left: calc(var(--drawer-w) + 8px); }
-
-/* ===== Left Drawer ===== */
-.drawer {
-  position: fixed;
-  top: var(--topbar-h);
-  left: 0;
-  width: var(--drawer-w);
-  max-width: 90vw;
-  height: calc(100vh - var(--topbar-h));
-  background: #fff;
-  border-right: 1px solid #e5e7eb;
-  box-shadow: var(--shadow-sm);
-  transform: translateX(-100%);
-  transition: transform 0.3s ease;
-  z-index: 60;
-  display: flex;
-  flex-direction: column;
+  margin: 0
 }
 
-.drawerOpen { transform: translateX(0); }
-
-.drawerContent {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 16px;
-  gap: 8px;
+/* Background image (accepts .jpg or .png — rename if needed) */
+.hero::before{
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url('/lcphotoedited.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -2;
 }
 
-/* ===== Main Container (Plan only; full width) ===== */
-.container {
-  /* single column; Plan takes full width */
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-  padding: 20px;
-  max-width: 1200px;
+/* Darken overlay so white text is readable */
+.hero::after{
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,.35));
+  z-index: -1;
+}
+
+.heroInner{
+  width: min(1100px, 92vw);
   margin: 0 auto;
-  font-family: 'Proxima Nova', sans-serif;
 }
 
-/* ===== Common UI ===== */
-.heading { font-size: 1.8rem; margin-bottom: 12px; font-weight: 600; }
-
-.error {
-  background: #fff3cd;
-  border: 1px solid #ffeeba;
-  padding: 10px;
-  border-radius: var(--radius-sm);
-  margin-bottom: 10px;
-}
-
-.filters { display: grid; gap: 12px; }
-
-.searchRow { display: flex; gap: 10px; align-items: center; }
-
-.input, .select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: var(--radius-sm);
-  flex: 1;
-  font-family: inherit;
-}
-
-.checkboxLabel { font-size: 0.85rem; display: flex; gap: 6px; }
-
-.tagRow { display: flex; gap: 10px; font-size: 0.85rem; flex-wrap: wrap; }
-
-.tagInfo { opacity: 0.6; }
-
-.resultInfo { font-size: 0.9rem; opacity: 0.7; }
-
-/* ===== Scrollable Course List ===== */
-.courseList {
-  overflow-y: auto;
-  padding-right: 6px;
-  flex: 1;                     /* fill drawer vertical space */
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-
-  /* consistent width & color */
-  scrollbar-width: thin;       /* Firefox */
-  scrollbar-color: var(--sb-thumb) var(--sb-track);
-}
-
-/* WebKit (Chrome/Safari/Edge) */
-.courseList::-webkit-scrollbar { width: var(--sb-width); }
-.courseList::-webkit-scrollbar-track { background: var(--sb-track); }
-.courseList::-webkit-scrollbar-thumb {
-  background: var(--sb-thumb);
-  border-radius: 999px;
-  transition: background 0.2s ease;
-}
-.courseList::-webkit-scrollbar-thumb:hover { background: var(--sb-thumb-hover); }
-
-/* ===== Cards ===== */
-.cardGrid { display: grid; gap: 14px; padding-bottom: 8px; }
-
-.card {
-  background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: var(--radius);
-  padding: 16px 16px 0;       /* bottom 0 so banner sits flush */
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden;           /* make banner clip to rounded corners */
-}
-
-.card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.cardMeta { font-size: 0.85rem; opacity: 0.8; }
-
-.tagContainer { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-
-.tagChip { font-size: 0.75rem; border: 1px solid #ccc; border-radius: 999px; padding: 2px 8px; }
-
-.description { margin-top: 8px; font-size: 0.9rem; padding-bottom: 12px; }
-
-/* Red banner for prerequisite / permission — full bleed */
-.prereqBanner {
-  background: var(--danger);
+/* Title */
+.title{
+  font-family: 'Caslon Pro', serif;
   color: #fff;
-  padding: 12px 16px;
-  margin: 12px -16px 0;
-  border-top: 1px solid rgba(255,255,255,0.25);
-  border-radius: 0 0 var(--radius) var(--radius);
-  font-size: 0.9rem;
+  line-height: 1.1;
+  text-shadow: 0 2px 6px rgba(0,0,0,.35);
+  margin: 0 0 28px 0;
+  letter-spacing: -0.02em
+}
+.titleLine{
+  display: block;
+  font-size: clamp(28px, 4.2vw, 54px);
+  font-weight: 400;
+}
+.accent{ color: var(--lc-red); }
+
+/* CTA Button */
+.cta{
+  display: inline-block;
+  padding: 14px 24px;
+  border-radius: 10px;
+  background: var(--lc-red);
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Gotham Narrow', 'Proxima Nova', system-ui, -apple-system, sans-serif;
   font-weight: 700;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  letter-spacing: .2px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.25);
+  transition: transform .15s ease, box-shadow .15s ease, opacity .2s ease;
+}
+.cta:hover{ transform: translateY(-1px); box-shadow: 0 8px 26px rgba(0,0,0,.28); }
+.cta:active{ transform: translateY(0); box-shadow: 0 4px 16px rgba(0,0,0,.2); }
+
+/* Typewriter */
+.type {
+  display: inline-flex;
+  align-items: baseline;
+  position: relative;
 }
 
-/* ===== Buttons ===== */
-.addButton, .removeButton, .printButton {
-  padding: 6px 10px;
-  font-size: 0.8rem;
-  border: none;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-family: inherit;
+.typeText {
+  /* keep same font as title */
+  font: inherit;
+  letter-spacing: inherit;
+  color: #fff;            /* matches your title color */
 }
 
-/* Add button → red per your last change */
-.addButton { background: var(--danger); color: #fff; }
-.addButton:hover { background: var(--danger-hover); }
-
-.removeButton { background: var(--danger); color: #fff; }
-.removeButton:hover { background: var(--danger-hover); }
-
-.printButton { margin-top: 12px; background: var(--success); color: #fff; }
-.printButton:hover { background: var(--success-hover); }
-
-/* ===== Plan ===== */
-.planGrid { display: grid; gap: 8px; }
-
-.planItem {
-  border: 1px solid #ddd;
-  border-radius: var(--radius-sm);
-  padding: 8px;
-  display: flex;
-  justify-content: space-between;
-  background: #fafafa;
+.typeCaret {
+  width: 2px;
+  height: 0.9em;          /* about the text height */
+  margin-left: 4px;
+  background: #fff;       /* caret color */
+  display: inline-block;
+  animation: blink 1s steps(1, end) infinite;
+  transform: translateY(2px); /* tiny nudge to align on baseline */
 }
+
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .typeCaret { animation: none; }
+}
+
+.titleLine:nth-child(2) { margin-top: 10px; }
