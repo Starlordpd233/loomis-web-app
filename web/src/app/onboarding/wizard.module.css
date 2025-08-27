@@ -245,7 +245,105 @@
   .gridFour { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+/* Enforce Proxima Nova on interactive elements */
 .page * {
-  font-family: 'Proxima Nova', system-ui, sans-serif !important;
+  font-family: 'Proxima Nova', proxima-nova, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
 }
 
+/* ===== Step 0: Interstitial Intro ===== */
+
+.intro {
+  font-family: 'Proxima Nova', proxima-nova, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  background: #fafafa;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.introMain {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.introCard {
+  width: 100%;
+  max-width: 760px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.06);
+}
+
+.introTitle {
+  margin: 0 0 8px 0;
+  font-size: clamp(22px, 3.5vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.introBody {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #444;
+}
+
+.introList {
+  margin: 0 0 14px 20px;
+  padding: 0;
+  font-size: 16px;
+}
+.introList li { margin: 6px 0; }
+
+.introNote {
+  margin: 10px 0 18px 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.introActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.primaryBtn {
+  font-family: 'Proxima Nova', proxima-nova, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  appearance: none;
+  border: 1px solid #0a0a0a;
+  background: #0a0a0a;
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+.primaryBtn:hover { opacity: .92; }
+
+.secondaryLink {
+  font-family: 'Proxima Nova', proxima-nova, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: #666;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 8px 6px;
+  cursor: pointer;
+}
+.secondaryLink:hover { color: #111; }
+
+/* Ensure all interactive elements inherit Proxima Nova */
+.intro button { font-family: 'Proxima Nova', proxima-nova, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+.intro a, .intro select { font-family: 'Proxima Nova', proxima-nova, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+
+/* Responsive */
+@media (max-width: 520px) {
+  .introCard { padding: 20px; border-radius: 14px; }
+  .introActions { flex-direction: column; align-items: stretch; }
+  .secondaryLink { align-self: center; padding: 4px 0; }
+}
