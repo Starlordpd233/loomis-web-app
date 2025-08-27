@@ -26,11 +26,6 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <header className="site-header">
-          <img
-            src="/LC-wordmark-KO-rgb.png"
-            alt="Loomis Chaffee wordmark"
-            className="site-wordmark"
-          />
         </header>
         {children}
       </body>

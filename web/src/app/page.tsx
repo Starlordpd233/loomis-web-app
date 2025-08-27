@@ -31,26 +31,6 @@ type Course = {
 
 type PlanItem = { title: string };
 
-const GRADE_LABELS: Record<number, string> = {
-  9: 'Freshman',
-  10: 'Sophomore',
-  11: 'Junior',
-  12: 'Senior',
-};
-
-function formatGrades(grades?: number[]): string | null {
-  if (!grades || grades.length === 0) return null;
-  const names = Array.from(
-    new Set(
-      grades
-        .filter((g) => GRADE_LABELS[g])
-        .sort((a, b) => a - b)
-        .map((g) => GRADE_LABELS[g]!)
-    )
-  );
-  return names.length ? names.join(', ') : null;
-}
-
 async function fetchFirst<T>(paths: string[]): Promise<T | null> {
   for (const p of paths) {
     try { const r = await fetch(p); if (r.ok) return (await r.json()) as T; } catch {}
@@ -83,16 +63,16 @@ function deriveTags(c: RawCourse): { tags: string[]; level?: string } {
   return { tags: Array.from(new Set(tags)), level };
 }
 
-// ---- NEW: Canonical department mapping (matches your form sections) ----
+// ---- Canonical department mapping (matches form sections) ----
 const DEPT_OPTIONS = [
   'All',
   'English',
   'Modern or Classical Languages',
   'History, Philosophy, Religious Studies & Social Science',
   'Mathematics',
+  'Computer Science',
   'Science',
   'Performing Arts/Visual Arts',
-  'Computer Science'
 ] as const;
 
 type DeptOption = (typeof DEPT_OPTIONS)[number];
@@ -111,12 +91,11 @@ function canonicalizeDepartment(dep?: string): DeptOption | 'Other' {
   if (/(history|philosophy|religious|religion|social)/.test(d) || /\bhprss\b/.test(d))
     return 'History, Philosophy, Religious Studies & Social Science';
 
-  // Check CS BEFORE Science/Math so it isn't swallowed by "science"
+  // Check CS BEFORE math/science
   if (/\b(computer(\s+science)?|cs|comp(uter)?\s*sci(ence)?)\b/.test(d))
     return 'Computer Science';
 
-  if (/\bmath(ematics)?\b/.test(d))
-    return 'Mathematics';
+  if (/\bmath(ematics)?\b/.test(d)) return 'Mathematics';
 
   if (/\b(science|biology|chemistry|physics|environmental|earth)\b/.test(d))
     return 'Science';
@@ -126,7 +105,6 @@ function canonicalizeDepartment(dep?: string): DeptOption | 'Other' {
 
   return 'Other';
 }
-
 
 // flatten DB to simple array
 function flattenDatabase(db: any): Course[] {
@@ -202,14 +180,32 @@ function flattenDatabase(db: any): Course[] {
   });
 }
 
+// Grades → labels used in subheading
+const GRADE_LABELS: Record<number, string> = {
+  9: 'Freshman',
+  10: 'Sophomore',
+  11: 'Junior',
+  12: 'Senior',
+};
+
+function formatGrades(grades?: number[]): string | null {
+  if (!grades || grades.length === 0) return null;
+  const names = Array.from(
+    new Set(
+      grades
+        .filter((g) => GRADE_LABELS[g])
+        .sort((a, b) => a - b)
+        .map((g) => GRADE_LABELS[g]!)
+    )
+  );
+  return names.length ? names.join(', ') : null;
+}
+
 export default function Home() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [query, setQuery] = useState('');
   const [includeDescriptions, setIncludeDescriptions] = useState(false);
-
-  // Start at "All"
   const [deptFilter, setDeptFilter] = useState<DeptOption>('All');
-
   const [error, setError] = useState<string | null>(null);
   const [plan, setPlan] = useState<PlanItem[]>(() => {
     if (typeof window === 'undefined') return [];
@@ -220,6 +216,9 @@ export default function Home() {
   const [tagGESC, setTagGESC] = useState(false);
   const [tagPPR, setTagPPR] = useState(false);
   const [tagCL, setTagCL] = useState(false);
+
+  // Drawer state
+  const [drawerOpen, setDrawerOpen] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -237,7 +236,6 @@ export default function Home() {
     localStorage.setItem('plan', JSON.stringify(plan));
   }, [plan]);
 
-  // We still compute tags, but departments list is now fixed to DEPT_OPTIONS
   const tagsAvailable = useMemo(() => {
     const set = new Set<string>();
     courses.forEach(c => c.tags?.forEach(t => set.add(t)));
@@ -253,7 +251,6 @@ export default function Home() {
       return true;
     };
     return courses.filter(c => {
-      // Dept filter: compare against canonical group label
       const matchesDept =
         deptFilter === 'All' || canonicalizeDepartment(c.department) === deptFilter;
 
@@ -274,16 +271,32 @@ export default function Home() {
 
   return (
     <>
-      {/* Top bar 1920 x 126 with left-aligned logo */}
+      {/* Top bar */}
       <header className={styles.topBar}>
         <div className={styles.topBarInner}>
           <img src="/logo.svg" alt="Loomis Chaffee" className={styles.logo} />
         </div>
       </header>
 
-      <div className={styles.container}>
-        {/* Left: Browser */}
-        <div className={styles.leftPane}>
+      {/* Drawer toggle button */}
+      <button
+        type="button"
+        className={`${styles.drawerToggle} ${drawerOpen ? styles.drawerToggleOpen : ''}`}
+        aria-expanded={drawerOpen}
+        aria-controls="course-drawer"
+        onClick={() => setDrawerOpen(o => !o)}
+        title={drawerOpen ? 'Close course browser' : 'Open course browser'}
+      >
+        <span aria-hidden="true">{drawerOpen ? '◀' : '▶'}</span>
+      </button>
+
+      {/* Left Drawer: Course Browser */}
+      <aside
+        id="course-drawer"
+        className={`${styles.drawer} ${drawerOpen ? styles.drawerOpen : ''}`}
+        aria-hidden={!drawerOpen}
+      >
+        <div className={styles.drawerContent}>
           <h1 className={styles.heading}>Course Browser</h1>
           {error && <div className={styles.error}>{error}</div>}
 
@@ -293,7 +306,7 @@ export default function Home() {
               <input
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                placeholder="Search title or keyword"
+                placeholder="Search title or department"
                 className={styles.input}
               />
               <label className={styles.checkboxLabel}>
@@ -305,7 +318,7 @@ export default function Home() {
                 Search descriptions
               </label>
 
-              {/* Department dropdown — now fixed to canonical options */}
+              {/* Department dropdown — canonical options */}
               <select
                 value={deptFilter}
                 onChange={e => setDeptFilter(e.target.value as DeptOption)}
@@ -340,10 +353,16 @@ export default function Home() {
                     <strong>{c.title}</strong>
                     <button className={styles.addButton} onClick={() => addToPlan(c)}>Add</button>
                   </div>
+
+                  {/* Subheading: Department • Grades offered */}
                   <div className={styles.cardMeta}>
-                    <span>{c.department || '—'}</span>
+                    <span>{(() => {
+                      const canon = canonicalizeDepartment(c.department);
+                      return canon !== 'Other' ? canon : (c.department || '—');
+                    })()}</span>
                     {formatGrades(c.grades) ? <> • <span>{formatGrades(c.grades)}</span></> : null}
                   </div>
+
                   {c.tags?.length ? (
                     <div className={styles.tagContainer}>
                       {c.tags.map(tag => (
@@ -367,8 +386,10 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </aside>
 
-        {/* Right: Plan */}
+      {/* Main container — Plan on the page (full width while drawer overlays) */}
+      <div className={styles.container}>
         <div>
           <h2 className={styles.heading}>My Plan</h2>
           <div className={styles.planGrid}>

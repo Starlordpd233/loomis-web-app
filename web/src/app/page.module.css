@@ -7,40 +7,13 @@
   font-display: swap;
 }
 
-/* Top Bar */
-.topBar {
-  width: 100%;
-  height: 126px;                 /* requested height */
-  background: #323E48;
-  border-bottom: 1px solid #e5e7eb;
-  box-shadow: var(--shadow-sm);
-  position: sticky;              /* stays at top on scroll */
-  top: 0;
-  z-index: 50;
-}
-
-.topBarInner {
-  max-width: 1920px;             /* requested width */
-  margin: 0 auto;
-  height: 100%;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;            /* vertically center logo */
-  justify-content: flex-start;    /* keep logo on the left */
-}
-
-.logo {
-  height: 36px;                   /* adjust as you like */
-  width: auto;
-}
-
-/* ===== Base ===== */
+/* ===== Variables ===== */
 :root {
   --radius: 12px;
   --radius-sm: 8px;
   --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-  --primary: #0070f3;
+  --primary: #98252b;
   --primary-hover: #005ec2;
   --danger: #98252b;
   --danger-hover: #c53030;
@@ -51,14 +24,93 @@
   --sb-thumb: rgba(0,0,0,0.35);
   --sb-thumb-hover: rgba(0,0,0,0.5);
   --sb-track: transparent;
+
+  --topbar-h: 126px;
+  --drawer-w: 800px; /* width of the left drawer */
 }
 
 body { font-family: 'Proxima Nova', sans-serif; }
 
-/* ===== Layout ===== */
-.container {
+/* ===== Top Bar ===== */
+.topBar {
+  width: 100%;
+  height: var(--topbar-h);
+  background: #323E48;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topBarInner {
+  max-width: 1920px;
+  margin: 0 auto;
+  height: 100%;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.logo { height: 36px; width: auto; }
+
+/* ===== Drawer Toggle Button ===== */
+.drawerToggle {
+  position: fixed;
+  top: calc(var(--topbar-h) + 540px);
+  left: 8px;
+  z-index: 70;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #323E48;
+  box-shadow: var(--shadow-sm);
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  place-items: center;
+  cursor: pointer;
+  transition: left 0.3s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  color:#ffffff
+}
+.drawerToggle:hover { box-shadow: var(--shadow-md); transform: translateX(1px); }
+
+/* When drawer is open, move the toggle to sit near the drawer edge */
+.drawerToggleOpen { left: calc(var(--drawer-w) + 8px); }
+
+/* ===== Left Drawer ===== */
+.drawer {
+  position: fixed;
+  top: var(--topbar-h);
+  left: 0;
+  width: var(--drawer-w);
+  max-width: 90vw;
+  height: calc(100vh - var(--topbar-h));
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
+  box-shadow: var(--shadow-sm);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+}
+
+.drawerOpen { transform: translateX(0); }
+
+.drawerContent {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 8px;
+}
+
+/* ===== Main Container (Plan only; full width) ===== */
+.container {
+  /* single column; Plan takes full width */
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 20px;
   padding: 20px;
   max-width: 1200px;
@@ -66,14 +118,7 @@ body { font-family: 'Proxima Nova', sans-serif; }
   font-family: 'Proxima Nova', sans-serif;
 }
 
-/* BEFORE: max-height: calc(100vh - 40px); */
-.leftPane {
-  display: flex;
-  flex-direction: column;
-  max-height: calc(100vh - 126px - 40px); /* viewport - topBar - container padding */
-}
-
-
+/* ===== Common UI ===== */
 .heading { font-size: 1.8rem; margin-bottom: 12px; font-weight: 600; }
 
 .error {
@@ -84,8 +129,7 @@ body { font-family: 'Proxima Nova', sans-serif; }
   margin-bottom: 10px;
 }
 
-/* ===== Filters ===== */
-.filters { display: grid; gap: 12px; margin-bottom: 12px; }
+.filters { display: grid; gap: 12px; }
 
 .searchRow { display: flex; gap: 10px; align-items: center; }
 
@@ -103,19 +147,18 @@ body { font-family: 'Proxima Nova', sans-serif; }
 
 .tagInfo { opacity: 0.6; }
 
-.resultInfo { font-size: 0.9rem; opacity: 0.7; margin-bottom: 12px; }
+.resultInfo { font-size: 0.9rem; opacity: 0.7; }
 
-/* ===== Scrollable Course List (always visible) ===== */
+/* ===== Scrollable Course List ===== */
 .courseList {
   overflow-y: auto;
   padding-right: 6px;
-  margin-top: 8px;
-  flex: 1;
+  flex: 1;                     /* fill drawer vertical space */
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 
   /* consistent width & color */
-  scrollbar-width: thin; /* Firefox */
+  scrollbar-width: thin;       /* Firefox */
   scrollbar-color: var(--sb-thumb) var(--sb-track);
 }
 
@@ -184,8 +227,9 @@ body { font-family: 'Proxima Nova', sans-serif; }
   font-family: inherit;
 }
 
+/* Add button → red per your last change */
 .addButton { background: var(--danger); color: #fff; }
-.addButton:hover { background: var(--primary-hover); }
+.addButton:hover { background: var(--danger-hover); }
 
 .removeButton { background: var(--danger); color: #fff; }
 .removeButton:hover { background: var(--danger-hover); }
