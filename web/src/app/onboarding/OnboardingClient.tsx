@@ -6,6 +6,12 @@ import styles from "./wizard.module.css";   // wizard-only styles
 
 type LangIntent = "placed" | "planning";
 
+function readCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const m = document.cookie.match(new RegExp("(^|; )" + name + "=([^;]*)"));
+  return m ? decodeURIComponent(m[2]) : null;
+}
+
 export default function OnboardingPage({
   showIntroDefault,
 }: {
@@ -47,6 +53,34 @@ export default function OnboardingPage({
   ];
   const languageNames = ["Arabic", "Chinese", "French", "Latin", "Spanish"];
   const languageLevels = ["I", "II", "III", "IV", "V"];
+
+  useEffect(() => {
+    try {
+      let prefs: any = null;
+
+      // 1) check cookie written by save()
+      const raw = readCookie("catalogPrefs");
+      if (raw) prefs = JSON.parse(raw);
+
+      // 2) fall back to localStorage
+      if (!prefs) {
+        const ls = localStorage.getItem("catalogPrefs");
+        if (ls) prefs = JSON.parse(ls);
+      }
+
+      const complete =
+        !!prefs?.grade &&
+        !!prefs?.mathCourse &&
+        !!prefs?.language?.name &&
+        !!prefs?.language?.level;
+
+      if (complete) {
+        window.location.replace("/browser"); // full navigation
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Load saved prefs (if any)
   useEffect(() => {
@@ -91,6 +125,9 @@ export default function OnboardingPage({
     setLanguageIntent("placed");
     setStep(0);
     try { localStorage.removeItem("catalogPrefs"); } catch {}
+
+    document.cookie = "catalogPrefs=; Path=/; Max-Age=0; SameSite=Lax";
+    document.cookie = "prefsSet=; Path=/; Max-Age=0; SameSite=Lax";
   };
 
   const save = () => {
@@ -103,6 +140,9 @@ export default function OnboardingPage({
     };
     try {
       localStorage.setItem("catalogPrefs", JSON.stringify(payload));
+
+      document.cookie = `catalogPrefs=${encodeURIComponent(JSON.stringify(payload))}; Path=/; Max-Age=31536000; SameSite=Lax`;
+
       setSavedToast("Preferences saved");
       window.location.href = "/browser"; // feels like a real page load
     } catch {
