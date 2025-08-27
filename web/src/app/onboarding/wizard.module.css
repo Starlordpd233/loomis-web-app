@@ -5,7 +5,7 @@
   --border: #e5e5e5;
   --bg: #f7f7f7;
   --card: #ffffff;
-  --accent: #0a0a0a; /* neutral dark for buttons */
+  --accent: #98252b; /* neutral dark for buttons */
   --radius: 14px;
 }
 
@@ -78,7 +78,7 @@
   font-weight: 700;
 }
 .stepIndexActive {
-  background: #0a0a0a;
+  background: #98252b;
   color: #fff;
 }
 .stepLabel {
@@ -136,9 +136,9 @@
 }
 .pill:hover { border-color: #0a0a0a; }
 .pillActive {
-  background: #0a0a0a;
+  background: #98252b;
   color: #fff;
-  border-color: #0a0a0a;
+  border-color: #98252b;
 }
 
 .select {
@@ -169,9 +169,9 @@
 }
 .intentBtn:hover { border-color: #0a0a0a; }
 .intentBtnActive {
-  background: #0a0a0a;
+  background: #98252b;
   color: #fff;
-  border-color: #0a0a0a;
+  border-color: #98252b;
 }
 
 /* review */
@@ -202,8 +202,8 @@
 .backBtn:not(:disabled):hover { border-color: #0a0a0a; }
 
 .primaryBtn {
-  border: 1px solid #0a0a0a;
-  background: #0a0a0a;
+  border: 1px solid #98252b;
+  background: #98252b;
   color: #fff;
   border-radius: var(--radius);
   padding: 12px 18px;
@@ -216,7 +216,7 @@
 .toast {
   margin-top: 12px;
   display: inline-block;
-  background: #0a0a0a;
+  background: #98252b;
   color: #fff;
   border-radius: 10px;
   padding: 8px 10px;
@@ -245,15 +245,14 @@
   .gridFour { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-/* Enforce Proxima Nova on interactive elements */
 .page * {
-  font-family: 'Proxima Nova', proxima-nova, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+  font-family: 'Proxima Nova', system-ui, sans-serif !important;
 }
 
 /* ===== Step 0: Interstitial Intro ===== */
 
 .intro {
-  font-family: 'Proxima Nova', proxima-nova, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Proxima Nova', system-ui, sans-serif;
   background: #fafafa;
   min-height: 100vh;
   display: flex;
@@ -282,7 +281,7 @@
   font-size: clamp(22px, 3.5vw, 32px);
   font-weight: 700;
   letter-spacing: -0.02em;
-  text-transform: none;
+  text-transform: none; /* keep the lowercase vibe you used */
 }
 
 .introBody {
@@ -296,7 +295,9 @@
   padding: 0;
   font-size: 16px;
 }
-.introList li { margin: 6px 0; }
+.introList li {
+  margin: 6px 0;
+}
 
 .introNote {
   margin: 10px 0 18px 0;
@@ -311,10 +312,10 @@
 }
 
 .primaryBtn {
-  font-family: 'Proxima Nova', proxima-nova, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Proxima Nova', system-ui, sans-serif; /* enforce font on buttons */
   appearance: none;
-  border: 1px solid #0a0a0a;
-  background: #0a0a0a;
+  border: 1px solid #98252b;
+  background: #98252b;
   color: #fff;
   border-radius: 12px;
   padding: 12px 18px;
@@ -325,7 +326,7 @@
 .primaryBtn:hover { opacity: .92; }
 
 .secondaryLink {
-  font-family: 'Proxima Nova', proxima-nova, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Proxima Nova', system-ui, sans-serif;
   appearance: none;
   background: transparent;
   border: none;
@@ -338,8 +339,8 @@
 .secondaryLink:hover { color: #111; }
 
 /* Ensure all interactive elements inherit Proxima Nova */
-.intro button { font-family: 'Proxima Nova', proxima-nova, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
-.intro a, .intro select { font-family: 'Proxima Nova', proxima-nova, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+.intro button { font-family: 'Proxima Nova', system-ui, sans-serif; }
+.intro a, .intro select { font-family: 'Proxima Nova', system-ui, sans-serif; }
 
 /* Responsive */
 @media (max-width: 520px) {
@@ -347,3 +348,4 @@
   .introActions { flex-direction: column; align-items: stretch; }
   .secondaryLink { align-self: center; padding: 4px 0; }
 }
+
