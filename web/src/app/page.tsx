@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import styles from './page.module.css';
 
@@ -82,15 +81,15 @@ export default function Landing() {
             words={['experience.', 'adventure.', 'path.', 'journey.']}
             typing={90}
             deleting={60}
-            hold={1100}
+            hold={2000}
             />
             </span>
         </h1>
 
 
-          <Link href="/browser" className={styles.cta}>
+          <a href="/onboarding" className={styles.cta}>
             Get Started →
-          </Link>
+          </a>
         </div>
       </section>
     </>
