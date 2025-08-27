@@ -269,6 +269,105 @@ export default function Home() {
   function addToPlan(c: Course) { setPlan(prev => [...prev, { title: c.title }]); }
   function removeFromPlan(i: number) { setPlan(prev => prev.filter((_, idx) => idx !== i)); }
 
+  function printPlan(): void {
+  if (typeof window === 'undefined') return;
+
+  const escapeHtml = (s = '') =>
+    String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+  const itemsHtml = plan
+    .map((p) => {
+      const course = courses.find((c) => c.title === p.title) || {
+        title: p.title,
+        description: '',
+        department: '—',
+        termLabel: '—',
+        tags: [] as string[],
+        level: undefined,
+      };
+
+      const title = escapeHtml(course.title);
+      const subject = escapeHtml(course.department ?? '—');
+      const term = escapeHtml((course as any).termLabel ?? (course as any).duration ?? '—');
+      const level = escapeHtml(course.level ?? '');
+      const tagsHtml = (course.tags || [])
+        .map((t) => `<span class="tag">${escapeHtml(t)}</span>`)
+        .join(' ');
+      const descHtml = course.description ? `<div class="desc">${escapeHtml(course.description)}</div>` : '';
+
+      return `<div class="card">
+        <div class="card-header">
+          <div class="card-title">${title}</div>
+          ${level ? `<div class="card-level">${level}</div>` : ''}
+        </div>
+        <div class="card-meta"><span class="subject">${subject}</span> • <span class="term">${term}</span></div>
+        <div class="card-tags">${tagsHtml}</div>
+        ${descHtml}
+      </div>`;
+    })
+    .join('\n');
+
+  const html = `<!doctype html>
+  <html>
+    <head>
+      <meta charset="utf-8"/>
+      <title>My Plan</title>
+      <style>
+        @page { size: auto; margin: 0.5in; }
+        html,body{margin:0;padding:0;color:#111;font-family: Arial, Helvetica, sans-serif;background:#fff;}
+        body{padding:18px; font-size:13px; line-height:1.5;}
+        h1{font-size:18px;margin:0 0 12px 0;}
+        .container{max-width:800px;margin:0 auto;}
+        .card{
+          display:block;
+          border:1px solid #e6e6e6;
+          border-radius:6px;
+          padding:12px 14px;
+          margin:0 0 12px 0;
+          background:#fff;
+          page-break-inside:avoid;
+          box-shadow:0 0 0 rgba(0,0,0,0);
+        }
+        .card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+        .card-title{font-weight:700;font-size:15px;margin-bottom:6px;}
+        .card-level{font-size:12px;color:#666;font-weight:600;}
+        .card-meta{font-size:12px;color:#555;margin-bottom:8px;}
+        .card-tags{margin-bottom:8px;}
+        .tag{display:inline-block;background:#f1f1f1;color:#333;border-radius:3px;padding:3px 6px;font-size:11px;margin-right:6px;}
+        .desc{font-size:13px;color:#222;white-space:pre-wrap;margin-top:6px;}
+        button,.remove-button,.add-button{display:none !important;}
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h1>My Plan</h1>
+        ${itemsHtml}
+      </div>
+    </body>
+  </html>`;
+
+  const w = window.open('', '_blank');
+  if (!w) return;
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  // small delay gives the new window time to layout before printing on some browsers
+  setTimeout(() => {
+    try {
+      w.print();
+      w.close();
+    } catch {
+      // ignore
+    }
+  }, 250);
+}
+
   return (
     <>
       {/* Top bar */}
@@ -400,7 +499,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <button className={styles.printButton} onClick={() => window.print()}>Print / Save PDF</button>
+          <button className={styles.printButton} onClick={printPlan}>Print / Save PDF</button>
         </div>
       </div>
     </>
