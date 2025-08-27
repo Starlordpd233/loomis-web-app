@@ -7,6 +7,33 @@
   font-display: swap;
 }
 
+/* Top Bar */
+.topBar {
+  width: 100%;
+  height: 126px;                 /* requested height */
+  background: #323E48;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: var(--shadow-sm);
+  position: sticky;              /* stays at top on scroll */
+  top: 0;
+  z-index: 50;
+}
+
+.topBarInner {
+  max-width: 1920px;             /* requested width */
+  margin: 0 auto;
+  height: 100%;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;            /* vertically center logo */
+  justify-content: flex-start;    /* keep logo on the left */
+}
+
+.logo {
+  height: 36px;                   /* adjust as you like */
+  width: auto;
+}
+
 /* ===== Base ===== */
 :root {
   --radius: 12px;
@@ -20,35 +47,13 @@
   --success: #4caf50;
   --success-hover: #388e3c;
 
-  --scroll-thumb: rgba(0,0,0,0.35);
-  --scroll-thumb-hover: rgba(0,0,0,0.5);
+  --sb-width: 10px;
+  --sb-thumb: rgba(0,0,0,0.35);
+  --sb-thumb-hover: rgba(0,0,0,0.5);
+  --sb-track: transparent;
 }
 
 body { font-family: 'Proxima Nova', sans-serif; }
-
-/* ===== Top Bar ===== */
-.topBar {
-  width: 100%;
-  height: 126px;
-  background: #323E48;
-  border-bottom: 1px solid #e5e7eb;
-  box-shadow: var(--shadow-sm);
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-
-.topBarInner {
-  max-width: 1920px;
-  margin: 0 auto;
-  height: 100%;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.logo { height: 36px; width: auto; }
 
 /* ===== Layout ===== */
 .container {
@@ -61,11 +66,13 @@ body { font-family: 'Proxima Nova', sans-serif; }
   font-family: 'Proxima Nova', sans-serif;
 }
 
+/* BEFORE: max-height: calc(100vh - 40px); */
 .leftPane {
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 126px - 40px);
+  max-height: calc(100vh - 126px - 40px); /* viewport - topBar - container padding */
 }
+
 
 .heading { font-size: 1.8rem; margin-bottom: 12px; font-weight: 600; }
 
@@ -98,53 +105,29 @@ body { font-family: 'Proxima Nova', sans-serif; }
 
 .resultInfo { font-size: 0.9rem; opacity: 0.7; margin-bottom: 12px; }
 
-/* ===== Scrollable Course List ===== */
-/* Wrapper provides a stationary positioning context for the overlay scrollbar */
-.courseListWrap {
-  position: relative;
+/* ===== Scrollable Course List (always visible) ===== */
+.courseList {
+  overflow-y: auto;
+  padding-right: 6px;
   margin-top: 8px;
   flex: 1;
-  min-height: 0; /* allow flex child scroller to actually shrink */
-}
-
-/* Scroller: hides native scrollbar, no layout shift */
-.courseList {
-  height: 100%;
-  overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  scrollbar-gutter: stable;
-  scrollbar-width: none;   /* Firefox hide */
-  -ms-overflow-style: none;/* legacy Edge/IE hide */
-}
-.courseList::-webkit-scrollbar { width: 0; height: 0; } /* WebKit hide */
 
-/* Left overlay (ghost) scrollbar — sibling of scroller so it never scrolls away */
-.scrollGhost {
-  position: absolute;
-  top: 2px;
-  bottom: 3px;
-  left: -10;                 /* LEFT side */
-  width: 8px;
-  border-radius: 999px;
-  pointer-events: none;    /* never intercept clicks */
-  opacity: 0;
-  z-index: 2;              /* above the cards */
-  transition: opacity 0.35s ease;
+  /* consistent width & color */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: var(--sb-thumb) var(--sb-track);
 }
-.scrollGhostVisible { opacity: 1; }
 
-.scrollGhostThumb {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 40px;            /* JS sets real size */
+/* WebKit (Chrome/Safari/Edge) */
+.courseList::-webkit-scrollbar { width: var(--sb-width); }
+.courseList::-webkit-scrollbar-track { background: var(--sb-track); }
+.courseList::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb);
   border-radius: 999px;
-  background: var(--scroll-thumb);
-  transform: translateY(0);
-  will-change: transform, height;
+  transition: background 0.2s ease;
 }
-.scrollGhostThumb:hover { background: var(--scroll-thumb-hover); }
+.courseList::-webkit-scrollbar-thumb:hover { background: var(--sb-thumb-hover); }
 
 /* ===== Cards ===== */
 .cardGrid { display: grid; gap: 14px; padding-bottom: 8px; }
@@ -156,12 +139,17 @@ body { font-family: 'Proxima Nova', sans-serif; }
   padding: 16px 16px 0;       /* bottom 0 so banner sits flush */
   box-shadow: var(--shadow-sm);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden;           /* banner clips to rounded corners */
+  overflow: hidden;           /* make banner clip to rounded corners */
 }
 
 .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
-.cardHeader { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
 
 .cardMeta { font-size: 0.85rem; opacity: 0.8; }
 
@@ -171,7 +159,7 @@ body { font-family: 'Proxima Nova', sans-serif; }
 
 .description { margin-top: 8px; font-size: 0.9rem; padding-bottom: 12px; }
 
-/* Red banner for prerequisite / permission — full-bleed */
+/* Red banner for prerequisite / permission — full bleed */
 .prereqBanner {
   background: var(--danger);
   color: #fff;
