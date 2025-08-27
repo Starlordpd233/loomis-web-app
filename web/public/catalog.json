@@ -3289,7 +3289,7 @@
           "rigor": 1,
           "gesc": true,
           "ppr": false,
-          "duration": "full-year",
+          "duration": "half course",
           "required": false,
           "grades": [
             9,

@@ -34,7 +34,6 @@ type YearKey = 'Freshman' | 'Sophomore' | 'Junior' | 'Senior';
 const YEARS: YearKey[] = ['Freshman', 'Sophomore', 'Junior', 'Senior'];
 const SLOTS_PER_YEAR = 6; // adjust if you want more/less boxes
 
-type PlannerSlot = Course | null;
 type PlannerState = Record<YearKey, PlannerSlot[]>;
 
 async function fetchFirst<T>(paths: string[]): Promise<T | null> {
@@ -43,6 +42,26 @@ async function fetchFirst<T>(paths: string[]): Promise<T | null> {
   }
   return null;
 }
+
+// --- Term/half grouping support (ADD) ---
+type TermGroup = {
+  kind: 'GROUP';
+  size: 2 | 3;                 // 2 = Half course, 3 = Term course
+  items: (Course | null)[];
+};
+
+type PlannerSlot = Course | TermGroup | null; // if you already had PlannerSlot, extend it
+
+const isGroup = (s: PlannerSlot): s is TermGroup =>
+  !!s && (s as any).kind === 'GROUP';
+
+const isTermLike = (c: Course) =>
+  (c.termLabel?.toLowerCase().includes('term') && !c.termLabel?.toLowerCase().includes('two')) ||
+  c.termLabel?.toLowerCase().includes('half');
+
+const groupSizeFor = (c: Course): 2 | 3 =>
+  c.termLabel?.toLowerCase().includes('half') ? 2 : 3;
+
 
 function normalizeTerm(raw?: string, duration?: string): { termLabel?: string; termTags: string[] } {
   const s = `${(raw || '').toLowerCase()} ${(duration || '').toLowerCase()}`.trim();
@@ -254,13 +273,45 @@ const [selected, setSelected] = useState<{ year: YearKey; idx: number } | null>(
 
 // if a slot is selected, fill it; otherwise fall back to old Add-to-list behavior
 function assignToSelectedOrList(c: Course) {
-  if (!selected) { addToPlan(c); return; }
+  if (!selected) { addToPlan(c); return; } // keep your original list behavior
+
   setPlanner(prev => {
-    const copy: PlannerState = JSON.parse(JSON.stringify(prev));
-    copy[selected.year][selected.idx] = c;
+    const copy: any = JSON.parse(JSON.stringify(prev));
+    const y = selected.year, i = selected.idx;
+    const current = copy[y][i] as PlannerSlot;
+
+    // TERM / HALF → grouped sub-cells
+    if (isTermLike(c)) {
+      const needed = groupSizeFor(c); // 3 for term, 2 for half
+
+      // Create group if none exists
+      if (!current || !isGroup(current)) {
+        copy[y][i] = { kind: 'GROUP', size: needed, items: Array(needed).fill(null) } as TermGroup;
+      }
+
+      const g = copy[y][i] as TermGroup;
+
+      // Resize group if needed (switching between half/term)
+      if (g.size !== needed) {
+        g.size = needed;
+        g.items = g.items.slice(0, needed);
+        while (g.items.length < needed) g.items.push(null);
+      }
+
+      // Put the course into the first empty sub-slot (or replace the last if full)
+      const spot = g.items.findIndex(x => x === null);
+      if (spot === -1) g.items[g.items.length - 1] = c;
+      else g.items[spot] = c;
+
+      return copy;
+    }
+
+    // Non-term (full-year/two-terms/etc) → replace entire slot
+    copy[y][i] = c;
     return copy;
   });
 }
+
 
 function clearSlot(y: YearKey, i: number) {
   setPlanner(prev => {
@@ -281,6 +332,20 @@ function clearAllSlots() {
   });
   setSelected(null);
 }
+
+function clearSub(year: YearKey, idx: number, sub: number) {
+  setPlanner(prev => {
+    const copy: any = JSON.parse(JSON.stringify(prev));
+    const g = copy[year][idx] as TermGroup;
+    if (!g || !isGroup(g)) return copy;
+    g.items[sub] = null;
+
+    // If the whole group is empty, collapse to empty slot
+    if (g.items.every(x => x === null)) copy[year][idx] = null;
+    return copy;
+  });
+}
+
 
   useEffect(() => {
     (async () => {
@@ -571,37 +636,95 @@ useEffect(() => {
         <div className={styles.colTitle}>{year}</div>
         <div className={styles.colSlots}>
           {planner[year].map((slot, idx) => {
-            const isSel = selected && selected.year === year && selected.idx === idx;
-            return (
-              <div
-                key={year + idx}
-                className={`${styles.slot} ${isSel ? styles.slotSelected : ''}`}
-                onClick={() => setSelected({ year, idx })}
-                title="Click to select this slot, then press Add on a course"
+  const isSel =
+    selected && selected.year === year && selected.idx === idx;
+
+  // Grouped TERM/HALF slot
+  if (isGroup(slot)) {
+    return (
+      <div
+        key={`${year}-${idx}`}
+        className={`${styles.slot} ${styles.slotGroup} ${
+          slot.size === 3 ? styles.group3 : styles.group2
+        } ${isSel ? styles.slotSelected : ''}`}
+        onClick={() => setSelected({ year, idx })}
+      >
+        <div className={styles.bracket} aria-hidden="true" />
+        {slot.size === 3 ? (
+          <>
+            <div className={styles.bracketNotch} style={{ top: '33%' }} aria-hidden="true" />
+            <div className={styles.bracketNotch} style={{ top: '66%' }} aria-hidden="true" />
+          </>
+        ) : (
+          <div className={styles.bracketNotch} style={{ top: '50%' }} aria-hidden="true" />
+        )}
+
+        <div className={styles.subStack}>
+          {slot.items.map((item, k) => (
+            <div
+              key={k}
+              className={styles.subSlot}
+              onClick={() => setSelected({ year, idx })}
+            >
+              {item ? (
+                <>
+                  <div className={styles.slotTitle}>{item.title}</div>
+                  <div className={styles.slotMeta}>
+                    <span>{item.department || '—'}</span>
+                    {item.termLabel ? <> • <span>{item.termLabel}</span></> : null}
+                    {item.level ? <> • <span>{item.level}</span></> : null}
+                  </div>
+                </>
+              ) : (
+                <span className={styles.slotPlaceholder}>Select course →</span>
+              )}
+              <button
+                className={styles.subClear}
+                onClick={(e) => { e.stopPropagation(); clearSub(year, idx, k); }}
+                aria-label="Clear sub-slot"
+                title="Clear this term slot"
               >
-                {slot ? (
-                  <>
-                    <div className={styles.slotTitle}>{slot.title}</div>
-                    <div className={styles.slotMeta}>
-                      <span>{slot.department || '—'}</span>
-                      {slot.termLabel ? <> • <span>{slot.termLabel}</span></> : null}
-                      {slot.level ? <> • <span>{slot.level}</span></> : null}
-                    </div>
-                  </>
-                ) : (
-                  <span className={styles.slotPlaceholder}>Click and add from browser</span>
-                )}
-                <button
-                  className={styles.slotClear}
-                  onClick={(e) => { e.stopPropagation(); clearSlot(year, idx); }}
-                  aria-label="Clear slot"
-                  title="Clear this slot"
-                >
-                  ×
-                </button>
-              </div>
-            );
-          })}
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Regular single slot
+  return (
+    <div
+      key={`${year}-${idx}`}
+      className={`${styles.slot} ${isSel ? styles.slotSelected : ''}`}
+      onClick={() => setSelected({ year, idx })}
+      title="Click to select this slot, then press Add on a course"
+    >
+      {slot ? (
+        <>
+          <div className={styles.slotTitle}>{slot.title}</div>
+          <div className={styles.slotMeta}>
+            <span>{slot.department || '—'}</span>
+            {slot.termLabel ? <> • <span>{slot.termLabel}</span></> : null}
+            {slot.level ? <> • <span>{slot.level}</span></> : null}
+          </div>
+        </>
+      ) : (
+        <span className={styles.slotPlaceholder}>Select course →</span>
+      )}
+      <button
+        className={styles.slotClear}
+        onClick={(e) => { e.stopPropagation(); clearSlot(year, idx); }}
+        aria-label="Clear slot"
+        title="Clear this slot"
+      >
+        ×
+      </button>
+    </div>
+  );
+})}
+
         </div>
       </div>
     ))}
