@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import styles from './page.module.css';
 
-
 type RawCourse = {
   title: string;
   description?: string;
@@ -31,6 +30,26 @@ type Course = {
 };
 
 type PlanItem = { title: string };
+
+const GRADE_LABELS: Record<number, string> = {
+  9: 'Freshman',
+  10: 'Sophomore',
+  11: 'Junior',
+  12: 'Senior',
+};
+
+function formatGrades(grades?: number[]): string | null {
+  if (!grades || grades.length === 0) return null;
+  const names = Array.from(
+    new Set(
+      grades
+        .filter((g) => GRADE_LABELS[g])
+        .sort((a, b) => a - b)
+        .map((g) => GRADE_LABELS[g]!)
+    )
+  );
+  return names.length ? names.join(', ') : null;
+}
 
 async function fetchFirst<T>(paths: string[]): Promise<T | null> {
   for (const p of paths) {
@@ -63,6 +82,51 @@ function deriveTags(c: RawCourse): { tags: string[]; level?: string } {
 
   return { tags: Array.from(new Set(tags)), level };
 }
+
+// ---- NEW: Canonical department mapping (matches your form sections) ----
+const DEPT_OPTIONS = [
+  'All',
+  'English',
+  'Modern or Classical Languages',
+  'History, Philosophy, Religious Studies & Social Science',
+  'Mathematics',
+  'Science',
+  'Performing Arts/Visual Arts',
+  'Computer Science'
+] as const;
+
+type DeptOption = (typeof DEPT_OPTIONS)[number];
+
+function canonicalizeDepartment(dep?: string): DeptOption | 'Other' {
+  const d = (dep || '').toLowerCase().trim();
+
+  if (/\benglish\b/.test(d)) return 'English';
+
+  if (
+    /(modern|classical).*language/.test(d) ||
+    /\b(world )?languages?\b/.test(d) ||
+    /\b(arabic|chinese|french|latin|spanish)\b/.test(d)
+  ) return 'Modern or Classical Languages';
+
+  if (/(history|philosophy|religious|religion|social)/.test(d) || /\bhprss\b/.test(d))
+    return 'History, Philosophy, Religious Studies & Social Science';
+
+  // Check CS BEFORE Science/Math so it isn't swallowed by "science"
+  if (/\b(computer(\s+science)?|cs|comp(uter)?\s*sci(ence)?)\b/.test(d))
+    return 'Computer Science';
+
+  if (/\bmath(ematics)?\b/.test(d))
+    return 'Mathematics';
+
+  if (/\b(science|biology|chemistry|physics|environmental|earth)\b/.test(d))
+    return 'Science';
+
+  if (/\b(performing|visual|music|theater|theatre|dance|arts?)\b/.test(d))
+    return 'Performing Arts/Visual Arts';
+
+  return 'Other';
+}
+
 
 // flatten DB to simple array
 function flattenDatabase(db: any): Course[] {
@@ -142,7 +206,10 @@ export default function Home() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [query, setQuery] = useState('');
   const [includeDescriptions, setIncludeDescriptions] = useState(false);
-  const [deptFilter, setDeptFilter] = useState<string>('All');
+
+  // Start at "All"
+  const [deptFilter, setDeptFilter] = useState<DeptOption>('All');
+
   const [error, setError] = useState<string | null>(null);
   const [plan, setPlan] = useState<PlanItem[]>(() => {
     if (typeof window === 'undefined') return [];
@@ -170,12 +237,7 @@ export default function Home() {
     localStorage.setItem('plan', JSON.stringify(plan));
   }, [plan]);
 
-  const departments = useMemo(() => {
-    const set = new Set<string>();
-    courses.forEach(c => c.department && set.add(c.department));
-    return ['All', ...Array.from(set).sort()];
-  }, [courses]);
-
+  // We still compute tags, but departments list is now fixed to DEPT_OPTIONS
   const tagsAvailable = useMemo(() => {
     const set = new Set<string>();
     courses.forEach(c => c.tags?.forEach(t => set.add(t)));
@@ -191,8 +253,12 @@ export default function Home() {
       return true;
     };
     return courses.filter(c => {
-      const matchesDept = deptFilter === 'All' || (c.department || '').toLowerCase() === deptFilter.toLowerCase();
+      // Dept filter: compare against canonical group label
+      const matchesDept =
+        deptFilter === 'All' || canonicalizeDepartment(c.department) === deptFilter;
+
       const matchesTags = needTag(c);
+
       const haystacks = [
         (c.title || '').toLowerCase(),
         (c.department || '').toLowerCase(),
@@ -206,111 +272,116 @@ export default function Home() {
   function addToPlan(c: Course) { setPlan(prev => [...prev, { title: c.title }]); }
   function removeFromPlan(i: number) { setPlan(prev => prev.filter((_, idx) => idx !== i)); }
 
-  
   return (
     <>
-    {/* Top bar 1920 x 126 with left-aligned logo */}
-    <header className={styles.topBar}>
-      <div className={styles.topBarInner}>
-        <img src="/logo.svg" alt="Loomis Chaffee" className={styles.logo} />
-      </div>
-    </header>
+      {/* Top bar 1920 x 126 with left-aligned logo */}
+      <header className={styles.topBar}>
+        <div className={styles.topBarInner}>
+          <img src="/logo.svg" alt="Loomis Chaffee" className={styles.logo} />
+        </div>
+      </header>
 
-    <div className={styles.container}>
-      {/* Left: Browser */}
-      <div className={styles.leftPane}>
-        <h1 className={styles.heading}>Course Browser</h1>
-        {error && <div className={styles.error}>{error}</div>}
+      <div className={styles.container}>
+        {/* Left: Browser */}
+        <div className={styles.leftPane}>
+          <h1 className={styles.heading}>Course Browser</h1>
+          {error && <div className={styles.error}>{error}</div>}
 
-        {/* Filters */}
-        <div className={styles.filters}>
-          <div className={styles.searchRow}>
-            <input
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder="Search title or department"
-              className={styles.input}
-            />
-            <label className={styles.checkboxLabel}>
+          {/* Filters */}
+          <div className={styles.filters}>
+            <div className={styles.searchRow}>
               <input
-                type="checkbox"
-                checked={includeDescriptions}
-                onChange={e => setIncludeDescriptions(e.target.checked)}
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Search title or keyword"
+                className={styles.input}
               />
-              Search descriptions
-            </label>
-            <select value={deptFilter} onChange={e => setDeptFilter(e.target.value)} className={styles.select}>
-              {departments.map(d => <option key={d} value={d}>{d}</option>)}
-            </select>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={includeDescriptions}
+                  onChange={e => setIncludeDescriptions(e.target.checked)}
+                />
+                Search descriptions
+              </label>
+
+              {/* Department dropdown — now fixed to canonical options */}
+              <select
+                value={deptFilter}
+                onChange={e => setDeptFilter(e.target.value as DeptOption)}
+                className={styles.select}
+              >
+                {DEPT_OPTIONS.map(d => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Tag filters */}
+            <div className={styles.tagRow}>
+              <span>Tags:</span>
+              <label><input type="checkbox" checked={tagGESC} onChange={e => setTagGESC(e.target.checked)} /> GESC</label>
+              <label><input type="checkbox" checked={tagPPR} onChange={e => setTagPPR(e.target.checked)} /> PPR</label>
+              <label><input type="checkbox" checked={tagCL} onChange={e => setTagCL(e.target.checked)} /> CL</label>
+              <span className={styles.tagInfo}>({tagsAvailable.length} tag types found)</span>
+            </div>
           </div>
 
-          {/* Tag filters */}
-          <div className={styles.tagRow}>
-            <span>Tags:</span>
-            <label><input type="checkbox" checked={tagGESC} onChange={e => setTagGESC(e.target.checked)} /> GESC</label>
-            <label><input type="checkbox" checked={tagPPR} onChange={e => setTagPPR(e.target.checked)} /> PPR</label>
-            <label><input type="checkbox" checked={tagCL} onChange={e => setTagCL(e.target.checked)} /> CL</label>
-            <span className={styles.tagInfo}>({tagsAvailable.length} tag types found)</span>
+          <div className={styles.resultInfo}>
+            Showing {filtered.length} of {courses.length} courses
+          </div>
+
+          {/* Scrollable list */}
+          <div className={styles.courseList}>
+            <div className={styles.cardGrid}>
+              {filtered.map((c, i) => (
+                <div key={c.title + i} className={styles.card}>
+                  <div className={styles.cardHeader}>
+                    <strong>{c.title}</strong>
+                    <button className={styles.addButton} onClick={() => addToPlan(c)}>Add</button>
+                  </div>
+                  <div className={styles.cardMeta}>
+                    <span>{c.department || '—'}</span>
+                    {formatGrades(c.grades) ? <> • <span>{formatGrades(c.grades)}</span></> : null}
+                  </div>
+                  {c.tags?.length ? (
+                    <div className={styles.tagContainer}>
+                      {c.tags.map(tag => (
+                        <span key={tag} className={styles.tagChip}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {c.description && <p className={styles.description}>{c.description}</p>}
+
+                  {(c.prerequisiteText || c.permissionRequired) && (
+                    <div className={styles.prereqBanner}>
+                      {c.prerequisiteText ? <span>Prerequisite: {c.prerequisiteText}</span> : null}
+                      {c.permissionRequired ? <span>Departmental permission required</span> : null}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className={styles.resultInfo}>
-          Showing {filtered.length} of {courses.length} courses
-        </div>
-
-        {/* Scrollable list with native right scrollbar (always visible) */}
-        <div className={styles.courseList}>
-          <div className={styles.cardGrid}>
-            {filtered.map((c, i) => (
-              <div key={c.title + i} className={styles.card}>
-                <div className={styles.cardHeader}>
-                  <strong>{c.title}</strong>
-                  <button className={styles.addButton} onClick={() => addToPlan(c)}>Add</button>
-                </div>
-                <div className={styles.cardMeta}>
-                  <span>{c.department || '—'}</span>
-                  {c.termLabel ? <> • <span>{c.termLabel}</span></> : null}
-                  {c.level ? <> • <span>{c.level}</span></> : null}
-                </div>
-
-                {c.tags?.length ? (
-                  <div className={styles.tagContainer}>
-                    {c.tags.map(tag => (
-                      <span key={tag} className={styles.tagChip}>
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-
-                {c.description && <p className={styles.description}>{c.description}</p>}
-
-                {(c.prerequisiteText || c.permissionRequired) && (
-                  <div className={styles.prereqBanner}>
-                    {c.prerequisiteText ? <span>{c.prerequisiteText}</span> : null}
-                    {c.permissionRequired ? <span>Permission of Department Required</span> : null}
-                  </div>
-                )}
+        {/* Right: Plan */}
+        <div>
+          <h2 className={styles.heading}>My Plan</h2>
+          <div className={styles.planGrid}>
+            {plan.map((p, i) => (
+              <div key={i} className={styles.planItem}>
+                <span>{p.title}</span>
+                <button className={styles.removeButton} onClick={() => removeFromPlan(i)}>Remove</button>
               </div>
             ))}
           </div>
+          <button className={styles.printButton} onClick={() => window.print()}>Print / Save PDF</button>
         </div>
       </div>
-
-      {/* Right: Plan */}
-      <div>
-        <h2 className={styles.heading}>My Plan</h2>
-        <div className={styles.planGrid}>
-          {plan.map((p, i) => (
-            <div key={i} className={styles.planItem}>
-              <span>{p.title}</span>
-              <button className={styles.removeButton} onClick={() => removeFromPlan(i)}>Remove</button>
-            </div>
-          ))}
-        </div>
-        <button className={styles.printButton} onClick={() => window.print()}>Print / Save PDF</button>
-      </div>
-    </div>
-  </>
+    </>
   );
 }

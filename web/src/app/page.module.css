@@ -184,7 +184,7 @@ body { font-family: 'Proxima Nova', sans-serif; }
   font-family: inherit;
 }
 
-.addButton { background: var(--primary); color: #fff; }
+.addButton { background: var(--danger); color: #fff; }
 .addButton:hover { background: var(--primary-hover); }
 
 .removeButton { background: var(--danger); color: #fff; }
