@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import styles from "./enhanced-styles.module.css";
+import { COURSE_BROWSER_URL } from "@/linking/config";
 
 
 // Allow inline CSS custom properties like --size, --duration without using 'any'
@@ -116,11 +117,14 @@ export default function LoginPage() {
 
 
   const handleLoomisLogin = () => {
-    setIsLoading(true);
-    setTimeout(() => { setIsLoading(false); alert("Redirecting to Loomis authentication..."); }, 1500);
+    // For now, just navigate to the Course Browser
+    window.location.href = COURSE_BROWSER_URL;
   };
 
-  const handleSignup = () => { setIsLoading(true); setTimeout(() => { setIsLoading(false); alert("Create account form would appear"); }, 1500); };
+  const handleSignup = () => {
+    // For now, just navigate to the Course Browser
+    window.location.href = COURSE_BROWSER_URL;
+  };
 
   return (
     <>
