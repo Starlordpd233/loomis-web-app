@@ -1,0 +1,165 @@
+.container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Inter', sans-serif;
+}
+
+.heading {
+  font-size: 1.8rem;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.error {
+  background: #fff3cd;
+  border: 1px solid #ffeeba;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.filters {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.searchRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.input, .select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  flex: 1;
+}
+
+.checkboxLabel {
+  font-size: 0.85rem;
+  display: flex;
+  gap: 6px;
+}
+
+.tagRow {
+  display: flex;
+  gap: 10px;
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.tagInfo {
+  opacity: 0.6;
+}
+
+.resultInfo {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  margin-bottom: 12px;
+}
+
+.cardGrid {
+  display: grid;
+  gap: 14px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.cardMeta {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.tagContainer {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.tagChip {
+  font-size: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.description {
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+.addButton, .removeButton, .printButton {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.addButton {
+  background: #0070f3;
+  color: #fff;
+}
+
+.addButton:hover {
+  background: #005ec2;
+}
+
+.removeButton {
+  background: #e53e3e;
+  color: #fff;
+}
+
+.removeButton:hover {
+  background: #c53030;
+}
+
+.printButton {
+  margin-top: 12px;
+  background: #4caf50;
+  color: #fff;
+}
+
+.printButton:hover {
+  background: #388e3c;
+}
+
+.planGrid {
+  display: grid;
+  gap: 8px;
+}
+
+.planItem {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  background: #fafafa;
+}

@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Enhanced Course Browser",
-  description: "Modern course selection interface with dark mode support and improved UX",
+  title: "Academic Path Planner",
+  description: "A modern interface to explore, plan, and schedule your academic journey.",
 };
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} antialiased`}>
+      <body className={`${inter.variable} font-sans antialiased main-background`}>
         {children}
       </body>
     </html>

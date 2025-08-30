@@ -1,0 +1,241 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark mode class-based setup for manual control */
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+/* Simple fixed header with wordmark top-left */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+  transition: all 0.3s ease;
+}
+
+.dark .site-header {
+  background: rgba(17, 24, 39, 0.95);
+  border-bottom: 1px solid rgba(75, 85, 99, 0.8);
+}
+
+.site-wordmark {
+  height: 28px;
+  width: auto;
+}
+
+/* add small top padding to avoid overlap if a page has content flush to top */
+html body > div:first-child, html body > main:first-child {
+  padding-top: 60px;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+/* Enhanced animations */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.loading-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+.dark .loading-shimmer::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+/* Hero background with subtle gradients for visual depth */
+.hero-surface {
+  position: relative;
+  background:
+    radial-gradient(1000px 400px at 0% -20%, rgba(59, 130, 246, 0.15), transparent 60%),
+    radial-gradient(800px 300px at 100% 0%, rgba(99, 102, 241, 0.15), transparent 60%),
+    linear-gradient(180deg, #f8fafc, #ffffff);
+}
+
+.dark .hero-surface {
+  background:
+    radial-gradient(1000px 400px at 0% -20%, rgba(59, 130, 246, 0.18), transparent 60%),
+    radial-gradient(800px 300px at 100% 0%, rgba(99, 102, 241, 0.18), transparent 60%),
+    linear-gradient(180deg, #0b1120, #0a0a0a);
+}
+
+/* Subtle grid pattern overlay utility */
+.pattern-grid {
+  position: relative;
+}
+.pattern-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(99,102,241,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99,102,241,0.06) 1px, transparent 1px);
+  background-size: 24px 24px, 24px 24px;
+  mask-image: radial-gradient(circle at 50% 0%, rgba(0,0,0,0.25), transparent 60%);
+  pointer-events: none;
+}
+.dark .pattern-grid::before {
+  background-image:
+    linear-gradient(rgba(148,163,184,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148,163,184,0.08) 1px, transparent 1px);
+}
+
+/* Focus ring improvements */
+.focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #3b82f6;
+  border-radius: 8px;
+}
+
+.dark .focus-ring:focus {
+  box-shadow: 0 0 0 2px #60a5fa;
+}
+
+@media print {
+  /* Hide everything */
+  * {
+    visibility: hidden !important;
+  }
+  
+  /* Show only the plan container and its contents */
+  #plan,
+  #plan *,
+  .print-plan-only #plan,
+  .print-plan-only #plan * {
+    visibility: visible !important;
+  }
+  
+  /* Position the plan at the top of the page */
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  #plan,
+  .print-plan-only #plan {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    background: white !important;
+    color: black !important;
+  }
+  
+  /* Hide buttons in print */
+  #plan button,
+  .print-plan-only #plan button {
+    display: none !important;
+  }
+  
+  /* Ensure proper spacing for plan items */
+  #plan > div,
+  .print-plan-only #plan > div {
+    margin-bottom: 10px !important;
+    display: block !important;
+  }
+}
