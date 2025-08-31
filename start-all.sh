@@ -44,9 +44,10 @@ LANDING_PID=$!
 wait_for_port 3002 "landing page"
 
 # Start login page on port 3000 (Next.js)
-echo "🔐 Starting login page on http://localhost:3000"
+echo "🔐 Starting login page on http://localhost:3000 (targets onboarding)"
 cd "/Users/MatthewLi/Desktop/Senior Year/web_dev_lc/login_page"
-PORT=3000 npm run dev &
+# Point Login -> Course Browser onboarding by default for a unified flow
+PORT=3000 NEXT_PUBLIC_COURSE_BROWSER_URL="http://localhost:3001/onboarding" npm run dev &
 LOGIN_PID=$!
 wait_for_port 3000 "login page"
 

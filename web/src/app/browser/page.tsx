@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './page.module.css';
+import ThemeToggle from '../ThemeToggle';
 
 type RawCourse = {
   title: string;
@@ -202,15 +203,21 @@ function formatGrades(grades?: number[]): string | null {
 }
 
 export default function Home() {
+  // Hide the global site wordmark header to prevent duplicate logos
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.body.classList.add('hide-wordmark');
+      return () => { document.body.classList.remove('hide-wordmark'); };
+    }
+  }, []);
+
   const [courses, setCourses] = useState<Course[]>([]);
   const [query, setQuery] = useState('');
   const [includeDescriptions, setIncludeDescriptions] = useState(false);
   const [deptFilter, setDeptFilter] = useState<DeptOption>('All');
   const [error, setError] = useState<string | null>(null);
-  const [plan, setPlan] = useState<PlanItem[]>(() => {
-    if (typeof window === 'undefined') return [];
-    try { return JSON.parse(localStorage.getItem('plan') || '[]'); } catch { return []; }
-  });
+  const [plan, setPlan] = useState<PlanItem[]>([]);
+  const hasLoadedPlanRef = useRef(false);
 
   // Tag filters
   const [tagGESC, setTagGESC] = useState(false);
@@ -232,8 +239,18 @@ export default function Home() {
     })();
   }, []);
 
+  // Load saved plan on mount to avoid SSR/client mismatch
   useEffect(() => {
-    localStorage.setItem('plan', JSON.stringify(plan));
+    try {
+      const saved = localStorage.getItem('plan');
+      if (saved) setPlan(JSON.parse(saved));
+    } catch {}
+    hasLoadedPlanRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedPlanRef.current) return; // skip first run to avoid overwriting saved data
+    try { localStorage.setItem('plan', JSON.stringify(plan)); } catch {}
   }, [plan]);
 
   const tagsAvailable = useMemo(() => {
@@ -268,6 +285,21 @@ export default function Home() {
 
   function addToPlan(c: Course) { setPlan(prev => [...prev, { title: c.title }]); }
   function removeFromPlan(i: number) { setPlan(prev => prev.filter((_, idx) => idx !== i)); }
+
+  function resetOnboarding() {
+    // Clear localStorage
+    try {
+      localStorage.removeItem("catalogPrefs");
+    } catch {}
+    
+    // Clear cookies
+    document.cookie = "catalogPrefs=; Path=/; Max-Age=0; SameSite=Lax";
+    document.cookie = "prefsSet=; Path=/; Max-Age=0; SameSite=Lax";
+    document.cookie = "onboardingIntroSeen=; Path=/; Max-Age=0; SameSite=Lax";
+    
+    // Redirect to onboarding
+    window.location.href = "/onboarding";
+  }
 
   function printPlan(): void {
   if (typeof window === 'undefined') return;
@@ -374,6 +406,16 @@ export default function Home() {
       <header className={styles.topBar}>
         <div className={styles.topBarInner}>
           <img src="/logo.svg" alt="Loomis Chaffee" className={styles.logo} />
+          <div className={styles.topBarActions}>
+            <button 
+              className={styles.resetOnboardingBtn}
+              onClick={resetOnboarding}
+              title="Reset your course placement information and restart the setup process"
+            >
+              Reset Your Info
+            </button>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
@@ -493,7 +535,7 @@ export default function Home() {
           <h2 className={styles.heading}>My Plan</h2>
           <div className={styles.planGrid}>
             {plan.map((p, i) => (
-              <div key={i} className={styles.planItem}>
+              <div key={`${p.title}-${i}`} className={styles.planItem}>
                 <span>{p.title}</span>
                 <button className={styles.removeButton} onClick={() => removeFromPlan(i)}>Remove</button>
               </div>

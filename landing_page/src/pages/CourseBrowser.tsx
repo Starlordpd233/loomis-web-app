@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 
 export default function CourseBrowser() {
   useEffect(() => {
-    // Redirect to the course browser running on port 3001
-    window.location.href = 'http://localhost:3001';
+    // Redirect to the onboarding wizard inside Course Browser
+    window.location.href = 'http://localhost:3001/onboarding';
   }, []);
 
   return (

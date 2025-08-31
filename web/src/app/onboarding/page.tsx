@@ -18,6 +18,8 @@ export default async function OnboardingWrapper() {
           __html: `
 (function(){
   try {
+    // Hide global wordmark header immediately to avoid flicker
+    document.documentElement.classList.add('hide-wordmark');
     var m = document.cookie.match(/(?:^|; )catalogPrefs=([^;]+)/);
     if (!m) return;
     var prefs = JSON.parse(decodeURIComponent(m[1]));

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import topbar from "../page.module.css";    // reuses your landing-page top bar
+import topbar from "../browser/page.module.css";   // reuse the course browser top bar
 import styles from "./wizard.module.css";   // wizard-only styles
 
 type LangIntent = "placed" | "planning";
@@ -17,6 +17,13 @@ export default function OnboardingPage({
 }: {
   showIntroDefault: boolean;
 }) {
+  // Hide the global wordmark header on this route to avoid duplicates
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.body.classList.add("hide-wordmark");
+      return () => { document.body.classList.remove("hide-wordmark"); };
+    }
+  }, []);
   // ----- Intro (cookie-driven; no flicker) -----
   const [showIntro, setShowIntro] = useState(showIntroDefault);
 

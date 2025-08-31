@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './page.module.css';
 
 type RawCourse = {
@@ -233,10 +233,8 @@ export default function Home() {
   const [includeDescriptions, setIncludeDescriptions] = useState(false);
   const [deptFilter, setDeptFilter] = useState<DeptOption>('All');
   const [error, setError] = useState<string | null>(null);
-  const [plan, setPlan] = useState<PlanItem[]>(() => {
-    if (typeof window === 'undefined') return [];
-    try { return JSON.parse(localStorage.getItem('plan') || '[]'); } catch { return []; }
-  });
+  const [plan, setPlan] = useState<PlanItem[]>([]);
+  const hasLoadedPlanRef = useRef(false);
 
   // Tag filters
   const [tagGESC, setTagGESC] = useState(false);
@@ -247,26 +245,13 @@ export default function Home() {
   const [drawerOpen, setDrawerOpen] = useState(true);
 
   // === 4-year planner state (ADD) ===
-const [planner, setPlanner] = useState<PlannerState>(() => {
-  if (typeof window === 'undefined') {
-    return {
-      Freshman: Array(SLOTS_PER_YEAR).fill(null),
-      Sophomore: Array(SLOTS_PER_YEAR).fill(null),
-      Junior: Array(SLOTS_PER_YEAR).fill(null),
-      Senior: Array(SLOTS_PER_YEAR).fill(null),
-    };
-  }
-  try {
-    const saved = localStorage.getItem('plannerV1');
-    if (saved) return JSON.parse(saved) as PlannerState;
-  } catch {}
-  return {
-    Freshman: Array(SLOTS_PER_YEAR).fill(null),
-    Sophomore: Array(SLOTS_PER_YEAR).fill(null),
-    Junior: Array(SLOTS_PER_YEAR).fill(null),
-    Senior: Array(SLOTS_PER_YEAR).fill(null),
-  };
+const [planner, setPlanner] = useState<PlannerState>({
+  Freshman: Array(SLOTS_PER_YEAR).fill(null),
+  Sophomore: Array(SLOTS_PER_YEAR).fill(null),
+  Junior: Array(SLOTS_PER_YEAR).fill(null),
+  Senior: Array(SLOTS_PER_YEAR).fill(null),
 });
+const hasLoadedPlannerRef = useRef(false);
 
 // which slot is selected for assignment
 const [selected, setSelected] = useState<{ year: YearKey; idx: number } | null>(null);
@@ -359,8 +344,18 @@ function clearSub(year: YearKey, idx: number, sub: number) {
     })();
   }, []);
 
+  // Load saved simple plan on mount, then enable persistence
   useEffect(() => {
-    localStorage.setItem('plan', JSON.stringify(plan));
+    try {
+      const saved = localStorage.getItem('plan');
+      if (saved) setPlan(JSON.parse(saved));
+    } catch {}
+    hasLoadedPlanRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedPlanRef.current) return;
+    try { localStorage.setItem('plan', JSON.stringify(plan)); } catch {}
   }, [plan]);
 
   const tagsAvailable = useMemo(() => {
@@ -495,8 +490,17 @@ function clearSub(year: YearKey, idx: number, sub: number) {
   }, 250);
 }
 
-// persist 4-year plan
+// Load saved 4-year planner on mount, then enable persistence
 useEffect(() => {
+  try {
+    const saved = localStorage.getItem('plannerV1');
+    if (saved) setPlanner(JSON.parse(saved));
+  } catch {}
+  hasLoadedPlannerRef.current = true;
+}, []);
+
+useEffect(() => {
+  if (!hasLoadedPlannerRef.current) return;
   try { localStorage.setItem('plannerV1', JSON.stringify(planner)); } catch {}
 }, [planner]);
 
@@ -737,7 +741,7 @@ useEffect(() => {
           <h2 className={styles.heading}>My Plan</h2>
           <div className={styles.planGrid}>
             {plan.map((p, i) => (
-              <div key={i} className={styles.planItem}>
+              <div key={`${p.title}-${i}`} className={styles.planItem}>
                 <span>{p.title}</span>
                 <button className={styles.removeButton} onClick={() => removeFromPlan(i)}>Remove</button>
               </div>

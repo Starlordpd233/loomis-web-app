@@ -1,35 +1,4 @@
-/* ===== Proxima Nova Font (from /public/fonts) ===== */
-@font-face {
-  font-family: 'Proxima Nova';
-  src: url('/fonts/proximanova_regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* ===== Variables ===== */
-:root {
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-  --primary: #98252b;
-  --primary-hover: #005ec2;
-  --danger: #98252b;
-  --danger-hover: #c53030;
-  --success: #4caf50;
-  --success-hover: #388e3c;
-
-  --sb-width: 10px;
-  --sb-thumb: rgba(0,0,0,0.35);
-  --sb-thumb-hover: rgba(0,0,0,0.5);
-  --sb-track: transparent;
-
-  --topbar-h: 126px;
-  --drawer-w: 800px; /* width of the left drawer */
-}
-
-body { font-family: 'Proxima Nova', sans-serif; }
+/* Uses global CSS variables defined in app/globals.css */
 
 /* ===== Top Bar ===== */
 .topBar {

@@ -15,8 +15,8 @@
 }
 
 .error {
-  background: #fff3cd;
-  border: 1px solid #ffeeba;
+  background: color-mix(in srgb, var(--card) 85%, #fff3cd);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, #ffeeba);
   padding: 10px;
   border-radius: 8px;
   margin-bottom: 10px;
@@ -36,9 +36,11 @@
 
 .input, .select {
   padding: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 8px;
   flex: 1;
+  background: var(--card);
+  color: var(--card-text);
 }
 
 .checkboxLabel {
@@ -70,17 +72,17 @@
 }
 
 .card {
-  background: #fff;
-  border: 1px solid #e0e0e0;
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-sm);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .cardHeader {
@@ -92,7 +94,7 @@
 
 .cardMeta {
   font-size: 0.85rem;
-  opacity: 0.8;
+  color: var(--muted);
 }
 
 .tagContainer {
@@ -104,9 +106,10 @@
 
 .tagChip {
   font-size: 0.75rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--chip-border);
   border-radius: 999px;
   padding: 2px 8px;
+  color: var(--chip-text);
 }
 
 .description {
@@ -123,31 +126,31 @@
 }
 
 .addButton {
-  background: #0070f3;
+  background: var(--primary);
   color: #fff;
 }
 
 .addButton:hover {
-  background: #005ec2;
+  background: var(--primary-hover);
 }
 
 .removeButton {
-  background: #e53e3e;
+  background: var(--danger);
   color: #fff;
 }
 
 .removeButton:hover {
-  background: #c53030;
+  background: var(--danger-hover);
 }
 
 .printButton {
   margin-top: 12px;
-  background: #4caf50;
+  background: var(--success);
   color: #fff;
 }
 
 .printButton:hover {
-  background: #388e3c;
+  background: var(--success-hover);
 }
 
 .planGrid {
@@ -156,10 +159,10 @@
 }
 
 .planItem {
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px;
   display: flex;
   justify-content: space-between;
-  background: #fafafa;
+  background: var(--bg);
 }

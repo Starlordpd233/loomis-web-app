@@ -1,12 +1,87 @@
+/* ===== Proxima Nova Font (from /public/fonts) ===== */
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('/fonts/proximanova_regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Shared UI tokens (used by onboarding, browser, planner) */
+  --text: #0a0a0a;
+  --muted: #666666;
+  --border: #e5e5e5;
+  --bg: #f7f7f7;
+  --card: #ffffff;
+  --card-text: #0a0a0a;
+  --chip-border: #cccccc;
+  --chip-text: #0a0a0a;
+  --accent: #98252b;
+  --radius: 14px;
+
+  --radius-sm: 8px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --primary: #0070f3;
+  --primary-hover: #005ec2;
+  --danger: #e53e3e;
+  --danger-hover: #c53030;
+  --success: #4caf50;
+  --success-hover: #388e3c;
+
+  --sb-width: 10px;
+  --sb-thumb: rgba(0,0,0,0.35);
+  --sb-thumb-hover: rgba(0,0,0,0.5);
+  --sb-track: transparent;
+  --topbar-h: 126px;
+  --drawer-w: 800px;
 }
 
+/* Explicit theme overrides when user selects dark */
+[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --text: #ededed;
+  --muted: #aaaaaa;
+  --border: #333333;
+  --bg: #111111;
+  --card: #1a1a1a;
+  --card-text: #f5f5f5;
+  --chip-border: #444444;
+  --chip-text: #e6e6e6;
+}
+
+/* Explicit theme overrides when user selects light */
+[data-theme="light"] {
+  --background: #ffffff;
+  --foreground: #171717;
+  --text: #0a0a0a;
+  --muted: #666666;
+  --border: #e5e5e5;
+  --bg: #f7f7f7;
+  --card: #ffffff;
+  --card-text: #0a0a0a;
+  --chip-border: #cccccc;
+  --chip-text: #0a0a0a;
+}
+
+/* System default (no explicit data-theme) honors prefers-color-scheme */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --text: #ededed;
+    --muted: #aaaaaa;
+    --border: #333333;
+    --bg: #111111;
+    --card: #1a1a1a;
+    --card-text: #f5f5f5;
+    --chip-border: #444444;
+    --chip-text: #e6e6e6;
   }
 }
 
@@ -19,7 +94,7 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Proxima Nova', Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -32,6 +107,7 @@ body {
   width: 100%;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 8px 12px;
   z-index: 1000;
   /* use transparent so it overlays existing UIs without altering themes */
@@ -43,10 +119,47 @@ body {
   width: auto;
 }
 
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.theme-select {
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--card-text);
+  border: 1px solid var(--border);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* add small top padding to avoid overlap if a page has content flush to top */
 html body > div:first-child, html body > main:first-child {
   padding-top: 40px;
 }
+
+/* When a page opts out of the global wordmark header */
+/* Hide header if either html or body has .hide-wordmark, or data attr is set */
+html.hide-wordmark .site-header,
+body.hide-wordmark .site-header,
+[data-hide-wordmark="1"] .site-header { display: none !important; }
+
+html.hide-wordmark > div:first-child,
+html.hide-wordmark > main:first-child,
+body.hide-wordmark > div:first-child,
+body.hide-wordmark > main:first-child,
+[data-hide-wordmark="1"] > div:first-child,
+[data-hide-wordmark="1"] > main:first-child { padding-top: 0 !important; }
 
 * {
   box-sizing: border-box;

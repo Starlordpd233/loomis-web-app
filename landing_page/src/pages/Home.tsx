@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-// Use a static asset served from public/ for compatibility
-const backgroundImg = '/frame1_background.jpg';
+import scenicBg from '@/assets/landing_page_background.jp2';
+// Prefer your original image bundled with Vite; fall back to a public PNG
+const PRIMARY_BG = scenicBg;
+const FALLBACK_BG = '/lcphotoedited.png';
 
 // Define interface for the landing page content
 interface LandingPageContent {
@@ -19,11 +21,12 @@ const landingPageData: LandingPageContent = {
   highlightText: "Loomis Chaffee",
   subtitle: "experience.",
   ctaText: "Get Started→",
-  backgroundImage: backgroundImg
+  backgroundImage: PRIMARY_BG
 };
 
 export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [bgUrl, setBgUrl] = useState<string>(PRIMARY_BG);
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
@@ -59,8 +62,9 @@ export default function Home() {
         {/* Background Image with blur effect */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-black bg-opacity-30 z-10"></div>
-          <img 
-            src={landingPageData.backgroundImage} 
+          <img
+            src={bgUrl}
+            onError={() => setBgUrl(FALLBACK_BG)}
             alt="Campus scenery" 
             className="w-full h-full object-cover blur-sm"
           />

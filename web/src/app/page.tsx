@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './page.module.css';
 
 type RawCourse = {
@@ -157,14 +157,8 @@ export default function Home() {
   const [includeDescriptions, setIncludeDescriptions] = useState(false);
   const [deptFilter, setDeptFilter] = useState<string>('All');
   const [error, setError] = useState<string | null>(null);
-  const [plan, setPlan] = useState<PlanItem[]>(() => {
-    if (typeof window === 'undefined') return [];
-    try {
-      return JSON.parse(localStorage.getItem('plan') || '[]');
-    } catch {
-      return [];
-    }
-  });
+  const [plan, setPlan] = useState<PlanItem[]>([]);
+  const hasLoadedPlanRef = useRef(false);
 
   const [tagGESC, setTagGESC] = useState(false);
   const [tagPPR, setTagPPR] = useState(false);
@@ -183,7 +177,16 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('plan', JSON.stringify(plan));
+    try {
+      const saved = localStorage.getItem('plan');
+      if (saved) setPlan(JSON.parse(saved));
+    } catch {}
+    hasLoadedPlanRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedPlanRef.current) return;
+    try { localStorage.setItem('plan', JSON.stringify(plan)); } catch {}
   }, [plan]);
 
   const departments = useMemo(() => {
@@ -354,7 +357,7 @@ function printPlan(): void {
         <h2 className={styles.heading}>My Plan</h2>
         <div id="plan" className={styles.planGrid}>
           {plan.map((p, i) => (
-            <div key={i} className={styles.planItem}>
+            <div key={`${p.title}-${i}`} className={styles.planItem}>
               <span>{p.title}</span>
               <button className={styles.removeButton} onClick={() => removeFromPlan(i)}>Remove</button>
             </div>
