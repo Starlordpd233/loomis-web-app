@@ -1,0 +1,351 @@
+/* All text uses Proxima Nova */
+:root {
+  --text: #0a0a0a;
+  --muted: #666;
+  --border: #e5e5e5;
+  --bg: #f7f7f7;
+  --card: #ffffff;
+  --accent: #98252b; /* neutral dark for buttons */
+  --radius: 14px;
+}
+
+.page {
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Proxima Nova, proxima-nova, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* main container under the existing top bar */
+.container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 28px 20px 48px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 8px 0 20px;
+}
+
+.title {
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.resetBtn {
+  background: transparent;
+  border: none;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.resetBtn:hover { color: var(--text); }
+
+/* stepper */
+.stepper {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 18px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.stepItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f0f0f0;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.stepIndex {
+  height: 24px;
+  width: 24px;
+  flex: 0 0 24px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  background: #d0d0d0;
+  color: #333;
+  font-weight: 700;
+}
+.stepIndexActive {
+  background: #98252b;
+  color: #fff;
+}
+.stepLabel {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* card */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 4px 18px rgba(0,0,0,.06);
+}
+
+.loading {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* sections */
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+}
+
+.label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.gridFour {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.gridTwo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.pill {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
+.pill:hover { border-color: #0a0a0a; }
+.pillActive {
+  background: #98252b;
+  color: #fff;
+  border-color: #98252b;
+}
+
+.select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  background: #fff;
+  font-size: 15px;
+  outline: none;
+}
+.select:focus { border-color: #0a0a0a; }
+
+/* intent toggle */
+.intentRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.intentBtn {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 14px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.intentBtn:hover { border-color: #0a0a0a; }
+.intentBtnActive {
+  background: #98252b;
+  color: #fff;
+  border-color: #98252b;
+}
+
+/* review */
+.reviewList {
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* footer */
+.footerRow {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.backBtn {
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 11px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+.backBtn:disabled { opacity: .45; cursor: not-allowed; }
+.backBtn:not(:disabled):hover { border-color: #0a0a0a; }
+
+.primaryBtn {
+  border: 1px solid #98252b;
+  background: #98252b;
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 12px 18px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+.primaryBtn:disabled { background: #d9d9d9; border-color: #d9d9d9; color:#555; cursor:not-allowed; }
+
+.toast {
+  margin-top: 12px;
+  display: inline-block;
+  background: #98252b;
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+/* debug */
+.debug {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.debugPre {
+  margin-top: 8px;
+  background: #0a0a0a;
+  color: #f1f1f1;
+  border-radius: 12px;
+  padding: 12px;
+  overflow: auto;
+  font-size: 12px;
+}
+
+/* responsive tweaks */
+@media (max-width: 640px) {
+  .gridTwo { grid-template-columns: 1fr; }
+  .gridFour { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.page * {
+  font-family: 'Proxima Nova', system-ui, sans-serif !important;
+}
+
+/* ===== Step 0: Interstitial Intro ===== */
+
+.intro {
+  font-family: 'Proxima Nova', system-ui, sans-serif;
+  background: #fafafa;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.introMain {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.introCard {
+  width: 100%;
+  max-width: 760px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.06);
+}
+
+.introTitle {
+  margin: 0 0 8px 0;
+  font-size: clamp(22px, 3.5vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: none; /* keep the lowercase vibe you used */
+}
+
+.introBody {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #444;
+}
+
+.introList {
+  margin: 0 0 14px 20px;
+  padding: 0;
+  font-size: 16px;
+}
+.introList li {
+  margin: 6px 0;
+}
+
+.introNote {
+  margin: 10px 0 18px 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.introActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.primaryBtn {
+  font-family: 'Proxima Nova', system-ui, sans-serif; /* enforce font on buttons */
+  appearance: none;
+  border: 1px solid #98252b;
+  background: #98252b;
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+.primaryBtn:hover { opacity: .92; }
+
+.secondaryLink {
+  font-family: 'Proxima Nova', system-ui, sans-serif;
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: #666;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 8px 6px;
+  cursor: pointer;
+}
+.secondaryLink:hover { color: #111; }
+
+/* Ensure all interactive elements inherit Proxima Nova */
+.intro button { font-family: 'Proxima Nova', system-ui, sans-serif; }
+.intro a, .intro select { font-family: 'Proxima Nova', system-ui, sans-serif; }
+
+/* Responsive */
+@media (max-width: 520px) {
+  .introCard { padding: 20px; border-radius: 14px; }
+  .introActions { flex-direction: column; align-items: stretch; }
+  .secondaryLink { align-self: center; padding: 4px 0; }
+}
+
