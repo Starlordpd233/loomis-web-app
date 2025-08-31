@@ -1,0 +1,374 @@
+/* ===== Proxima Nova Font (from /public/fonts) ===== */
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('/fonts/proximanova_regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===== Variables ===== */
+:root {
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --primary: #98252b;
+  --primary-hover: #005ec2;
+  --danger: #98252b;
+  --danger-hover: #c53030;
+  --success: #4caf50;
+  --success-hover: #388e3c;
+
+  --sb-width: 10px;
+  --sb-thumb: rgba(0,0,0,0.35);
+  --sb-thumb-hover: rgba(0,0,0,0.5);
+  --sb-track: transparent;
+
+  --topbar-h: 126px;
+  --drawer-w: 800px; /* width of the left drawer */
+}
+
+body { font-family: 'Proxima Nova', sans-serif; }
+
+/* ===== Top Bar ===== */
+.topBar {
+  width: 100%;
+  height: var(--topbar-h);
+  background: #323E48;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topBarInner {
+  max-width: 1920px;
+  margin: 0 auto;
+  height: 100%;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.logo { height: 36px; width: auto; }
+
+/* ===== Drawer Toggle Button ===== */
+.drawerToggle {
+  position: fixed;
+  top: calc(var(--topbar-h) + 540px);
+  left: 8px;
+  z-index: 70;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #323E48;
+  box-shadow: var(--shadow-sm);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: left 0.3s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  color:#ffffff
+}
+.drawerToggle:hover { box-shadow: var(--shadow-md); transform: translateX(1px); }
+
+/* When drawer is open, move the toggle to sit near the drawer edge */
+.drawerToggleOpen { left: calc(var(--drawer-w) + 8px); }
+
+/* ===== Left Drawer ===== */
+.drawer {
+  position: fixed;
+  top: var(--topbar-h);
+  left: 0;
+  width: var(--drawer-w);
+  max-width: 90vw;
+  height: calc(100vh - var(--topbar-h));
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
+  box-shadow: var(--shadow-sm);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+}
+
+.drawerOpen { transform: translateX(0); }
+
+.drawerContent {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  gap: 8px;
+}
+
+/* ===== Main Container (Plan only; full width) ===== */
+.container {
+  /* single column; Plan takes full width */
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Proxima Nova', sans-serif;
+}
+
+/* ===== Common UI ===== */
+.heading { font-size: 1.8rem; margin-bottom: 12px; font-weight: 600; }
+
+.error {
+  background: #fff3cd;
+  border: 1px solid #ffeeba;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+}
+
+.filters { display: grid; gap: 12px; }
+
+.searchRow { display: flex; gap: 10px; align-items: center; }
+
+.input, .select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: var(--radius-sm);
+  flex: 1;
+  font-family: inherit;
+}
+
+.checkboxLabel { font-size: 0.85rem; display: flex; gap: 6px; }
+
+.tagRow { display: flex; gap: 10px; font-size: 0.85rem; flex-wrap: wrap; }
+
+.tagInfo { opacity: 0.6; }
+
+.resultInfo { font-size: 0.9rem; opacity: 0.7; }
+
+/* ===== Scrollable Course List ===== */
+.courseList {
+  overflow-y: auto;
+  padding-right: 6px;
+  flex: 1;                     /* fill drawer vertical space */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+
+  /* consistent width & color */
+  scrollbar-width: thin;       /* Firefox */
+  scrollbar-color: var(--sb-thumb) var(--sb-track);
+}
+
+/* WebKit (Chrome/Safari/Edge) */
+.courseList::-webkit-scrollbar { width: var(--sb-width); }
+.courseList::-webkit-scrollbar-track { background: var(--sb-track); }
+.courseList::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb);
+  border-radius: 999px;
+  transition: background 0.2s ease;
+}
+.courseList::-webkit-scrollbar-thumb:hover { background: var(--sb-thumb-hover); }
+
+/* ===== Cards ===== */
+.cardGrid { display: grid; gap: 14px; padding-bottom: 8px; }
+
+.card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--radius);
+  padding: 16px 16px 0;       /* bottom 0 so banner sits flush */
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;           /* make banner clip to rounded corners */
+}
+
+.card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.cardMeta { font-size: 0.85rem; opacity: 0.8; }
+
+.tagContainer { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+
+.tagChip { font-size: 0.75rem; border: 1px solid #ccc; border-radius: 999px; padding: 2px 8px; }
+
+.description { margin-top: 8px; font-size: 0.9rem; padding-bottom: 12px; }
+
+/* Red banner for prerequisite / permission — full bleed */
+.prereqBanner {
+  background: var(--danger);
+  color: #fff;
+  padding: 12px 16px;
+  margin: 12px -16px 0;
+  border-top: 1px solid rgba(255,255,255,0.25);
+  border-radius: 0 0 var(--radius) var(--radius);
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ===== Buttons ===== */
+.addButton, .removeButton, .printButton {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Add button → red per your last change */
+.addButton { background: var(--danger); color: #fff; }
+.addButton:hover { background: var(--danger-hover); }
+
+.removeButton { background: var(--danger); color: #fff; }
+.removeButton:hover { background: var(--danger-hover); }
+
+.printButton { margin-top: 12px; background: var(--success); color: #fff; }
+.printButton:hover { background: var(--success-hover); }
+
+/* ===== Plan ===== */
+.planGrid { display: grid; gap: 8px; }
+
+.planItem {
+  border: 1px solid #ddd;
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  background: #fafafa;
+}
+
+/* === 4-year planner (ADD) === */
+.main { max-width: 1200px; margin: 0 auto; padding: 0; }
+
+.plannerShell{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding:20px;
+  margin-bottom:20px;
+}
+
+.plannerHeaderRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+
+.smallNote{ font-size:.9rem; opacity:.75; }
+.tools{ display:flex; gap:8px; }
+.toolBtn{
+  padding:6px 10px;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  border-radius: var(--radius-sm);
+  cursor:pointer;
+}
+.toolBtn:hover{ box-shadow: var(--shadow-sm); }
+
+/* 4 equal columns for the years */
+.grid{
+  display:grid;
+  gap:18px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.colTitle{ font-weight:700; margin-bottom:10px; }
+.colSlots{ display:grid; gap:12px; }
+
+.slot{
+  position:relative;
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding:12px 36px 12px 14px;
+  min-height:56px;
+  cursor:pointer;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+.slot:hover{ box-shadow: var(--shadow-md); }
+.slotSelected{ border-color:#111; box-shadow: 0 0 0 2px #1111; }
+
+.slotTitle{ font-weight:600; }
+.slotMeta{ font-size:.85rem; opacity:.75; margin-top:2px; }
+.slotPlaceholder{ color:#666; }
+
+.slotClear{
+  position:absolute;
+  right:8px; top:8px;
+  width:24px; height:24px;
+  border-radius:999px; border:none;
+  background:#f2f2f2;
+  cursor:pointer;
+}
+.slotClear:hover{ background:#e6e6e6; }
+
+/* --- Grouped term/half slots (ADD) --- */
+.slotGroup{
+  border:none;
+  background:transparent;
+  box-shadow:none;
+  padding:0 0 0 36px;        /* room for bracket */
+  position:relative;
+}
+.slotGroup.slotSelected .subSlot{
+  border-color:#111;
+  box-shadow:0 0 0 2px #1111;
+}
+
+.subStack{ display:grid; gap:16px; }
+.subSlot{
+  position:relative;
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding:12px 36px 12px 14px;
+  min-height:56px;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+.subSlot:hover{ box-shadow: var(--shadow-md); }
+.subClear{
+  position:absolute; right:8px; top:8px;
+  width:24px; height:24px; border-radius:999px; border:none;
+  background:#f2f2f2; cursor:pointer;
+}
+.subClear:hover{ background:#e6e6e6; }
+
+/* Bracket on the left */
+.bracket{
+  position:absolute; left:10px; top:6px; bottom:6px;
+  width:0; border-left:2px solid #e2e2e2;
+}
+.bracketNotch{
+  position:absolute; left:10px; width:18px; height:1px;
+  background:#e2e2e2; transform:translateX(-1px);
+}
+
+/* (Optional) small visual difference between 2 vs 3 term groups */
+.group2 .subStack{ gap:18px; }
+.group3 .subStack{ gap:14px; }
+
+/* hide the horizontal notches */
+.bracketNotch { display: none !important; }
+
+/* nudge grouped cells left (keep the vertical bracket) */
+.slotGroup { padding-left: 22px; }   /* was 36px */
+.bracket   { left: 4px; top: 8px; bottom: 8px; }
+
+/* tighten spacing between sub-cells a touch (optional) */
+.subStack { gap: 12px; }  /* was 14–18px */
