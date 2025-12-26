@@ -33,7 +33,7 @@ wait_for_port() {
 
 # Start landing page on port 3002 (Vite)
 echo "📄 Starting landing page on http://localhost:3002"
-cd "/Users/MatthewLi/Desktop/Senior Year/web_dev_lc/landing_page"
+cd "landing_page"
 # Prefer running the Vite command directly to avoid a pnpm dependency when invoked via npm
 if has_cmd pnpm; then
   pnpm run dev:client &
@@ -45,7 +45,7 @@ wait_for_port 3002 "landing page"
 
 # Start login page on port 3000 (Next.js)
 echo "🔐 Starting login page on http://localhost:3000 (targets onboarding)"
-cd "/Users/MatthewLi/Desktop/Senior Year/web_dev_lc/login_page"
+cd "../login_page"
 # Point Login -> Course Browser onboarding by default for a unified flow
 PORT=3000 NEXT_PUBLIC_COURSE_BROWSER_URL="http://localhost:3001/onboarding" npm run dev &
 LOGIN_PID=$!
@@ -53,7 +53,7 @@ wait_for_port 3000 "login page"
 
 # Start course browser on port 3001 (Next.js)
 echo "📚 Starting course browser on http://localhost:3001"
-cd "/Users/MatthewLi/Desktop/Senior Year/web_dev_lc/web"
+cd "../web"
 npm run dev &
 COURSE_PID=$!
 wait_for_port 3001 "course browser"
