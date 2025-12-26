@@ -7,6 +7,8 @@ if they are good for the graduation requirements or maximum courses allowed, num
 – for prerequisite mentioned in the course description, we can add the feature that, based on the user's input about the courses that've already taken
 so far, that automatically tells me whether they're missing a prerequisite, when they select this course. Add this feature later once core features are
 done. 
+– add a button on top right corner to switch system modes (light/dark)
+–I'm thinking about drawing insight from some college course academic catalog for the general entry of all courses
 
 
 
