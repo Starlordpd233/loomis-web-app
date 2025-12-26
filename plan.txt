@@ -9,6 +9,7 @@ so far, that automatically tells me whether they're missing a prerequisite, when
 done. 
 – add a button on top right corner to switch system modes (light/dark)
 –I'm thinking about drawing insight from some college course academic catalog for the general entry of all courses
+– I think there should be separate pages for course browser and course planner
 
 
 
