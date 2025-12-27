@@ -1,80 +1,72 @@
-# Loomis Chaffee Web Application Suite
+# Loomis Chaffee Course Planner
 
-This project contains three connected web applications:
+A Next.js web application for browsing the Loomis Chaffee course catalog and planning four-year academic schedules.
 
-1. **Landing Page** (Port 3002) - React/Vite application with landing page
-2. **Login Page** (Port 3000) - Next.js application for authentication  
-3. **Course Browser** (Port 3001) - Next.js application for course browsing
+## Features
 
-## Navigation Flow
-
-Landing Page → Login Page → Course Browser
+- **Course Browser** (`/browser`) - Search and filter the complete course catalog, build a shopping list of courses
+- **Course Planner** (`/planner`) - Visual 4-year grid for planning your academic schedule
+- **Onboarding** (`/onboarding`) - Initial setup wizard for new users
 
 ## Quick Start
 
-### Option 1: Run All Applications (Recommended)
-
 ```bash
-./start-all.sh
-```
+# Install dependencies
+cd loomis-course-app && npm install
 
-This will start all three applications simultaneously:
-- Landing page at http://localhost:3002
-- Login page at http://localhost:3000
-- Course browser at http://localhost:3001
-
-Press `Ctrl+C` to stop all applications.
-
-### Option 2: Run Individual Applications
-
-#### Landing Page Only
-```bash
-cd landing_page
+# Start development server (runs on port 3001)
 npm run dev
 ```
 
-#### Login Page Only
-```bash
-cd login_page
-npm run dev
-```
+Open [http://localhost:3001](http://localhost:3001) in your browser.
 
-#### Course Browser Only
+## Development Commands
+
 ```bash
-cd web
-npm run dev
+# Development server
+cd loomis-course-app && npm run dev
+
+# Production build
+cd loomis-course-app && npm run build
+
+# Run linter
+cd loomis-course-app && npm run lint
+
+# Start production server
+cd loomis-course-app && npm start
 ```
 
 ## Project Structure
 
 ```
 web_dev_lc/
-├── landing_page/          # React/Vite landing page (port 3002)
-├── login_page/            # Next.js login application (port 3000)
-├── web/                   # Next.js course browser (port 3001)
-├── start-all.sh          # Script to run all applications
-└── README.md             # This file
+├── loomis-course-app/     # Main Next.js application
+│   ├── src/
+│   │   ├── app/           # Next.js App Router pages
+│   │   │   ├── (marketing)/   # Landing and login pages
+│   │   │   ├── (app)/         # Main app pages (browser, planner)
+│   │   │   └── sandbox/       # Design experimentation area
+│   │   ├── lib/           # Utilities (courseUtils, plannerStore)
+│   │   └── types/         # TypeScript type definitions
+│   └── public/            # Static assets and course catalog JSON
+├── prep_data/             # Source materials for building catalog
+├── design_ideas/          # UI/UX design exploration
+└── README.md              # This file
 ```
 
-## Getting Started
+## Navigation Flow
 
-1. Make sure all dependencies are installed:
-   ```bash
-   cd landing_page && npm install
-   cd ../login_page && npm install  
-   cd ../web && npm install
-   ```
+```
+/ (Landing) → /login → /onboarding → /browser ↔ /planner
+```
 
-2. Run all applications:
-   ```bash
-   ./start-all.sh
-   ```
+## Tech Stack
 
-3. Open http://localhost:3002 in your browser to start from the landing page
+- **Framework:** Next.js 15 with App Router
+- **Language:** TypeScript
+- **Styling:** CSS Modules (main app), Tailwind CSS (sandbox)
+- **State:** localStorage persistence with migration support
 
-## Development Notes
+## Design Sandbox
 
-- Each application runs on its own port to avoid conflicts
-- The landing page redirects to the login page when "Get Started" is clicked
-- The login page redirects to the course browser after login
-- All applications can be stopped with `Ctrl+C` when using the startup script
+The `/sandbox` route provides an isolated environment for prototyping new UI ideas using Tailwind CSS without affecting the main application styles.

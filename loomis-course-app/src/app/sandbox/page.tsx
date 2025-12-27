@@ -162,7 +162,7 @@ export default function SandboxIndex() {
           <ol className="space-y-3 text-slate-300 text-sm">
             <li className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 bg-slate-700 rounded-full flex items-center justify-center text-xs font-bold">1</span>
-              <span>Create a folder: <code className="bg-slate-700 px-2 py-0.5 rounded">web/src/app/sandbox/[category]/[idea-name]/page.tsx</code></span>
+              <span>Create a folder: <code className="bg-slate-700 px-2 py-0.5 rounded">src/app/sandbox/[category]/[idea-name]/page.tsx</code></span>
             </li>
             <li className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 bg-slate-700 rounded-full flex items-center justify-center text-xs font-bold">2</span>
