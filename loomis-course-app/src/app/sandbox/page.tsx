@@ -33,6 +33,7 @@ export default function SandboxIndex() {
   
   const activeCount = countByStatus(CATEGORIES, 'wip') + countByStatus(CATEGORIES, 'ready');
   const totalCategories = activeCategories.length;
+  const archivedCount = countByStatus(CATEGORIES, 'archived');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
@@ -49,12 +50,22 @@ export default function SandboxIndex() {
                 {activeCount} active experiment{activeCount !== 1 ? 's' : ''} across {totalCategories} categor{totalCategories !== 1 ? 'ies' : 'y'}
               </p>
             </div>
-            <Link
-              href="/"
-              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition-colors"
-            >
-              ← Back to Main App
-            </Link>
+            <div className="flex items-center gap-3">
+              {archivedCount > 0 && (
+                <Link
+                  href="/sandbox/archive"
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-lg text-sm font-medium transition-colors text-slate-300"
+                >
+                  Archive ({archivedCount})
+                </Link>
+              )}
+              <Link
+                href="/"
+                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-medium transition-colors"
+              >
+                ← Back to Main App
+              </Link>
+            </div>
           </div>
         </div>
       </header>
