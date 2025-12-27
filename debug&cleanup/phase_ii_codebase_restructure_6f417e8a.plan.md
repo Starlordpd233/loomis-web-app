@@ -1,164 +1,106 @@
 ---
 name: Phase II Codebase Restructure
-overview: Consolidate the repo into a single Next.js app (`web/`) with a clean route structure and a standard user flow (Landing → Login → (optional) Onboarding → Browser → Planner). Browser and Planner remain separate routes/features (no embedded course browser UI inside the planner page). Extract shared course logic/state and organize data/assets/docs so navigation and development become predictable.
+overview: Consolidate the repo into a single Next.js app (`web/`) with a clean route structure and a standard user flow. Browser and Planner remain separate routes/features. Extract shared course logic/state, enforce strict typing, and organize data/assets/docs.
 todos:
   - id: choose-canonical-pages
-    content: Pick canonical implementations for Landing/Login/Browser from the duplicate list (defaults recommended by your doc).
+    content: Pick canonical implementations for Landing/Login/Browser from the duplicate list.
     status: pending
   - id: route-groups-layouts
-    content: Refactor `web/src/app` into route groups with separate layouts for marketing vs app routes, removing the hide-wordmark hacks.
+    content: Refactor `web/src/app` into route groups (`(marketing)` vs `(app)`) with separate layouts to isolate styles and headers.
+    status: pending
+  - id: strict-typing
+    content: Create `web/src/types/course.ts` with Zod/TS definitions to standardize data shapes before migration.
     status: pending
   - id: migrate-landing-login
-    content: Port landing + login UIs into `web/` and replace cross-port redirects with Next.js internal navigation.
+    content: Port landing + login UIs into `web/`, merging Tailwind configs and namespacing assets (`public/landing/`) to avoid collisions.
     status: pending
   - id: static-assets-catalog
-    content: Create `web/public/` and standardize required assets + one canonical catalog JSON file so `/browser` can load data.
+    content: Standardize `web/public/` with a single canonical `catalog.json` and organized image subfolders.
     status: pending
   - id: extract-course-utils
-    content: Create `web/src/lib/courseUtils.ts` and refactor Browser/Planner to import shared logic.
+    content: Create `web/src/lib/courseUtils.ts` using the new strict types and refactor Browser/Planner to import shared logic.
     status: pending
   - id: decouple-browser-planner
-    content: Remove duplicated Course Browser UI/logic inside the Planner page; implement a clean cross-route “pick course in /browser, arrange in /planner” workflow.
+    content: Remove duplicated Course Browser UI inside the Planner page; implement `picker` pattern (deep-link to Browser) for simpler code.
     status: pending
   - id: unify-plan-state
-    content: Define one persisted plan/planner data model used by both pages (shared state, separate UIs) and migrate from `plan`/`plannerV1` to a single key.
+    content: Define one persisted data model (`plannerV2`) used by both pages and implement a migration strategy.
     status: pending
   - id: cleanup-and-verify
-    content: Update docs/scripts for single-app dev, then verify end-to-end flow and archive/remove redundant apps.
+    content: Verify end-to-end flow, ensure no style bleeding, and remove redundant apps.
     status: pending
 ---
 
 # Phase II: Unify + Restructure `web_dev_lc`
 
 ## Goals
-- **One app, one URL base**: eliminate cross-port redirects and duplicated page implementations.
-- **Standard user journey** inside one Next.js App Router project:
-  - `/` (Landing) → `/login` → (`/onboarding` if first time) → `/browser` → `/planner`
-- **Browser and Planner are separate features/pages**:
-  - **Browser** = search/filter the full catalog and build a selection (shortlist/plan).
-  - **Planner** = arrange the selected courses into a 4-year plan (no full catalog browser embedded).
-- **Single source of truth** for course data shaping + plan/planner state to remove duplication (shared state, separate UIs).
-- **Clean repo layout**: separate app code vs data vs docs.
+- **One app, one URL base**: Eliminate cross-port redirects and duplicated page implementations.
+- **Standard user journey**: `/` (Landing) → `/login` → `/onboarding` → `/browser` → `/planner`.
+- **Browser/Planner Separation**: 
+  - **Browser**: Search, filter, "Shopping List".
+  - **Planner**: Grid view, arrange courses from list.
+- **Single Source of Truth**: Unified state management and strict data typing.
+- **Clean Repo Layout**: Separate app code, data, and docs.
 
-## Current core folders (what stays “core”)
-- **App code**
-  - [`/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/web/`](file:///Users/MatthewLi/Desktop/Senior%20Year/clubs/web_dev_lc/web): target monolith (Next.js 15.5 / React 19).
-  - [`/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/landing_page/`](file:///Users/MatthewLi/Desktop/Senior%20Year/clubs/web_dev_lc/landing_page): contains the best landing UI, but will be migrated in.
-  - [`/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/login_page/`](file:///Users/MatthewLi/Desktop/Senior%20Year/clubs/web_dev_lc/login_page): contains the best login UI, but will be migrated in.
-- **Data**
-  - [`/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/prep_data/`](file:///Users/MatthewLi/Desktop/Senior%20Year/clubs/web_dev_lc/prep_data): source datasets; keep, but reorganize/rename.
-  - [`/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/FINALcatalog.json`](file:///Users/MatthewLi/Desktop/Senior%20Year/clubs/web_dev_lc/FINALcatalog.json): candidate canonical catalog.
-- **Docs/notes**
-  - [`/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/`](file:///Users/MatthewLi/Desktop/Senior%20Year/clubs/web_dev_lc/debug%26cleanup): keep as documentation (can later move under `docs/`).
-
-## Duplicate page implementations you must choose between (canonical “keepers”)
-These are duplicates for the **3 pages in the target flow**; you said you’ll pick which to keep.
-- **Landing (`/`)**
-  - `landing_page/src/pages/Home.tsx` (marketing landing UI)
-  - `web/src/app/page.tsx` (currently an outdated course browser sitting at `/` — should be replaced by the landing UI)
-- **Login (`/login`)**
-  - `login_page/src/app/login/page.tsx` (login UI)
-  - (redirect-only helper) `login_page/src/app/page.tsx` (`/` → `/login` inside `login_page`) Delete this if not serving any real purpose.
-- **Course Browser (`/browser`)** (page + logic)
-  - `web/src/app/browser/page.tsx` (canonical browser UI)
-  - (legacy/duplicate browser implementation at `/`) `web/src/app/page.tsx` Delete this.
-  - (duplicated browser logic embedded inside planner) `web/src/app/planner/page.tsx` (the browser portion should be removed)
-- **Planner (`/planner`)** (page should be planner-only)
-  - `web/src/app/planner/page.tsx` (currently mixes planner + embedded browser; Phase II will split so this route only contains planner UI)
-
-## Standard navigation + user flow (best practice)
-### Route map
-```mermaid
-flowchart TD
-  Landing["/"] --> Login["/login"]
-  Login -->|"first_time"| Onboarding["/onboarding"]
-  Login -->|"returning"| Browser["/browser"]
-  Onboarding --> Browser
-  Browser --> Planner["/planner"]
-  Planner --> Browser
-```
-
-### Navigation rules
-- **Internal navigation**: use Next.js `Link` + `useRouter().push()` (no `window.location.href` for internal routes).
-- **Feature separation**: do not embed the entire catalog browser (drawer/search/filter) inside `/planner`. Planner should link out to `/browser` to add more courses, or deep-link to `/browser` for course picking, then return.
-- **Route guarding** (lightweight, since auth is currently “mock”):
-  - Require a simple “session cookie” for `/browser`, `/planner`, `/onboarding` → otherwise redirect to `/login`.
-  - Keep the existing onboarding-complete check (cookie-based) and make it consistent with the login redirect decision.
-
-### Browser vs Planner responsibilities (clean separation)
-- **`/browser` responsibilities**
-  - Full catalog search, filters, department canonicalization, tags.
-  - Add/remove courses to a selection (“My Courses” / “My Plan list”).
-  - Optional “Assign to slot” flow via deep-linking from `/planner` (see below).
-- **`/planner` responsibilities**
-  - Visualize a 4-year plan grid.
-  - Assign courses from the user’s selected list (or via a pick-in-browser flow).
-  - Print/export the plan.
-  - No full-catalog browsing UI; keep the page focused on planning.
+## Canonical Pages ("Keepers")
+- **Landing:** `landing_page/src/pages/Home.tsx` (Migrate to `web/src/app/(marketing)/page.tsx`)
+- **Login:** `login_page/src/app/login/page.tsx` (Migrate to `web/src/app/(marketing)/login/page.tsx`)
+- **Browser:** `web/src/app/browser/page.tsx` (Move to `web/src/app/(app)/browser/page.tsx`)
+- **Planner:** `web/src/app/planner/page.tsx` (Refactor to `web/src/app/(app)/planner/page.tsx` - Planner Grid ONLY)
 
 ## Phase II Implementation Outline
-### A) Restructure `web/` to support clean layouts
-- Add App Router **route groups** so pages stop hiding the global header via CSS hacks.
-  - `web/src/app/layout.tsx`: minimal root HTML/body + `globals.css` only.
-  - `web/src/app/(marketing)/page.tsx`: landing.
-  - `web/src/app/(marketing)/login/page.tsx`: login.
-  - `web/src/app/(app)/layout.tsx`: app shell header + nav (Browser/Planner/Theme/Reset).
-  - `web/src/app/(app)/browser/page.tsx`: existing browser.
-  - `web/src/app/(app)/planner/page.tsx`: existing planner.
-  - `web/src/app/(app)/onboarding/*`: existing onboarding.
 
-### B) Migrate the canonical Landing + Login into `web/`
-- Convert `landing_page/src/pages/Home.tsx` (React Router) to Next.js App Router:
-  - replace `useNavigate()` with `Link` or `useRouter().push('/login')`.
-- Copy the login UI from `login_page/src/app/login/page.tsx` into `web/src/app/(marketing)/login/page.tsx`:
-  - replace `COURSE_BROWSER_URL` usage with internal routing (`/onboarding` or `/browser`).
+### A) Restructure `web/` Layouts (Route Groups)
+- **Goal:** Isolate Marketing UI (Landing/Login) from App UI (Browser/Planner) to prevent style bleeding and header conflicts.
+- **Structure:**
+  - `web/src/app/layout.tsx`: Base HTML/Body + `globals.css`.
+  - `web/src/app/(marketing)/layout.tsx`: Landing-specific layout.
+  - `web/src/app/(app)/layout.tsx`: App Shell (Header, Nav, ThemeToggle).
+  - `web/src/app/(app)/browser/`: Browser page.
+  - `web/src/app/(app)/planner/`: Planner page (Grid only).
 
-### C) Fix/standardize static assets + catalog data
-Right now `web/` references static files that are not present in-repo (`/logo.svg`, `/fonts/*`, catalog JSON paths). Phase II should make these explicit.
-- Create/standardize `web/public/`:
-  - `web/public/catalogdbfinal.json` (or `catalog.json`) as the single file the app fetches.
-  - `web/public/images/*` for landing/login images.
-  - Decide whether to keep/remove the custom Proxima Nova font references in `web/src/app/globals.css` depending on whether you actually have the licensed font files.
+### B) Enforce Strict Typing (Pre-requisite)
+- **Action:** Create `web/src/types/course.ts`.
+- **Content:** Define strict TypeScript interfaces (and optional Zod schemas) for `Course`, `PlanItem`, and `Catalog`.
+- **Why:** Prevents "termLabel" vs "term" bugs during the migration of logic from 3 different sources.
 
-### D) Extract shared course logic (remove duplicated functions)
-- Create `web/src/lib/courseUtils.ts` and move shared helpers out of:
-  - `web/src/app/page.tsx`
-  - `web/src/app/browser/page.tsx`
-  - `web/src/app/planner/page.tsx`
-- Target exports:
-  - `fetchCatalog()` (replaces `fetchFirst([...])`)
-  - `flattenDatabase()`
-  - `deriveTags()` / `normalizeTerm()`
-  - `canonicalizeDepartment()` and shared constants (dept options)
+### C) Migrate & Merge UI
+- **Landing & Login:**
+  - Port React/Vite components to Next.js App Router.
+  - **Critical:** Merge `tailwind.config.js` carefully. If conflicts arise, use CSS Modules for the Landing page or prefix custom classes.
+- **Assets:**
+  - Create `web/public/landing/` and `web/public/login/`.
+  - Move images into these namespaces to prevent filename collisions (e.g., generic `hero.jpg`).
 
-### E) Decouple Planner UI from Browser UI (separate pages, shared data)
-- Refactor `web/src/app/planner/page.tsx` so it is **planner-only**:
-  - remove the embedded course browser drawer/search/filter UI
-  - keep planner grid + (optional) a “Selected courses” pool sourced from shared state
-  - add clear navigation: “Add courses” button → `/browser`
-- Optional best-practice “course picker” deep-link flow (keeps pages separate, avoids duplicate browser UI):
-  - from `/planner`, selecting a slot can link to `/browser?pickForYear=Freshman&pickForIdx=2&returnTo=/planner`
-  - `/browser` can show an “Assign” action that writes assignment into shared state and routes back to `returnTo`
+### D) Extract Shared Logic (`courseUtils`)
+- Create `web/src/lib/courseUtils.ts`.
+- Centralize `fetchCatalog`, `flattenDatabase`, `deriveTags`, and `canonicalizeDepartment`.
+- Update all pages to import from this single source.
 
-### F) Unify plan/planner state + storage keys
-- Define a **single persisted data model** used by both pages (shared store, separate UIs).
-  - Example: `selectedCourses` (list) + `plannerGrid` (slots) in one persisted object.
-  - Implement one storage key (e.g. `plannerV2`) and a one-time migration from `plan` / `plannerV1`.
+### E) Decouple Planner from Browser
+- **Refactor Planner:** Remove the embedded side-drawer Course Browser.
+- **New Flow:**
+  - User clicks a slot in Planner.
+  - **Deep Link:** Navigates to `/browser?mode=picker&year=Freshman&slot=0&returnTo=/planner`.
+  - **Browser:** Renders in "Picker Mode" (showing "Select" instead of "Add").
+  - **Action:** Selection updates shared state and redirects back to `returnTo`.
+- **Note:** This trade-off (navigation vs. modal) is intentional for Phase II to reduce code duplication. A modal can be reintroduced in Phase III using shared components.
 
-### G) Remove cross-app tooling once unified
-- Update or replace `start-all.sh` to run only `web/`.
-- Update root `README.md` to describe the single-app workflow.
-- After verification, archive/remove `landing_page/` and `login_page/`.
+### F) Unify State Management
+- **New Key:** `plannerV2` (replaces `plan` and `plannerV1`).
+- **Structure:** `{ selectedCourses: Course[], grid: PlannerGrid }`.
+- **Migration:** On app load, check for legacy keys, convert to new structure, and save to `plannerV2`.
 
-## Verification ("see if strategies work")
-- Start `web/` dev server only and verify:
-  - `/` renders landing and CTA routes to `/login`.
-  - `/login` routes to `/onboarding` when no onboarding cookie, otherwise `/browser`.
-  - `/onboarding` redirects to `/browser` if prefs already complete.
-  - `/browser` loads catalog JSON successfully and can add courses.
-  - `/planner` is planner-only (no embedded full course browser UI) and loads the same underlying shared state (no split-brain `plan` vs `plannerV1`).
-  - Navigation between `/browser` and `/planner` works via standard links (and optional pick/return flow if implemented).
+## Execution Strategy (Atomic Commits)
+1.  **The Move:** Establish Route Groups and migrate files/assets first. Get pages rendering at new URLs (even if logic is mock/broken).
+2.  **The Type:** Define `src/types/course.ts` to lock down the data shape.
+3.  **The Refactor:** Implement `courseUtils` and State Manager. Wire pages to these shared utilities one by one.
+4. Committ regularly during the execution. Do not wait for one huge commit at the end.
 
-## Scope boundaries for Phase II
-- This phase focuses on **structure + navigation + removing duplication**.
-- Real authentication (SSO/OAuth) can come later; Phase II uses a lightweight session cookie to enforce the flow.
+## Risks & Mitigations
+- **CSS Conflicts:** `landing_page` styles might break `web` layout.
+  - *Mitigation:* Use Route Groups layouts to scope styles.
+- **UX Friction:** "Picker" flow is heavier than a sidebar.
+  - *Mitigation:* Accept for Phase II to ensure architecture is clean. Upgrade to a shared "Mini-Browser" component later.
+- **Asset Collisions:** Overwriting `public/logo.svg`.
+  - *Mitigation:* Namespace all migrated assets into subfolders.

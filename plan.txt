@@ -1,5 +1,7 @@
 Plans for web features (Phase II aligned):
 
+We'd have to figure out a reason why students would use this service. What draws them in? The planner?
+
 Phase II (Architecture & navigation best practices):
 - Single unified Next.js app under `web/` (one URL base; no cross-port redirects between apps)
 - Standard route flow: `/` → `/login` → (optional) `/onboarding` → `/browser` → `/planner`
