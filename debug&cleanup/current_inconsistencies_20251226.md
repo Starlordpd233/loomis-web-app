@@ -1,23 +1,21 @@
 # 🔍 Code Space Inconsistencies Report
 
-**Date:** December 26, 2025 (Phase 1 Complete)
+**Date:** December 26, 2025 (Phase 2 In Progress)
 **Repository:** web_dev_lc
 **Purpose:** Comprehensive documentation of all inconsistencies, duplications, and organizational issues
-**Status:** Phase 1 (Trash Cleanup) COMPLETED. Ready for Phase 2 (Unify Codebase).
+**Status:** Phase 2 (Unify Codebase) IN PROGRESS.
 
 ---
 
 ## 📊 Executive Summary
 
-This codespace contains **4 separate web applications** that collectively implement a course registration and planning system for Loomis Chaffee. There is significant duplication, redundancy, and architectural confusion:
+This codespace contains **3 separate web applications** that collectively implement a course registration and planning system for Loomis Chaffee. There is significant duplication, redundancy, and architectural confusion:
 
-- **2 different login pages** (one redirect stub, one actual UI)
-- **4 different course browsers** (nearly identical code copied 4 times)
-- **Port conflict** between `landing_page/` and `enhanced_course_browser/` (both claim 3002)
-- **Dead redirect stub code** that serves no purpose
-- **Confusing folder structure** with non-descriptive names
-- **Inconsistent state management** across components (`plan`, `plannerV1`, `academicPlan`)
-- **Orphan/backup files** cluttering the codebase
+- **Separate Apps:** We are running 3 servers for what should be 1 app (`web`, `landing_page`, `login_page`).
+- **Multiple course browsers** (logic duplicated across pages in `web`).
+- **Port fragmentation** (`landing_page/` on 3002, `web/` on 3001, `login_page/` on 3000).
+- **Confusing folder structure** with non-descriptive names.
+- **Inconsistent state management** across components (`plan`, `plannerV1`, `academicPlan`).
 
 **Recommendation:** Consolidate into a single, unified Next.js application (`web/`) by migrating unique features from other apps and deleting the redundant ones.
 
@@ -31,7 +29,6 @@ Grouped by the core application pages, identifying all duplicate, outdated, or r
 | File Path | Type | Status | Notes |
 |-----------|------|--------|-------|
 | `landing_page/src/pages/Home.tsx` | React/Vite | **Golden Copy** | The actual marketing page with Hero image & "Get Started". |
-| `web_app/index.html` | Static HTML | **Legacy** | Old static site version. To be deleted. |
 | `web/src/app/page.tsx` | Next.js Page | **Occupied by Wrong Component** | Currently renders an *Outdated Course Browser*. Should be replaced by the content of `landing_page/src/pages/Home.tsx`. |
 
 ### 2. Login Page Versions
@@ -39,7 +36,6 @@ Grouped by the core application pages, identifying all duplicate, outdated, or r
 |-----------|------|--------|-------|
 | `login_page/src/app/login/page.tsx` | Next.js Page | **Golden Copy** | The full login UI (Crest, "Welcome Back", Forms). |
 | `login_page/src/app/page.tsx` | Next.js Redirect | **Redirect** | Just redirects `/` to `/login`. |
-| `landing_page/src/pages/Login.tsx` | React Stub | **Stub** | Fake page used to redirect users to port 3000. |
 
 ### 3. Course Browser Versions (Catalog & Selection)
 | File Path | Type | Status | Notes |
@@ -47,21 +43,18 @@ Grouped by the core application pages, identifying all duplicate, outdated, or r
 | `web/src/app/browser/page.tsx` | Next.js Page | **Golden Copy** | The superior version with "Drawer UI", Filters, and Canonical Departments. |
 | `web/src/app/page.tsx` | Next.js Page | **Outdated** | Older version of the browser sitting at the root URL. |
 | `web/src/app/planner/page.tsx` | Next.js Page | **Hybrid / Mixed** | Re-implements browser logic (search/filter) inside the Planner view. |
-| `landing_page/src/pages/CourseBrowser.tsx` | React Stub | **Stub** | Fake page used to redirect users to port 3001. |
-| `web_app/course.html` | Static HTML | **Legacy** | Old static site version. |
-| `enhanced_course_browser/` | Next.js App | **Deleted** | Redundant copy removed in Phase 1. |
 
 ---
 
 ## 🚨 CRITICAL ARCHITECTURE ISSUES
 
-### Issue #2: Broken Navigation Chain & Project Pollution
+### Issue #2: Broken Navigation Chain & Port Fragmentation
 **Severity:** MEDIUM
 
 1.  **Fragile Redirects:** The current flow relies on hardcoded full-URL redirects between ports (e.g., `window.location.href = 'http://localhost:3000'`). This is slow and breaks if ports change.
-2.  **Project Pollution:** The `landing_page` project contains "stub" pages (`Login.tsx`, `CourseBrowser.tsx`) whose only purpose is to redirect to *other* applications. This violates the Single Responsibility Principle and confuses the folder structure.
+2.  **Separate Apps:** We are running 3 servers for what should be 1 app.
 
-**Fix:** Eliminate the stubs. Build a single app where `/login` is a real route, not a redirect to a different server.
+**Fix:** Build a single app where `/login` is a real route, not a redirect to a different server.
 
 ---
 
@@ -90,19 +83,17 @@ Grouped by the core application pages, identifying all duplicate, outdated, or r
 | `landing_page/` | Vite App (Marketing) | **Migrating to `web/`** |
 | `login_page/` | Next.js App (Login) | **Migrating to `web/`** |
 | `web/` | Main Next.js App | **The Target Monolith** |
-| `web_app/` | Static HTML | **Trash (Legacy)** |
 | `prep_data/` | Data & Assets | **Keep (Rename to `course-data`)** |
 
 ---
 
 ## 📋 RECOMMENDED CLEANUP PLAN
 
-### Phase 1: Clean Trash (COMPLETED Dec 26, 2025)
-1. ~~Delete `enhanced_course_browser/`~~ - Already deleted via prior git commit.
-2. ~~Delete `web_app/`~~ - Legacy static HTML deleted.
-3. ~~Delete `landing_page/src/pages/CourseBrowser.tsx~~ - Stub removed.
-4. ~~Delete `landing_page/src/pages/Login.tsx~~ - Stub removed.
-5. ~~Delete files inside `design_ideas/`~~ - Mockup files removed.
+### Phase 1: Clean Trash (COMPLETED)
+- `enhanced_course_browser/` deleted.
+- `web_app/` legacy static HTML deleted.
+- Stub pages in `landing_page` deleted.
+- `design_ideas/` deleted.
 
 ### Phase 2: Unify Codebase (The "Big Merge")
 1. **Create `web/src/lib/courseUtils.ts`**: Move shared logic (`fetchFirst`, `flattenDatabase`, `deriveTags`, `normalizeTerm`) here.
@@ -139,38 +130,3 @@ Grouped by the core application pages, identifying all duplicate, outdated, or r
 - **Source:** `web/src/app/browser/page.tsx` (The "Superior" browser with Drawer/Filters).
 - **Purpose:** Browsing catalog, filtering courses, adding to simple plan.
 - **Action:** User selects courses -> Can switch to `/planner` for grid view.
-
----
-
-## 🔄 Revision Process
-
-**Strategy:**
-We are transforming a distributed, multi-app system into a centralized Monolith to reduce complexity.
-
-**Steps:**
-1. **Audit:** Identify all redundant files and "stub" pages (Completed Dec 26).
-2. **Purge:** Remove the "trash" (Phase 1) - **COMPLETED Dec 26**.
-3. **Centralize Logic:** Create shared utility libraries before moving UI components.
-4. **Migrate UI:** Move the "Golden Copy" of each page (Home, Login, Browser) to the unified `web` app.
-5. **Wiring:** Update internal links (e.g., `<Link href="/login">` instead of `window.location.href="http://localhost:3000"`).
-6. **Verify:** Test the full flow in the unified app.
-7. **Cleanup:** Delete the empty shells of the old apps.
-
----
-
-## ✅ VERIFICATION LOG (December 26, 2025)
-
-All claims in this report have been verified against the current codebase state:
-
-| Claim Category | Finding | Status |
-|----------------|---------|--------|
-| `enhanced_course_browser/` deletion | Confirmed via git commit `1b402847` | ✅ Accurate |
-| 3 course browsers in `web/` | Found at `/`, `/browser`, `/planner` | ✅ Accurate |
-| Stub page redirects | `Login.tsx`→`:3000`, `CourseBrowser.tsx`→`:3001/onboarding` | ✅ Accurate |
-| Port configuration | `web/`=3001, `landing_page/`=3002, `login_page/`=3000 | ✅ Accurate |
-| Fragmented localStorage | `'plan'` in page/browser, `'plan'`+`'plannerV1'` in planner | ✅ Accurate |
-| Code duplication | Identical utility functions duplicated across files | ✅ Accurate |
-| `web_app/` legacy static | Exists with index.html, course.html | ✅ Deleted (Dec 26) |
-| `landing_page/` stub pages | CourseBrowser.tsx, Login.tsx stubs | ✅ Deleted (Dec 26) |
-| `login_page/` | Exists with login UI | ⚠️ Phase 2 migration |
-| `potential_idea_*` files | Staged for deletion in git | ✅ Deleted (Dec 26) |

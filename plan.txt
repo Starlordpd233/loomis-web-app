@@ -1,15 +1,26 @@
-Plans for web features:
-1. course selection planner:
+Plans for web features (Phase II aligned):
+
+Phase II (Architecture & navigation best practices):
+- Single unified Next.js app under `web/` (one URL base; no cross-port redirects between apps)
+- Standard route flow: `/` → `/login` → (optional) `/onboarding` → `/browser` → `/planner`
+- Separate pages/features (important):
+  - Course Browser (`/browser`): full catalog search + filters + build a selected list (shortlist/plan)
+  - Course Planner (`/planner`): 4-year grid planning using the selected list; **no full catalog browser embedded on this page**
+- Navigation: use Next.js `Link` / router push for internal routing; avoid hardcoded full URLs
+- Shared state: one persisted data model used by both pages (shared data, separate UIs), migrate legacy keys (`plan`, `plannerV1`) → single key (e.g. `plannerV2`)
+- Optional best-practice course picking: planner slot → link to `/browser` with query params → assign → return to `/planner`
+
+1. course planning system (two core features: browser + planner):
 – currently students have to go through the pdf and find the courses, put it down somewhere on a piece of paper or something, and then
 count the number of courses/etc.
 – our goal is to make an interface where they can easily and conveniently choose the courses that they want, put it down, and then verify
-if they are good for the graduation requirements or maximum courses allowed, number of credts offered, etc. 
+if they are good for the graduation requirements or maximum courses allowed, number of credts offered, etc.
 – for prerequisite mentioned in the course description, we can add the feature that, based on the user's input about the courses that've already taken
 so far, that automatically tells me whether they're missing a prerequisite, when they select this course. Add this feature later once core features are
-done. 
+done.
 – add a button on top right corner to switch system modes (light/dark)
-–I'm thinking about drawing insight from some college course academic catalog for the general entry of all courses
-– I think there should be separate pages for course browser and course planner
+– I'm thinking about drawing insight from some college course academic catalog for the general entry of all courses
+– Keep browser and planner on separate pages: browse in `/browser`, plan in `/planner` (no combined page UI)
 
 
 
