@@ -75,12 +75,14 @@ async function loadManifest() {
   try {
     const data = await fs.readFile(MANIFEST_PATH, 'utf-8');
     return JSON.parse(data);
-  } catch (error) {
-    return {
-      version: 1,
-      lastSync: null,
-      entries: [],
-    };
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      // File doesn't exist yet - this is normal for first run
+      return { version: 1, lastSync: null, entries: [] };
+    }
+    // File exists but is corrupted/invalid
+    console.log(`${colors.yellow}⚠ Warning: Manifest file corrupted, starting fresh${colors.reset}`);
+    return { version: 1, lastSync: null, entries: [] };
   }
 }
 
@@ -206,19 +208,45 @@ async function scanDesignIdeas() {
  * Generate a URL-safe slug from a string
  */
 function slugify(str) {
-  return str
+  let slug = str
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+
+  // Path traversal protection
+  if (slug.includes('..') || slug.startsWith('/')) {
+    slug = slug.replace(/\.\./g, '').replace(/^\/+/, '');
+  }
+
+  return slug || 'unnamed';
+}
+
+/**
+ * Ensure component name is a valid JSX identifier
+ * - Must start with letter
+ * - Must not be empty
+ */
+function ensureValidComponentName(name) {
+  // If starts with number, prefix with underscore
+  if (/^\d/.test(name)) {
+    name = '_' + name;
+  }
+  // If empty or still invalid, use fallback
+  if (!name || !/^[a-zA-Z_]/.test(name)) {
+    return 'UnnamedComponent';
+  }
+  return name;
 }
 
 /**
  * Generate wrapper page for TSX source
  */
 function generateTsxWrapper(item) {
-  const componentName = item.name
-    .replace(/[^a-zA-Z0-9]/g, '')
-    .replace(/^./, (c) => c.toUpperCase());
+  const componentName = ensureValidComponentName(
+    item.name
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .replace(/^./, (c) => c.toUpperCase())
+  );
 
   return `/**
  * Sandbox wrapper for TSX component
@@ -257,9 +285,11 @@ export default function ${componentName}Page() {
  */
 function generateHtmlWrapper(item) {
   const staticPath = `/sandbox-static/${item.path}/index.html`;
-  const componentName = item.name
-    .replace(/[^a-zA-Z0-9]/g, '')
-    .replace(/^./, (c) => c.toUpperCase());
+  const componentName = ensureValidComponentName(
+    item.name
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .replace(/^./, (c) => c.toUpperCase())
+  );
 
   return `/**
  * Sandbox wrapper for static HTML
@@ -296,9 +326,11 @@ export default function ${componentName}Page() {
 function generateImageWrapper(item) {
   const ext = path.extname(item.path);
   const staticPath = `/sandbox-static/${item.path}`;
-  const componentName = item.name
-    .replace(/[^a-zA-Z0-9]/g, '')
-    .replace(/^./, (c) => c.toUpperCase());
+  const componentName = ensureValidComponentName(
+    item.name
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .replace(/^./, (c) => c.toUpperCase())
+  );
 
   return `/**
  * Sandbox wrapper for image asset
@@ -337,9 +369,11 @@ export default function ${componentName}Page() {
  * Generate wrapper page for standalone app
  */
 function generateStandaloneWrapper(item) {
-  const componentName = item.name
-    .replace(/[^a-zA-Z0-9]/g, '')
-    .replace(/^./, (c) => c.toUpperCase());
+  const componentName = ensureValidComponentName(
+    item.name
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .replace(/^./, (c) => c.toUpperCase())
+  );
 
   return `/**
  * Sandbox reference for standalone app
