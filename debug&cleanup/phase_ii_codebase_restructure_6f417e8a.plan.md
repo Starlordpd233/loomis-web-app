@@ -4,31 +4,31 @@ overview: Consolidate the repo into a single Next.js app (`web/`) with a clean r
 todos:
   - id: choose-canonical-pages
     content: Pick canonical implementations for Landing/Login/Browser from the duplicate list.
-    status: pending
+    status: completed
   - id: route-groups-layouts
     content: Refactor `web/src/app` into route groups (`(marketing)` vs `(app)`) with separate layouts to isolate styles and headers.
-    status: pending
+    status: completed
   - id: strict-typing
     content: Create `web/src/types/course.ts` with Zod/TS definitions to standardize data shapes before migration.
-    status: pending
+    status: completed
   - id: migrate-landing-login
     content: Port landing + login UIs into `web/`, merging Tailwind configs and namespacing assets (`public/landing/`) to avoid collisions.
-    status: pending
+    status: completed
   - id: static-assets-catalog
     content: Standardize `web/public/` with a single canonical `catalog.json` and organized image subfolders.
-    status: pending
+    status: completed
   - id: extract-course-utils
     content: Create `web/src/lib/courseUtils.ts` using the new strict types and refactor Browser/Planner to import shared logic.
-    status: pending
+    status: completed
   - id: decouple-browser-planner
     content: Remove duplicated Course Browser UI inside the Planner page; implement `picker` pattern (deep-link to Browser) for simpler code.
-    status: pending
+    status: completed
   - id: unify-plan-state
     content: Define one persisted data model (`plannerV2`) used by both pages and implement a migration strategy.
-    status: pending
+    status: completed
   - id: cleanup-and-verify
     content: Verify end-to-end flow, ensure no style bleeding, and remove redundant apps.
-    status: pending
+    status: completed
 ---
 
 # Phase II: Unify + Restructure `web_dev_lc`
