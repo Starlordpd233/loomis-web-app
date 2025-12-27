@@ -144,7 +144,8 @@ temp/
 
 debug&cleanup/
 planning/
-design_ideas/
+design_ideas/*
+!design_ideas/README.md
 to_do/
 
 #Agent customization files
