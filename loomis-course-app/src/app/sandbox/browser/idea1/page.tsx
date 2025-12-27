@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Search, 
-  BookOpen, 
-  Atom, 
-  Palette, 
-  Globe, 
-  Cpu, 
-  Calculator, 
-  Microscope, 
-  Landmark, 
-  Music, 
+'use client';
+
+import { useState, useEffect } from 'react';
+import {
+  Search,
+  BookOpen,
+  Atom,
+  Palette,
+  Globe,
+  Cpu,
+  Calculator,
+  Landmark,
+  Music,
   Briefcase,
   FlaskConical,
   Dna,
@@ -22,12 +23,29 @@ import {
   Filter,
   X,
   ChevronRight,
-  GraduationCap
+  GraduationCap,
+  LucideIcon,
 } from 'lucide-react';
+
+// --- Types ---
+
+interface Category {
+  id: string;
+  label: string;
+  icon: LucideIcon | null;
+}
+
+interface Department {
+  code: string;
+  name: string;
+  category: string;
+  icon: LucideIcon;
+  courses: number;
+}
 
 // --- Mock Data ---
 
-const CATEGORIES = [
+const CATEGORIES: Category[] = [
   { id: 'all', label: 'All Departments', icon: null },
   { id: 'stem', label: 'Science & Math', icon: Atom },
   { id: 'humanities', label: 'Humanities', icon: BookOpen },
@@ -36,7 +54,7 @@ const CATEGORIES = [
   { id: 'business', label: 'Business', icon: Briefcase },
 ];
 
-const DEPARTMENTS = [
+const DEPARTMENTS: Department[] = [
   { code: 'CS', name: 'Computer Science', category: 'stem', icon: Code, courses: 42 },
   { code: 'BIO', name: 'Biology', category: 'stem', icon: Dna, courses: 38 },
   { code: 'MATH', name: 'Mathematics', category: 'stem', icon: Calculator, courses: 55 },
@@ -57,58 +75,41 @@ const DEPARTMENTS = [
   { code: 'DS', name: 'Data Science', category: 'stem', icon: Cpu, courses: 15 },
 ];
 
-// --- Types ---
-
-interface BadgeProps {
-  children: React.ReactNode;
-  color?: "blue" | "purple" | "green" | "orange" | "gray";
-}
-
-interface Department {
-  code: string;
-  name: string;
-  category: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  courses: number;
-}
-
-interface DepartmentCardProps {
-  dept: Department;
-}
-
 // --- Components ---
 
-const Badge: React.FC<BadgeProps> = ({ children, color = "blue" }) => {
-  const colors: Record<string, string> = {
-    blue: "bg-blue-100 text-blue-800",
-    purple: "bg-purple-100 text-purple-800",
-    green: "bg-emerald-100 text-emerald-800",
-    orange: "bg-orange-100 text-orange-800",
-    gray: "bg-gray-100 text-gray-800",
+type BadgeColor = 'blue' | 'purple' | 'green' | 'orange' | 'gray';
+
+function Badge({ children, color = 'blue' }: { children: React.ReactNode; color?: BadgeColor }) {
+  const colors: Record<BadgeColor, string> = {
+    blue: 'bg-blue-100 text-blue-800',
+    purple: 'bg-purple-100 text-purple-800',
+    green: 'bg-emerald-100 text-emerald-800',
+    orange: 'bg-orange-100 text-orange-800',
+    gray: 'bg-gray-100 text-gray-800',
   };
   return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[color] || colors.gray}`}>
+    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors[color]}`}>
       {children}
     </span>
   );
-};
+}
 
-const DepartmentCard: React.FC<DepartmentCardProps> = ({ dept }) => {
+function DepartmentCard({ dept }: { dept: Department }) {
   const Icon = dept.icon || BookOpen;
-  
+
   return (
     <div className="group relative bg-white rounded-xl border border-gray-100 p-5 hover:shadow-lg hover:border-blue-200 transition-all duration-200 cursor-pointer flex flex-col h-full">
       <div className="flex items-start justify-between mb-4">
         <div className="p-3 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors duration-200">
           <Icon size={24} />
         </div>
-        <Badge color="gray">{String(dept.code)}</Badge>
+        <Badge color="gray">{dept.code}</Badge>
       </div>
-      
+
       <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
         {dept.name}
       </h3>
-      
+
       <p className="text-sm text-gray-500 mb-4 mt-auto">
         {dept.courses} courses available
       </p>
@@ -118,9 +119,9 @@ const DepartmentCard: React.FC<DepartmentCardProps> = ({ dept }) => {
       </div>
     </div>
   );
-};
+}
 
-export default function App() {
+export default function BrowserIdea1() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [filteredDepts, setFilteredDepts] = useState(DEPARTMENTS);
@@ -137,8 +138,8 @@ export default function App() {
     // 2. Filter by Search Term
     if (searchTerm) {
       const lowerTerm = searchTerm.toLowerCase();
-      results = results.filter(d => 
-        d.name.toLowerCase().includes(lowerTerm) || 
+      results = results.filter(d =>
+        d.name.toLowerCase().includes(lowerTerm) ||
         d.code.toLowerCase().includes(lowerTerm)
       );
     }
@@ -151,14 +152,12 @@ export default function App() {
 
   const handleCategoryClick = (id: string) => {
     setSelectedCategory(id);
-    // Reset search when switching categories for better UX? 
-    // Usually better to keep it, but let's scroll to top
     window.scrollTo({ top: 400, behavior: 'smooth' });
   };
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans text-gray-900">
-      
+
       {/* Navigation Bar */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -195,7 +194,7 @@ export default function App() {
           <p className="max-w-2xl mx-auto text-lg text-gray-500 mb-10">
             Browse over 800 courses across {DEPARTMENTS.length} departments for the 2025-2026 Academic Year.
           </p>
-          
+
           {/* Main Search Bar */}
           <div className="max-w-2xl mx-auto relative group">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -209,7 +208,7 @@ export default function App() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             {searchTerm && (
-              <button 
+              <button
                 onClick={() => setSearchTerm('')}
                 className="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer text-gray-400 hover:text-gray-600"
               >
@@ -222,7 +221,7 @@ export default function App() {
           <div className="flex flex-wrap justify-center gap-3 mt-8">
             <span className="text-sm font-medium text-gray-500 mr-2 uppercase tracking-wide">Popular:</span>
             {['Computer Science', 'Psychology', 'Economics', 'English'].map(term => (
-              <button 
+              <button
                 key={term}
                 onClick={() => setSearchTerm(term)}
                 className="px-3 py-1 bg-white border border-gray-200 rounded-full text-sm text-gray-600 hover:border-indigo-300 hover:text-indigo-600 hover:shadow-sm transition-all"
@@ -237,11 +236,11 @@ export default function App() {
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col lg:flex-row gap-8">
-          
+
           {/* Sidebar Filters (Desktop) */}
           <div className="w-full lg:w-64 flex-shrink-0">
             <div className="sticky top-24 space-y-8">
-              
+
               {/* Category Filter */}
               <div>
                 <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">
@@ -256,8 +255,8 @@ export default function App() {
                         key={cat.id}
                         onClick={() => handleCategoryClick(cat.id)}
                         className={`w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          isActive 
-                            ? 'bg-indigo-50 text-indigo-700' 
+                          isActive
+                            ? 'bg-indigo-50 text-indigo-700'
                             : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                         }`}
                       >
@@ -278,7 +277,7 @@ export default function App() {
                 </h3>
                 <div className="flex flex-wrap gap-1">
                   {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map(letter => (
-                    <button 
+                    <button
                       key={letter}
                       className="w-6 h-6 flex items-center justify-center text-[10px] font-bold text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded"
                     >
@@ -304,7 +303,7 @@ export default function App() {
 
             {filteredDepts.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredDepts.map((dept: Department) => (
+                {filteredDepts.map((dept) => (
                   <DepartmentCard key={dept.code} dept={dept} />
                 ))}
               </div>
@@ -313,7 +312,7 @@ export default function App() {
                 <Search className="mx-auto h-12 w-12 text-gray-300 mb-4" />
                 <h3 className="text-lg font-medium text-gray-900">No departments found</h3>
                 <p className="text-gray-500">Try adjusting your search or filters.</p>
-                <button 
+                <button
                   onClick={() => {setSearchTerm(''); setSelectedCategory('all');}}
                   className="mt-4 text-indigo-600 font-medium hover:text-indigo-800"
                 >

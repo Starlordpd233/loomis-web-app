@@ -1,0 +1,38 @@
+/*
+ * Sandbox Styles
+ * This file imports Tailwind CSS and any other styling frameworks used in experiments.
+ * Add additional framework imports here as needed (e.g., Bootstrap, Chakra UI, etc.)
+ */
+
+@import "tailwindcss";
+
+/*
+ * Custom sandbox utilities and overrides can be added below.
+ * These styles only affect the /sandbox routes.
+ */
+
+/* Dev toolbar styling */
+.sandbox-toolbar {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  color: white;
+  font-family: ui-monospace, monospace;
+}
+
+.sandbox-toolbar a {
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.sandbox-toolbar a:hover {
+  text-decoration: underline;
+}
