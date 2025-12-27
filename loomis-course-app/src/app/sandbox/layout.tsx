@@ -30,6 +30,8 @@ export default function SandboxLayout({
         <span>|</span>
         <Link href="/sandbox">Index</Link>
         <span>|</span>
+        <Link href="/sandbox/archive">Archive</Link>
+        <span>|</span>
         <Link href="/">Main App</Link>
       </div>
     </>
