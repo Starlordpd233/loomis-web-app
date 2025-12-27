@@ -1,66 +1,38 @@
 'use client';
 
 import Link from 'next/link';
+import { 
+  CATEGORIES, 
+  getActiveCategories, 
+  countByStatus, 
+  ExperimentStatus 
+} from './experiments';
 
 /**
  * Sandbox Index
  *
  * Lists all design experiments organized by category.
- * Add new experiments to the EXPERIMENTS array below.
+ * Add new experiments to the EXPERIMENTS array in ./experiments.ts.
  */
 
-interface Experiment {
-  name: string;
-  description: string;
-  path: string;
-  status: 'wip' | 'ready' | 'archived';
-  frameworks: string[];
-}
-
-interface Category {
-  id: string;
-  name: string;
-  icon: string;
-  experiments: Experiment[];
-}
-
-// Add your experiments here
-const CATEGORIES: Category[] = [
-  {
-    id: 'browser',
-    name: 'Course Browser',
-    icon: '📚',
-    experiments: [
-      {
-        name: 'Idea 1 - Department Cards',
-        description: 'Modern department browser with category filtering and search',
-        path: '/sandbox/browser/idea1',
-        status: 'ready',
-        frameworks: ['Tailwind CSS'],
-      },
-      // Add more browser experiments here
-    ],
-  },
-  // Add more categories here (planner, landing, etc.)
-];
-
-const statusColors = {
+const statusColors: Record<ExperimentStatus, string> = {
   wip: 'bg-yellow-100 text-yellow-800',
   ready: 'bg-green-100 text-green-800',
   archived: 'bg-gray-100 text-gray-600',
 };
 
-const statusLabels = {
+const statusLabels: Record<ExperimentStatus, string> = {
   wip: 'Work in Progress',
   ready: 'Ready for Review',
   archived: 'Archived',
 };
 
 export default function SandboxIndex() {
-  const totalExperiments = CATEGORIES.reduce(
-    (sum, cat) => sum + cat.experiments.length,
-    0
-  );
+  // Only show active categories/experiments on the main index
+  const activeCategories = getActiveCategories(CATEGORIES);
+  
+  const activeCount = countByStatus(CATEGORIES, 'wip') + countByStatus(CATEGORIES, 'ready');
+  const totalCategories = activeCategories.length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
@@ -74,7 +46,7 @@ export default function SandboxIndex() {
                 Design Sandbox
               </h1>
               <p className="text-slate-400 mt-1">
-                {totalExperiments} experiment{totalExperiments !== 1 ? 's' : ''} across {CATEGORIES.length} categor{CATEGORIES.length !== 1 ? 'ies' : 'y'}
+                {activeCount} active experiment{activeCount !== 1 ? 's' : ''} across {totalCategories} categor{totalCategories !== 1 ? 'ies' : 'y'}
               </p>
             </div>
             <Link
@@ -89,7 +61,7 @@ export default function SandboxIndex() {
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-6 py-12">
-        {CATEGORIES.length === 0 ? (
+        {activeCategories.length === 0 ? (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🎨</div>
             <h2 className="text-xl font-semibold mb-2">No experiments yet</h2>
@@ -102,7 +74,7 @@ export default function SandboxIndex() {
           </div>
         ) : (
           <div className="space-y-12">
-            {CATEGORIES.map((category) => (
+            {activeCategories.map((category) => (
               <section key={category.id}>
                 <h2 className="text-lg font-semibold flex items-center gap-2 mb-6">
                   <span className="text-2xl">{category.icon}</span>
@@ -170,7 +142,7 @@ export default function SandboxIndex() {
             </li>
             <li className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 bg-slate-700 rounded-full flex items-center justify-center text-xs font-bold">3</span>
-              <span>Update the <code className="bg-slate-700 px-2 py-0.5 rounded">CATEGORIES</code> array in this file to list it</span>
+              <span>Update the <code className="bg-slate-700 px-2 py-0.5 rounded">CATEGORIES</code> array in <code className="bg-slate-700 px-2 py-0.5 rounded">experiments.ts</code></span>
             </li>
             <li className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 bg-slate-700 rounded-full flex items-center justify-center text-xs font-bold">4</span>
