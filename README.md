@@ -1,5 +1,9 @@
 # Loomis Chaffee Course Planner
 
+[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://typescriptlang.org/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
 A Next.js web application for browsing the Loomis Chaffee course catalog and planning four-year academic schedules.
 
 ## Features
@@ -7,18 +11,39 @@ A Next.js web application for browsing the Loomis Chaffee course catalog and pla
 - **Course Browser** (`/browser`) - Search and filter the complete course catalog, build a shopping list of courses
 - **Course Planner** (`/planner`) - Visual 4-year grid for planning your academic schedule
 - **Onboarding** (`/onboarding`) - Initial setup wizard for new users
+- **Design Sandbox** (`/sandbox`) - Isolated environment for UI prototyping
+
+## Prerequisites
+
+- Node.js 18+
+- npm or yarn
+- Git
 
 ## Quick Start
 
 ```bash
+# Clone the repository
+git clone https://github.com/your-org/web_dev_lc.git
+cd web_dev_lc
+
 # Install dependencies
-cd loomis-course-app && npm install
+cd loomis-course-app
+npm install
 
 # Start development server (runs on port 3001)
 npm run dev
 ```
 
 Open [http://localhost:3001](http://localhost:3001) in your browser.
+
+## Configuration
+
+Copy `.env.example` to `.env` and configure:
+
+```bash
+NEXT_PUBLIC_APP_URL=http://localhost:3001
+NEXT_PUBLIC_API_URL=
+```
 
 ## Development Commands
 
@@ -27,13 +52,13 @@ Open [http://localhost:3001](http://localhost:3001) in your browser.
 cd loomis-course-app && npm run dev
 
 # Production build
-cd loomis-course-app && npm run build
+npm run build
 
 # Run linter
-cd loomis-course-app && npm run lint
+npm run lint
 
 # Start production server
-cd loomis-course-app && npm start
+npm start
 ```
 
 ## Project Structure
@@ -50,23 +75,46 @@ web_dev_lc/
 │   │   └── types/         # TypeScript type definitions
 │   └── public/            # Static assets and course catalog JSON
 ├── prep_data/             # Source materials for building catalog
-├── design_ideas/          # UI/UX design exploration
-└── README.md              # This file
+├── docs/                  # Documentation
+│   ├── architecture.md    # System architecture
+│   ├── API.md             # API reference
+│   ├── DEPLOYMENT.md      # Deployment guide
+│   ├── TESTING.md         # Testing guide
+│   └── DECISIONS.md       # Architecture decisions
+└── design_ideas/          # UI/UX design exploration
 ```
 
-## Navigation Flow
+## Documentation
 
-```
-/ (Landing) → /login → /onboarding → /browser ↔ /planner
-```
+- [Architecture](docs/architecture.md) - System design and data flow
+- [API Reference](docs/API.md) - Function and type documentation
+- [Contributing Guide](CONTRIBUTING.md) - How to contribute
+- [Deployment](docs/DEPLOYMENT.md) - Production deployment
+- [Testing](docs/TESTING.md) - Testing guide
 
-## Tech Stack
+## Troubleshooting
 
-- **Framework:** Next.js 15 with App Router
-- **Language:** TypeScript
-- **Styling:** CSS Modules (main app), Tailwind CSS (sandbox)
-- **State:** localStorage persistence with migration support
+**Issue:** Port 3001 already in use
+**Solution:** `PORT=3002 npm run dev`
 
-## Design Sandbox
+**Issue:** Build fails with "Module not found"
+**Solution:** Ensure `npm install` ran successfully in loomis-course-app/
 
-The `/sandbox` route provides an isolated environment for prototyping new UI ideas using Tailwind CSS without affecting the main application styles.
+**Issue:** Changes not appearing
+**Solution:** Check you're running `npm run dev`, not `npm start`
+
+## Roadmap
+
+- [ ] Add course prerequisites validation
+- [ ] Export planner to PDF
+- [ ] Mobile-responsive improvements
+- [ ] User authentication integration
+
+## Support
+
+- [Open an issue](https://github.com/your-org/web_dev_lc/issues)
+- [Read the docs](docs/)
+
+## License
+
+MIT © 2025 Loomis Chaffee Course Planner
