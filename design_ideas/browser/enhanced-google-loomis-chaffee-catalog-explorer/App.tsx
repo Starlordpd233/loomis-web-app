@@ -407,6 +407,55 @@ const CourseCard: React.FC<{
   );
 };
 
+const CourseListItem: React.FC<{
+  course: Course;
+  onClick: (course: Course) => void;
+  isStarred: boolean;
+  onToggleStar: (e: React.MouseEvent, id: string) => void;
+}> = ({ course, onClick, isStarred, onToggleStar }) => {
+  const dept = DEPARTMENTS.find(d => d.name === course.department);
+
+  return (
+    <div
+      onClick={() => onClick(course)}
+      className="group flex items-center gap-4 bg-white border border-slate-200 rounded-xl p-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+    >
+      <div className={`flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-${dept?.color}-50 text-${dept?.color}-600`}>
+        <i className={`fas ${dept?.icon}`}></i>
+      </div>
+
+      <div className="flex-grow min-w-0">
+        <div className="flex items-center gap-2 mb-1">
+          <span className={`text-xs font-bold px-2 py-0.5 rounded-full bg-${dept?.color}-100 text-${dept?.color}-700`}>
+            {course.code}
+          </span>
+          <span className="text-xs font-bold text-slate-400">{course.credits} Credits</span>
+          <span className="text-xs text-slate-400">{course.department}</span>
+        </div>
+        <h4 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors truncate">
+          {course.title}
+        </h4>
+      </div>
+
+      <div className="flex-shrink-0 flex items-center gap-3">
+        <div className="flex gap-1">
+          {course.tags.slice(0, 2).map(tag => (
+            <span key={tag} className="text-[10px] px-2 py-1 rounded bg-slate-50 text-slate-500 font-medium">
+              #{tag}
+            </span>
+          ))}
+        </div>
+        <button
+          onClick={(e) => onToggleStar(e, course.id)}
+          className={`p-2 rounded-full transition-colors ${isStarred ? 'text-amber-500' : 'text-slate-300 hover:text-amber-400'}`}
+        >
+          <i className={`fas fa-star ${isStarred ? '' : 'fa-regular'}`}></i>
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const CourseModal: React.FC<{ 
   course: Course | null; 
   onClose: () => void;
@@ -491,7 +540,8 @@ export default function App() {
   const [selectedDept, setSelectedDept] = useState<Department | 'All'>('All');
   const [starredCourses, setStarredCourses] = useState<string[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
   // AI Assistant State
   const [advicePrompt, setAdvicePrompt] = useState('');
   const [aiAdvice, setAiAdvice] = useState<any>(null);
@@ -683,8 +733,26 @@ export default function App() {
                     {activeTab === 'shortlist' ? 'My Shortlist' : selectedDept === 'All' ? 'Explore Courses' : selectedDept}
                   </h2>
                   <div className="flex bg-white border border-slate-200 rounded-xl p-1">
-                    <button className="px-4 py-2 bg-slate-100 rounded-lg text-slate-900 font-bold text-xs"><i className="fas fa-th-large mr-2"></i>Grid</button>
-                    <button className="px-4 py-2 text-slate-400 hover:text-slate-600 font-bold text-xs"><i className="fas fa-list mr-2"></i>List</button>
+                    <button
+                      onClick={() => setViewMode('grid')}
+                      className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${
+                        viewMode === 'grid'
+                          ? 'bg-slate-100 text-slate-900'
+                          : 'text-slate-400 hover:text-slate-600'
+                      }`}
+                    >
+                      <i className="fas fa-th-large mr-2"></i>Grid
+                    </button>
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${
+                        viewMode === 'list'
+                          ? 'bg-slate-100 text-slate-900'
+                          : 'text-slate-400 hover:text-slate-600'
+                      }`}
+                    >
+                      <i className="fas fa-list mr-2"></i>List
+                    </button>
                   </div>
                 </div>
                 <p className="text-slate-500 text-lg max-w-2xl leading-relaxed">
@@ -716,17 +784,31 @@ export default function App() {
 
               {/* Course Grid */}
               {filteredCourses.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {filteredCourses.map(course => (
-                    <CourseCard 
-                      key={course.id} 
-                      course={course} 
-                      onClick={setSelectedCourse}
-                      isStarred={starredCourses.includes(course.id)}
-                      onToggleStar={toggleStar}
-                    />
-                  ))}
-                </div>
+                viewMode === 'grid' ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredCourses.map(course => (
+                      <CourseCard
+                        key={course.id}
+                        course={course}
+                        onClick={setSelectedCourse}
+                        isStarred={starredCourses.includes(course.id)}
+                        onToggleStar={toggleStar}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {filteredCourses.map(course => (
+                      <CourseListItem
+                        key={course.id}
+                        course={course}
+                        onClick={setSelectedCourse}
+                        isStarred={starredCourses.includes(course.id)}
+                        onToggleStar={toggleStar}
+                      />
+                    ))}
+                  </div>
+                )
               ) : (
                 <div className="flex flex-col items-center justify-center py-24 text-center">
                   <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 mb-6">
