@@ -34,47 +34,6 @@ const SOURCE_TYPES = {
 // File extensions for each type
 const TSX_EXTENSIONS = ['.tsx', '.jsx'];
 const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg'];
-const STANDALONE_COPY_EXTENSIONS = [
-  '.ts',
-  '.tsx',
-  '.js',
-  '.jsx',
-  '.json',
-  '.css',
-  '.png',
-  '.jpg',
-  '.jpeg',
-  '.webp',
-  '.gif',
-  '.svg',
-];
-
-const STANDALONE_SKIP_DIRS = new Set([
-  '.git',
-  '.next',
-  'build',
-  'dist',
-  'node_modules',
-  'out',
-  'public',
-]);
-
-const STANDALONE_SKIP_FILES = new Set([
-  'index.html',
-  'package.json',
-  'package-lock.json',
-  'pnpm-lock.yaml',
-  'yarn.lock',
-  'README.md',
-  'tsconfig.json',
-  'tailwind.config.js',
-  'tailwind.config.ts',
-  'postcss.config.js',
-  'postcss.config.cjs',
-  'postcss.config.mjs',
-  'vite.config.js',
-  'vite.config.ts',
-]);
 
 // Colors for terminal output
 const colors = {
@@ -107,11 +66,6 @@ function logInfo(message) {
 
 function logWarning(message) {
   log(`⚠ ${message}`, 'yellow');
-}
-
-async function readJson(filePath) {
-  const data = await fs.readFile(filePath, 'utf-8');
-  return JSON.parse(data);
 }
 
 /**
@@ -475,34 +429,6 @@ export default function ${componentName}Page() {
 `;
 }
 
-function generateEmbeddedStandalonePage({ componentName }) {
-  return `/**
- * Embedded standalone app
- */
-
-import ${componentName}App from './AppWrapper';
-
-export default function ${componentName}Page() {
-  return <${componentName}App />;
-}
-`;
-}
-
-function generateEmbeddedStandaloneWrapper({ componentName, appImportPath }) {
-  return `'use client';
-
-import App from '${appImportPath}';
-
-export default function ${componentName}App() {
-  return (
-    <div className="text-slate-900 antialiased">
-      <App />
-    </div>
-  );
-}
-`;
-}
-
 /**
  * Generate wrapper based on source type
  */
@@ -521,79 +447,10 @@ function generateWrapper(item) {
   }
 }
 
-async function findStandaloneAppEntry(fullPath) {
-  const candidates = [
-    path.join(fullPath, 'src', 'App.tsx'),
-    path.join(fullPath, 'src', 'App.jsx'),
-    path.join(fullPath, 'App.tsx'),
-    path.join(fullPath, 'App.jsx'),
-  ];
-
-  for (const candidate of candidates) {
-    if (await fileExists(candidate)) return path.relative(fullPath, candidate);
-  }
-  return null;
-}
-
-function getHostDependencySet(hostPkg) {
-  const deps = Object.keys(hostPkg.dependencies || {});
-  const devDeps = Object.keys(hostPkg.devDependencies || {});
-  return new Set([...deps, ...devDeps]);
-}
-
-async function getStandaloneMissingDeps(item, hostDeps) {
-  const pkgPath = path.join(item.fullPath, 'package.json');
-  const pkg = await readJson(pkgPath);
-
-  const deps = Object.keys(pkg.dependencies || {});
-  const externalDeps = deps.filter((d) => d !== 'react' && d !== 'react-dom');
-
-  return externalDeps.filter((d) => !hostDeps.has(d));
-}
-
-function toPosixPath(p) {
-  return p.split(path.sep).join('/');
-}
-
-async function copyStandaloneSources(srcDir, destDir, copied) {
-  let entries = [];
-  try {
-    entries = await fs.readdir(srcDir, { withFileTypes: true });
-  } catch {
-    return;
-  }
-
-  await fs.mkdir(destDir, { recursive: true });
-
-  for (const entry of entries) {
-    if (entry.name.startsWith('.')) continue;
-    if (entry.isDirectory()) {
-      if (STANDALONE_SKIP_DIRS.has(entry.name)) continue;
-      await copyStandaloneSources(
-        path.join(srcDir, entry.name),
-        path.join(destDir, entry.name),
-        copied
-      );
-      continue;
-    }
-
-    if (!entry.isFile()) continue;
-    if (STANDALONE_SKIP_FILES.has(entry.name)) continue;
-
-    const ext = path.extname(entry.name).toLowerCase();
-    if (!STANDALONE_COPY_EXTENSIONS.includes(ext)) continue;
-
-    const srcPath = path.join(srcDir, entry.name);
-    const destPath = path.join(destDir, entry.name);
-    await fs.copyFile(srcPath, destPath);
-    copied.push(destPath);
-  }
-}
-
 /**
  * Sync a single item to the sandbox
  */
-async function syncItem(item, manifest, hostDeps) {
+async function syncItem(item, manifest) {
   const categorySlug = slugify(item.category || 'misc');
   const itemSlug = slugify(item.name);
   const routePath = path.join(SANDBOX_ROOT, categorySlug, itemSlug);
@@ -602,65 +459,7 @@ async function syncItem(item, manifest, hostDeps) {
   // Create directory
   await fs.mkdir(routePath, { recursive: true });
 
-  const generatedFiles = [path.relative(APP_ROOT, pagePath)];
-
-  if (item.sourceType === SOURCE_TYPES.STANDALONE && hostDeps) {
-    const missingDeps = await getStandaloneMissingDeps(item, hostDeps);
-    const appEntry = await findStandaloneAppEntry(item.fullPath);
-
-    const canEmbed = missingDeps.length === 0 && !!appEntry;
-
-    if (canEmbed) {
-      const componentName = ensureValidComponentName(
-        item.name
-          .replace(/[^a-zA-Z0-9]/g, '')
-          .replace(/^./, (c) => c.toUpperCase())
-      );
-
-      const standaloneDir = path.join(routePath, '_standalone');
-      const copied = [];
-      await copyStandaloneSources(item.fullPath, standaloneDir, copied);
-
-      const appImportPath = toPosixPath(
-        `./_standalone/${appEntry.replace(/\.(tsx|jsx)$/, '')}`
-      );
-
-      const appWrapperPath = path.join(routePath, 'AppWrapper.tsx');
-      await fs.writeFile(
-        appWrapperPath,
-        generateEmbeddedStandaloneWrapper({ componentName, appImportPath })
-      );
-      generatedFiles.push(path.relative(APP_ROOT, appWrapperPath));
-      for (const copiedPath of copied) {
-        generatedFiles.push(path.relative(APP_ROOT, copiedPath));
-      }
-
-      await fs.writeFile(
-        pagePath,
-        generateEmbeddedStandalonePage({ componentName })
-      );
-
-      const entry = {
-        id: `${categorySlug}-${itemSlug}`,
-        sourceType: item.sourceType,
-        sourcePath: item.path,
-        sandboxRoute: `/sandbox/${categorySlug}/${itemSlug}`,
-        generatedFiles,
-        embedded: true,
-        syncedAt: new Date().toISOString(),
-      };
-
-      const existingIndex = manifest.entries.findIndex((e) => e.id === entry.id);
-      if (existingIndex >= 0) {
-        manifest.entries[existingIndex] = entry;
-      } else {
-        manifest.entries.push(entry);
-      }
-
-      return entry;
-    }
-  }
-
+  // Generate and write wrapper
   const wrapper = generateWrapper(item);
   await fs.writeFile(pagePath, wrapper);
 
@@ -670,7 +469,7 @@ async function syncItem(item, manifest, hostDeps) {
     sourceType: item.sourceType,
     sourcePath: item.path,
     sandboxRoute: `/sandbox/${categorySlug}/${itemSlug}`,
-    generatedFiles,
+    generatedFiles: [path.relative(APP_ROOT, pagePath)],
     syncedAt: new Date().toISOString(),
   };
 
@@ -801,8 +600,6 @@ async function main() {
 
   // Load manifest
   const manifest = await loadManifest();
-  const hostPkg = await readJson(path.join(APP_ROOT, 'package.json'));
-  const hostDeps = getHostDependencySet(hostPkg);
 
   // Create readline interface
   const rl = createInterface({ input, output });
@@ -826,7 +623,7 @@ async function main() {
     // Sync selected items
     for (const item of selectedItems) {
       try {
-        const entry = await syncItem(item, manifest, hostDeps);
+        const entry = await syncItem(item, manifest);
         logSuccess(`Synced: ${item.name} -> ${entry.sandboxRoute}`);
       } catch (error) {
         logError(`Failed to sync ${item.name}: ${error.message}`);
