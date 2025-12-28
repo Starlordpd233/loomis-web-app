@@ -555,7 +555,7 @@ function toPosixPath(p) {
   return p.split(path.sep).join('/');
 }
 
-async function copyStandaloneSources(srcDir, destDir, copied) {
+async function copyStandaloneSources(srcDir, destDir, rootDestDir, copied) {
   let entries = [];
   try {
     entries = await fs.readdir(srcDir, { withFileTypes: true });
@@ -572,6 +572,7 @@ async function copyStandaloneSources(srcDir, destDir, copied) {
       await copyStandaloneSources(
         path.join(srcDir, entry.name),
         path.join(destDir, entry.name),
+        rootDestDir,
         copied
       );
       continue;
@@ -585,7 +586,28 @@ async function copyStandaloneSources(srcDir, destDir, copied) {
 
     const srcPath = path.join(srcDir, entry.name);
     const destPath = path.join(destDir, entry.name);
-    await fs.copyFile(srcPath, destPath);
+
+    if (['.ts', '.tsx', '.js', '.jsx'].includes(ext)) {
+      let content = await fs.readFile(srcPath, 'utf-8');
+      
+      // Rewrite @/ imports to relative paths
+      if (rootDestDir) {
+        const relPathToRoot = path.relative(path.dirname(destPath), rootDestDir);
+        // path.relative returns '' if same dir, '..' if up one level
+        // We need './' if same dir, '../' if up
+        const prefix = relPathToRoot === '' ? './' : (relPathToRoot + path.sep);
+        // Normalize to forward slash for imports
+        const cleanPrefix = prefix.replace(/\\/g, '/');
+        
+        // Simple replace for common import patterns
+        content = content.replace(/from ['"]@\//g, match => match.replace('@/', cleanPrefix));
+        content = content.replace(/import ['"]@\//g, match => match.replace('@/', cleanPrefix));
+      }
+      
+      await fs.writeFile(destPath, content);
+    } else {
+      await fs.copyFile(srcPath, destPath);
+    }
     copied.push(destPath);
   }
 }
@@ -619,7 +641,7 @@ async function syncItem(item, manifest, hostDeps) {
 
       const standaloneDir = path.join(routePath, '_standalone');
       const copied = [];
-      await copyStandaloneSources(item.fullPath, standaloneDir, copied);
+      await copyStandaloneSources(item.fullPath, standaloneDir, standaloneDir, copied);
 
       const appImportPath = toPosixPath(
         `./_standalone/${appEntry.replace(/\.(tsx|jsx)$/, '')}`

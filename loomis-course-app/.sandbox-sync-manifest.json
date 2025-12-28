@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastSync": "2025-12-27T23:55:52.262Z",
+  "lastSync": "2025-12-28T21:55:40.175Z",
   "entries": [
     {
       "id": "browser-coze",
@@ -28,9 +28,19 @@
       "sourcePath": "browser/google-academic-catalog-browser",
       "sandboxRoute": "/sandbox/browser/google-academic-catalog-browser",
       "generatedFiles": [
-        "src/app/sandbox/browser/google-academic-catalog-browser/page.tsx"
+        "src/app/sandbox/browser/google-academic-catalog-browser/page.tsx",
+        "src/app/sandbox/browser/google-academic-catalog-browser/AppWrapper.tsx",
+        "src/app/sandbox/browser/google-academic-catalog-browser/_standalone/App.tsx",
+        "src/app/sandbox/browser/google-academic-catalog-browser/_standalone/components/DepartmentCard.tsx",
+        "src/app/sandbox/browser/google-academic-catalog-browser/_standalone/components/Header.tsx",
+        "src/app/sandbox/browser/google-academic-catalog-browser/_standalone/components/Sidebar.tsx",
+        "src/app/sandbox/browser/google-academic-catalog-browser/_standalone/constants.ts",
+        "src/app/sandbox/browser/google-academic-catalog-browser/_standalone/index.tsx",
+        "src/app/sandbox/browser/google-academic-catalog-browser/_standalone/metadata.json",
+        "src/app/sandbox/browser/google-academic-catalog-browser/_standalone/types.ts"
       ],
-      "syncedAt": "2025-12-27T23:55:52.260Z"
+      "embedded": true,
+      "syncedAt": "2025-12-28T21:55:40.174Z"
     }
   ]
 }
