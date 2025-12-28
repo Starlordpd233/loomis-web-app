@@ -1,0 +1,89 @@
+
+import { Course, Department } from './types';
+
+export const DEPARTMENTS: { name: Department; icon: string; color: string; prefix: string; description: string }[] = [
+  { name: 'Computer Science', icon: 'fa-code', color: 'blue', prefix: 'CS', description: 'Programming, web development, robotics, and computational thinking.' },
+  { name: 'English', icon: 'fa-book-open', color: 'orange', prefix: 'ENG', description: 'Literature, creative writing workshops, and critical analysis.' },
+  { name: 'History', icon: 'fa-landmark', color: 'amber', prefix: 'HIST', description: 'Global history, ethical reasoning, philosophy, and world religions.' },
+  { name: 'Mathematics', icon: 'fa-calculator', color: 'indigo', prefix: 'MATH', description: 'Algebra, geometry, calculus, statistics, and advanced logic.' },
+  { name: 'Science', icon: 'fa-flask-vial', color: 'emerald', prefix: 'SCI', description: 'Biology, chemistry, physics, and environmental research.' },
+  { name: 'Modern Languages', icon: 'fa-globe', color: 'cyan', prefix: 'LANG', description: 'Arabic, Chinese, French, Latin, and Spanish language and culture.' },
+  { name: 'Performing Arts', icon: 'fa-masks-theater', color: 'rose', prefix: 'ARTS', description: 'Music, theater, dance, orchestra, and jazz ensemble.' },
+  { name: 'Visual Arts', icon: 'fa-palette', color: 'fuchsia', prefix: 'VART', description: 'Drawing, painting, digital media, and architecture.' },
+  { name: 'Social Sciences', icon: 'fa-users', color: 'violet', prefix: 'SOC', description: 'Economics, psychology, and contemporary global issues.' }
+];
+
+export const MOCK_COURSES: Course[] = [
+  {
+    id: '1',
+    code: 'CS101',
+    title: 'Introduction to Computer Science',
+    department: 'Computer Science',
+    description: 'Learn the fundamentals of computational thinking through Python programming. We cover loops, functions, and basic data structures.',
+    credits: 1,
+    gradeLevels: [9, 10],
+    tags: ['Introductory', 'Python', 'Core']
+  },
+  {
+    id: '2',
+    code: 'CS450',
+    title: 'Advanced Machine Learning',
+    department: 'Computer Science',
+    description: 'A deep dive into neural networks, supervised learning, and AI ethics. Students will build and train their own models.',
+    credits: 1,
+    gradeLevels: [11, 12],
+    prerequisites: ['CS101', 'MATH202'],
+    tags: ['Advanced', 'AI', 'Capstone']
+  },
+  {
+    id: '3',
+    code: 'ENG210',
+    title: 'Modern World Literature',
+    department: 'English',
+    description: 'Exploring contemporary voices from across the globe, focusing on themes of identity, migration, and power.',
+    credits: 1,
+    gradeLevels: [10, 11],
+    tags: ['Writing Intensive', 'Global']
+  },
+  {
+    id: '4',
+    code: 'MATH305',
+    title: 'Multivariable Calculus',
+    department: 'Mathematics',
+    description: 'Calculus of functions of several variables, including partial derivatives, multiple integrals, and vector analysis.',
+    credits: 1,
+    gradeLevels: [11, 12],
+    prerequisites: ['MATH300'],
+    tags: ['Advanced', 'STEM']
+  },
+  {
+    id: '5',
+    code: 'SCI150',
+    title: 'Molecular Biology',
+    department: 'Science',
+    description: 'Investigation of life at the molecular level, including DNA replication, gene expression, and biotechnology.',
+    credits: 1,
+    gradeLevels: [9, 10, 11],
+    tags: ['Laboratory', 'Core']
+  },
+  {
+    id: '6',
+    code: 'SOC250',
+    title: 'Behavioral Psychology',
+    department: 'Social Sciences',
+    description: 'Understanding human behavior through cognitive, social, and developmental lenses.',
+    credits: 1,
+    gradeLevels: [11, 12],
+    tags: ['Research', 'Humanities']
+  },
+  {
+    id: '7',
+    code: 'ARTS120',
+    title: 'Digital Music Composition',
+    department: 'Performing Arts',
+    description: 'Learn to compose music using modern DAWs, synthesizers, and audio engineering techniques.',
+    credits: 0.5,
+    gradeLevels: [9, 10, 11, 12],
+    tags: ['Creative', 'Tech']
+  }
+];
