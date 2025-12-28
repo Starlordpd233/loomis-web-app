@@ -32,14 +32,7 @@ export const CATEGORIES: CategoryMeta[] = [
     name: 'Course Browser',
     icon: '📚',
     experiments: [
-      {
-        name: 'Idea 1 - Department Cards',
-        description: 'Modern department browser with category filtering and search',
-        path: '/sandbox/browser/idea1',
-        status: 'ready',
-        frameworks: ['Tailwind CSS'],
-      },
-      // Add more browser experiments here
+      // Browser experiments will be added here via manual integration
     ],
   },
   // Add more categories here (planner, landing, etc.)
