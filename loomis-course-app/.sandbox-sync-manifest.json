@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastSync": "2025-12-27T23:04:02.795Z",
+  "lastSync": "2025-12-27T23:55:52.262Z",
   "entries": [
     {
       "id": "browser-coze",
@@ -21,6 +21,16 @@
         "src/app/sandbox/browser/idea1/page.tsx"
       ],
       "syncedAt": "2025-12-27T23:04:02.795Z"
+    },
+    {
+      "id": "browser-google-academic-catalog-browser",
+      "sourceType": "standalone",
+      "sourcePath": "browser/google-academic-catalog-browser",
+      "sandboxRoute": "/sandbox/browser/google-academic-catalog-browser",
+      "generatedFiles": [
+        "src/app/sandbox/browser/google-academic-catalog-browser/page.tsx"
+      ],
+      "syncedAt": "2025-12-27T23:55:52.260Z"
     }
   ]
 }
