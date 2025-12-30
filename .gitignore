@@ -151,6 +151,12 @@ to_do/
 
 #Agent customization files
 .claude/
+.cursor/
 .vscode/
 CLAUDE.md
 GEMINI.md
+
+.mcp.json
+
+package-lock.json
+package.json
