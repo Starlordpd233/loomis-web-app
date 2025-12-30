@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { DEPARTMENTS, MOCK_COURSES } from './data';
 import { Course, Department } from './types';
 import { getCourseAdvice } from './services/geminiService';
+import MyListPanel from './components/MyListPanel';
 
 // --- Cool Search Bar Component ---
 
@@ -332,19 +333,18 @@ const SearchWrapper = styled.div`
 
 // --- Components ---
 
-const SidebarLink: React.FC<{ 
-  icon: string; 
-  label: string; 
-  active?: boolean; 
-  onClick?: () => void 
+const SidebarLink: React.FC<{
+  icon: string;
+  label: string;
+  active?: boolean;
+  onClick?: () => void
 }> = ({ icon, label, active, onClick }) => (
-  <button 
+  <button
     onClick={onClick}
-    className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all duration-200 ${
-      active 
-        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' 
+    className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl transition-all duration-200 ${active
+        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
         : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
-    }`}
+      }`}
   >
     <i className={`fas ${icon} w-5`}></i>
     <span className="font-medium text-sm">{label}</span>
@@ -357,26 +357,26 @@ const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   </h3>
 );
 
-const CourseCard: React.FC<{ 
-  course: Course; 
+const CourseCard: React.FC<{
+  course: Course;
   onClick: (course: Course) => void;
   isStarred: boolean;
   onToggleStar: (e: React.MouseEvent, id: string) => void;
 }> = ({ course, onClick, isStarred, onToggleStar }) => {
   const dept = DEPARTMENTS.find(d => d.name === course.department);
-  
+
   return (
-    <div 
+    <div
       onClick={() => onClick(course)}
       className="group relative bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden"
     >
       <div className={`absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 rounded-full opacity-10 bg-${dept?.color}-500 group-hover:scale-150 transition-transform duration-500`}></div>
-      
+
       <div className="flex justify-between items-start mb-4">
         <div className={`flex items-center justify-center w-12 h-12 rounded-xl bg-${dept?.color}-50 text-${dept?.color}-600`}>
           <i className={`fas ${dept?.icon} text-xl`}></i>
         </div>
-        <button 
+        <button
           onClick={(e) => onToggleStar(e, course.id)}
           className={`p-2 rounded-full transition-colors ${isStarred ? 'text-amber-500' : 'text-slate-300 hover:text-amber-400'}`}
         >
@@ -456,8 +456,8 @@ const CourseListItem: React.FC<{
   );
 };
 
-const CourseModal: React.FC<{ 
-  course: Course | null; 
+const CourseModal: React.FC<{
+  course: Course | null;
   onClose: () => void;
 }> = ({ course, onClose }) => {
   if (!course) return null;
@@ -541,6 +541,15 @@ export default function App() {
   const [starredCourses, setStarredCourses] = useState<string[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [isMyListOpen, setIsMyListOpen] = useState(false);
+  const [myListWidth, setMyListWidth] = useState(400);
+
+  const savedCourses = useMemo(() =>
+    MOCK_COURSES.filter(course => starredCourses.includes(course.id)),
+    [starredCourses]
+  );
+
+  const toggleMyList = () => setIsMyListOpen(!isMyListOpen);
 
   // AI Assistant State
   const [advicePrompt, setAdvicePrompt] = useState('');
@@ -549,8 +558,8 @@ export default function App() {
 
   const filteredCourses = useMemo(() => {
     return MOCK_COURSES.filter(course => {
-      const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          course.code.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        course.code.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesDept = selectedDept === 'All' || course.department === selectedDept;
       const matchesStarred = activeTab === 'shortlist' ? starredCourses.includes(course.id) : true;
       return matchesSearch && matchesDept && matchesStarred;
@@ -559,7 +568,7 @@ export default function App() {
 
   const toggleStar = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    setStarredCourses(prev => 
+    setStarredCourses(prev =>
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
   };
@@ -590,26 +599,31 @@ export default function App() {
 
         <nav className="flex-1 px-4 custom-scrollbar overflow-y-auto space-y-1">
           <SectionTitle>Discover</SectionTitle>
-          <SidebarLink 
-            icon="fa-compass" 
-            label="Explore Courses" 
-            active={activeTab === 'browse'} 
+          <SidebarLink
+            icon="fa-compass"
+            label="Explore Courses"
+            active={activeTab === 'browse'}
             onClick={() => { setActiveTab('browse'); setSelectedDept('All'); }}
           />
-          <SidebarLink 
-            icon="fa-star" 
-            label="My Shortlist" 
+          <SidebarLink
+            icon="fa-star"
+            label="My Shortlist"
             active={activeTab === 'shortlist'}
             onClick={() => setActiveTab('shortlist')}
           />
+          <SidebarLink
+            icon="fa-list"
+            label="My List"
+            onClick={toggleMyList}
+          />
           <SidebarLink icon="fa-chart-pie" label="Requirements" />
-          
+
           <SectionTitle>Academic Units</SectionTitle>
           {DEPARTMENTS.map(dept => (
-            <SidebarLink 
+            <SidebarLink
               key={dept.name}
-              icon={dept.icon} 
-              label={dept.name} 
+              icon={dept.icon}
+              label={dept.name}
               active={selectedDept === dept.name && activeTab === 'browse'}
               onClick={() => {
                 setSelectedDept(dept.name);
@@ -630,7 +644,7 @@ export default function App() {
               <span className="text-[10px] font-black uppercase tracking-widest">AI Counselor</span>
             </div>
             <p className="text-xs text-indigo-100 mb-3 font-medium">Need help picking courses for next term?</p>
-            <button 
+            <button
               onClick={() => setActiveTab('assistant')}
               className="w-full py-2 bg-indigo-500 hover:bg-indigo-400 rounded-lg text-xs font-bold transition-all"
             >
@@ -641,7 +655,13 @@ export default function App() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 bg-slate-50 overflow-hidden relative">
+      <main
+        className="flex-1 flex flex-col min-w-0 bg-slate-50 overflow-hidden relative"
+        style={{
+          marginRight: isMyListOpen ? `${myListWidth}px` : '0',
+          transition: 'margin-right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
+        }}
+      >
         {/* Top Navbar */}
         <header className="h-24 bg-slate-900/95 backdrop-blur-xl border-b border-slate-700/50 px-10 flex items-center justify-between sticky top-0 z-10">
           <CoolSearchBar
@@ -652,7 +672,7 @@ export default function App() {
           <div className="flex items-center gap-6 ml-10">
             <div className="flex -space-x-3">
               {[1, 2, 3].map(i => (
-                <img key={i} src={`https://picsum.photos/seed/${i*50}/40/40`} className="w-10 h-10 rounded-full border-4 border-slate-800 shadow-sm" alt="Student" />
+                <img key={i} src={`https://picsum.photos/seed/${i * 50}/40/40`} className="w-10 h-10 rounded-full border-4 border-slate-800 shadow-sm" alt="Student" />
               ))}
               <div className="w-10 h-10 rounded-full bg-slate-800 border-4 border-slate-900 flex items-center justify-center text-[10px] font-bold text-slate-300">+12</div>
             </div>
@@ -680,14 +700,14 @@ export default function App() {
               <div className="bg-white rounded-3xl shadow-xl border border-slate-200 p-8 mb-10">
                 <div className="mb-6">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Your Interests</label>
-                  <textarea 
+                  <textarea
                     value={advicePrompt}
                     onChange={(e) => setAdvicePrompt(e.target.value)}
                     placeholder="e.g., I love building things, I enjoy solving math puzzles, and I'm interested in how robots work..."
                     className="w-full p-6 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500/10 min-h-[150px] text-lg text-slate-700 placeholder:text-slate-300 transition-all resize-none"
                   ></textarea>
                 </div>
-                <button 
+                <button
                   onClick={handleAiAdvice}
                   disabled={isAiLoading || !advicePrompt}
                   className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-bold text-lg hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed shadow-xl shadow-indigo-100 transition-all flex items-center justify-center gap-3"
@@ -735,29 +755,27 @@ export default function App() {
                   <div className="flex bg-white border border-slate-200 rounded-xl p-1">
                     <button
                       onClick={() => setViewMode('grid')}
-                      className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${
-                        viewMode === 'grid'
+                      className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${viewMode === 'grid'
                           ? 'bg-slate-100 text-slate-900'
                           : 'text-slate-400 hover:text-slate-600'
-                      }`}
+                        }`}
                     >
                       <i className="fas fa-th-large mr-2"></i>Grid
                     </button>
                     <button
                       onClick={() => setViewMode('list')}
-                      className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${
-                        viewMode === 'list'
+                      className={`px-4 py-2 rounded-lg font-bold text-xs transition-all ${viewMode === 'list'
                           ? 'bg-slate-100 text-slate-900'
                           : 'text-slate-400 hover:text-slate-600'
-                      }`}
+                        }`}
                     >
                       <i className="fas fa-list mr-2"></i>List
                     </button>
                   </div>
                 </div>
                 <p className="text-slate-500 text-lg max-w-2xl leading-relaxed">
-                  {selectedDept === 'All' 
-                    ? 'Discover distinct programs, follow your curiosity, and plan your academic journey across 300+ rigorous offerings.' 
+                  {selectedDept === 'All'
+                    ? 'Discover distinct programs, follow your curiosity, and plan your academic journey across 300+ rigorous offerings.'
                     : DEPARTMENTS.find(d => d.name === selectedDept)?.description}
                 </p>
               </div>
@@ -818,7 +836,7 @@ export default function App() {
                   <p className="text-slate-500 max-w-sm">
                     Try adjusting your search filters or browse a different department to find what you're looking for.
                   </p>
-                  <button 
+                  <button
                     onClick={() => { setSearchQuery(''); setSelectedDept('All'); }}
                     className="mt-6 px-6 py-2 bg-indigo-600 text-white rounded-full font-bold text-sm shadow-lg shadow-indigo-100"
                   >
@@ -831,10 +849,18 @@ export default function App() {
         </div>
       </main>
 
+      <MyListPanel
+        isOpen={isMyListOpen}
+        onClose={() => setIsMyListOpen(false)}
+        savedCourses={savedCourses}
+        width={myListWidth}
+        onWidthChange={setMyListWidth}
+      />
+
       {/* Modal Overlay */}
-      <CourseModal 
-        course={selectedCourse} 
-        onClose={() => setSelectedCourse(null)} 
+      <CourseModal
+        course={selectedCourse}
+        onClose={() => setSelectedCourse(null)}
       />
     </div>
   );

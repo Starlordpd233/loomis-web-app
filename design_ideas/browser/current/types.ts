@@ -8,6 +8,7 @@ export interface Course {
   department: Department;
   description: string;
   credits: number;
+  term?: 'Fall' | 'Winter' | 'Spring';
   gradeLevels: number[];
   prerequisites?: string[];
   tags: string[];

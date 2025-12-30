@@ -23,6 +23,9 @@ importers:
       '@types/styled-components':
         specifier: ^5.1.36
         version: 5.1.36
+      lucide-react:
+        specifier: ^0.562.0
+        version: 0.562.0(react@19.2.3)
       react:
         specifier: ^19.2.3
         version: 19.2.3

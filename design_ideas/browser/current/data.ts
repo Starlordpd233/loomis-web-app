@@ -21,6 +21,7 @@ export const MOCK_COURSES: Course[] = [
     department: 'Computer Science',
     description: 'Learn the fundamentals of computational thinking through Python programming. We cover loops, functions, and basic data structures.',
     credits: 1,
+    term: 'Fall',
     gradeLevels: [9, 10],
     tags: ['Introductory', 'Python', 'Core']
   },
@@ -31,6 +32,7 @@ export const MOCK_COURSES: Course[] = [
     department: 'Computer Science',
     description: 'A deep dive into neural networks, supervised learning, and AI ethics. Students will build and train their own models.',
     credits: 1,
+    term: 'Spring',
     gradeLevels: [11, 12],
     prerequisites: ['CS101', 'MATH202'],
     tags: ['Advanced', 'AI', 'Capstone']
@@ -42,6 +44,7 @@ export const MOCK_COURSES: Course[] = [
     department: 'English',
     description: 'Exploring contemporary voices from across the globe, focusing on themes of identity, migration, and power.',
     credits: 1,
+    term: 'Winter',
     gradeLevels: [10, 11],
     tags: ['Writing Intensive', 'Global']
   },
@@ -52,6 +55,7 @@ export const MOCK_COURSES: Course[] = [
     department: 'Mathematics',
     description: 'Calculus of functions of several variables, including partial derivatives, multiple integrals, and vector analysis.',
     credits: 1,
+    term: 'Fall',
     gradeLevels: [11, 12],
     prerequisites: ['MATH300'],
     tags: ['Advanced', 'STEM']
@@ -63,6 +67,7 @@ export const MOCK_COURSES: Course[] = [
     department: 'Science',
     description: 'Investigation of life at the molecular level, including DNA replication, gene expression, and biotechnology.',
     credits: 1,
+    term: 'Spring',
     gradeLevels: [9, 10, 11],
     tags: ['Laboratory', 'Core']
   },
@@ -73,6 +78,7 @@ export const MOCK_COURSES: Course[] = [
     department: 'Social Sciences',
     description: 'Understanding human behavior through cognitive, social, and developmental lenses.',
     credits: 1,
+    term: 'Fall',
     gradeLevels: [11, 12],
     tags: ['Research', 'Humanities']
   },
@@ -83,6 +89,7 @@ export const MOCK_COURSES: Course[] = [
     department: 'Performing Arts',
     description: 'Learn to compose music using modern DAWs, synthesizers, and audio engineering techniques.',
     credits: 0.5,
+    term: 'Winter',
     gradeLevels: [9, 10, 11, 12],
     tags: ['Creative', 'Tech']
   }
