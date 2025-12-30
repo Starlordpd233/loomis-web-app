@@ -1,0 +1,292 @@
+import React from 'react';
+import styled from 'styled-components';
+
+const Card = () => {
+  return (
+    <StyledWrapper>
+      <div className="witcher-card-container">
+        <div className="witcher-card" tabIndex={0}>
+          <div className="witcher-card-corner top-left" />
+          <div className="witcher-card-corner top-right" />
+          <div className="witcher-card-corner bottom-left" />
+          <div className="witcher-card-corner bottom-right" />
+          <div className="witcher-card-content">
+            <div className="witcher-card-title">School of the Wolf</div>
+            <div className="witcher-card-icon">
+              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 15 L20 30 L25 55 L35 70 L50 85 L65 70 L75 55 L80 30 Z" />
+                <path d="M50 15 L35 35 L50 45 L65 35 Z" fill="#2a2a2a" opacity="0.3" />
+                <path d="M20 30 L35 35 L30 50 Z" fill="#2a2a2a" opacity="0.3" />
+                <path d="M80 30 L65 35 L70 50 Z" fill="#2a2a2a" opacity="0.3" />
+                <path d="M42 60 L50 65 L58 60 L50 85 Z" fill="#1a1a1a" opacity="0.5" />
+                <path className="wolf-eyes" d="M35 45 L45 50 L40 55 Z" />
+                <path className="wolf-eyes" d="M65 45 L55 50 L60 55 Z" />
+              </svg>
+            </div>
+            <div className="witcher-card-details">
+              <div className="witcher-card-stat">
+                <span>Class</span>
+                <span>Witcher</span>
+              </div>
+              <div className="witcher-card-stat">
+                <span>Origin</span>
+                <span>Kaer Morhen</span>
+              </div>
+              <div className="witcher-card-stat">
+                <span>Status</span>
+                <span>Active</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </StyledWrapper>
+  );
+}
+
+const StyledWrapper = styled.div`
+  .witcher-card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* background-color: #0e0e10; */
+    min-height: 30em; /* using em instead of vh */
+    padding: 2em;
+    font-family: serif;
+  }
+
+  .witcher-card {
+    /* Scoped Variables */
+    --wc-bg-dark: #121214;
+    --wc-bg-light: #1e1e21;
+    --wc-silver: #a8a8a8;
+    --wc-silver-dark: #4a4a4a;
+    --wc-gold: #cba874;
+    --wc-eye-glow: #ff2a2a;
+    --wc-magic-aura: rgba(205, 179, 128, 0.15);
+
+    position: relative;
+    width: 16em;
+    height: 22em;
+    background-color: var(--wc-bg-dark);
+    border: 0.2em solid var(--wc-silver-dark);
+    font-size: 16px; /* Base scale */
+    font-family: "Cinzel", serif; /* Fallback safe */
+    color: var(--wc-silver);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5em;
+    box-sizing: border-box;
+    cursor: pointer;
+    overflow: hidden;
+    transition:
+      transform 0.4s ease,
+      box-shadow 0.4s ease,
+      border-color 0.4s;
+
+    /* Leather/Parchment Texture */
+    background-image: radial-gradient(
+        circle at 50% 30%,
+        #2a2a2e,
+        var(--wc-bg-dark) 70%
+      ),
+      repeating-linear-gradient(
+        45deg,
+        rgba(0, 0, 0, 0.1) 0,
+        rgba(0, 0, 0, 0.1) 2px,
+        transparent 2px,
+        transparent 4px
+      );
+
+    box-shadow:
+      0 1em 2em rgba(0, 0, 0, 0.8),
+      inset 0 0 2em rgba(0, 0, 0, 0.9);
+  }
+
+  /* Background Runes (Hidden initially) */
+  .witcher-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(
+      circle at 50% 40%,
+      var(--wc-magic-aura) 0%,
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Corner Decorations (CSS Shapes) */
+  .witcher-card-corner {
+    position: absolute;
+    width: 2em;
+    height: 2em;
+    border: 0.15em solid var(--wc-gold);
+    transition: all 0.4s ease;
+    opacity: 0.6;
+    z-index: 1;
+  }
+
+  .witcher-card-corner.top-left {
+    top: 0.5em;
+    left: 0.5em;
+    border-right: none;
+    border-bottom: none;
+  }
+  .witcher-card-corner.top-right {
+    top: 0.5em;
+    right: 0.5em;
+    border-left: none;
+    border-bottom: none;
+  }
+  .witcher-card-corner.bottom-left {
+    bottom: 0.5em;
+    left: 0.5em;
+    border-right: none;
+    border-top: none;
+  }
+  .witcher-card-corner.bottom-right {
+    bottom: 0.5em;
+    right: 0.5em;
+    border-left: none;
+    border-top: none;
+  }
+
+  /* Content Wrapper */
+  .witcher-card-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1em;
+  }
+
+  /* Title Styling */
+  .witcher-card-title {
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.9em;
+    color: var(--wc-gold);
+    border-bottom: 1px solid var(--wc-silver-dark);
+    padding-bottom: 0.5em;
+    width: 100%;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  /* The Wolf Medallion Container */
+  .witcher-card-icon {
+    width: 8em;
+    height: 8em;
+    margin-top: 1em;
+    filter: drop-shadow(0 0.5em 1em rgba(0, 0, 0, 0.8));
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .witcher-card-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: var(--wc-silver);
+    transition: fill 0.3s ease;
+  }
+
+  /* The Eyes (Targeted via class inside SVG) */
+  .wolf-eyes {
+    fill: #1a1a1a; /* Dark initially */
+    transition:
+      fill 0.2s ease,
+      filter 0.2s ease;
+  }
+
+  /* Stats/Description Area */
+  .witcher-card-details {
+    margin-top: auto;
+    width: 100%;
+    font-size: 0.75em;
+    color: #888;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .witcher-card-stat {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #333;
+    padding: 0.4em 0;
+  }
+
+  .witcher-card-stat span:last-child {
+    color: var(--wc-silver);
+  }
+
+  /* --- Hover Interaction --- */
+
+  .witcher-card:hover {
+    transform: translateY(-0.5em);
+    box-shadow:
+      0 1.5em 3em rgba(0, 0, 0, 0.9),
+      0 0 1.5em rgba(203, 168, 116, 0.1); /* Subtle gold glow */
+    border-color: var(--wc-gold);
+  }
+
+  .witcher-card:hover::before {
+    opacity: 1; /* Show magical aura */
+  }
+
+  .witcher-card:hover .witcher-card-corner {
+    width: 90%;
+    height: 90%;
+    opacity: 1;
+    border-color: rgba(203, 168, 116, 0.3);
+    /* This animation expands the corners to form a frame */
+  }
+
+  /* Medallion Reaction */
+  .witcher-card:hover .witcher-card-icon {
+    transform: scale(1.1);
+    animation: medallionHum 0.1s infinite alternate; /* Vibrate */
+  }
+
+  .witcher-card:hover .witcher-card-icon svg {
+    fill: #dcdcdc; /* Brighten silver */
+  }
+
+  .witcher-card:hover .wolf-eyes {
+    fill: var(--wc-eye-glow);
+    filter: drop-shadow(0 0 5px var(--wc-eye-glow));
+  }
+
+  .witcher-card:hover .witcher-card-title {
+    color: #fff;
+    text-shadow: 0 0 10px var(--wc-gold);
+  }
+
+  /* --- Focus State --- */
+  .witcher-card:focus-visible {
+    outline: 2px solid var(--wc-gold);
+    outline-offset: 4px;
+  }
+
+  /* --- Animations --- */
+  @keyframes medallionHum {
+    0% {
+      transform: scale(1.1) translate(0, 0);
+    }
+    100% {
+      transform: scale(1.1) translate(1px, 1px);
+    }
+  }`;
+
+export default Card;
