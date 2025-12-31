@@ -145,8 +145,7 @@ temp/
 # TernJS port file
 .tern-port
 
-planning/
-to_do/
+
 
 #Agent customization files
 .claude/
@@ -160,3 +159,6 @@ GEMINI.md
 
 package-lock.json
 package.json
+
+# Visual baseline screenshots (documentation)
+**/visual-baseline/**/*.png
