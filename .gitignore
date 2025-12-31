@@ -145,7 +145,6 @@ temp/
 # TernJS port file
 .tern-port
 
-debug&cleanup/
 planning/
 to_do/
 
