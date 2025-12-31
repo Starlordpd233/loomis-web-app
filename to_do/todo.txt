@@ -1,0 +1,14 @@
+–consider adding a documentation file at each level inside each folder in the codebase for context and for optimal information retrieval when needed. 
+    –this needs to be refined now and documentation needs to be polished and up to date.
+– can add a skill for syncing and debugging the sync between design ideas and sanbox environment in existing app structure
+
+– add and replace the logo on top left corner on test catalog browser
+– implement the toggle feature.
+
+– backend data logic and connecting database to frontend.
+
+–consider the readons for why people would use this project
+
+– consider adding AI feature? how to integrate API?
+
+–Create AGENTS.md and Claude skills in different levels of repo
