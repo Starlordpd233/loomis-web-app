@@ -16,14 +16,14 @@
 ## Task 1: Establish promotion criteria and metrics
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/promotion-criteria.ts`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/experiment-metrics.ts`
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/experiments.ts:100-150`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/promotion-criteria.ts`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/experiment-metrics.ts`
+- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/experiments.ts:100-150`
 
 **Step 1: Define promotion criteria interface**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/promotion-criteria.ts
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/promotion-criteria.ts
 export interface PromotionCriteria {
   // Visual parity
   visualParityPassed: boolean;
@@ -81,7 +81,7 @@ export const DEFAULT_PROMOTION_CRITERIA: PromotionCriteria = {
 **Step 2: Create metrics tracking utilities**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/experiment-metrics.ts
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/experiment-metrics.ts
 import { ExperimentMetrics, PromotionCriteria, DEFAULT_PROMOTION_CRITERIA } from './promotion-criteria';
 
 export class ExperimentMetricsTracker {
@@ -203,7 +203,7 @@ export class ExperimentMetricsTracker {
 **Step 3: Update experiments.ts to include promotion status**
 
 ```typescript
-// In /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/experiments.ts
+// In /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/experiments.ts
 // Add to Experiment interface:
 export interface Experiment {
   // ... existing fields
@@ -232,7 +232,7 @@ export interface Experiment {
 **Step 4: Test metrics tracking**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 node -e "
 const { ExperimentMetricsTracker } = require('./src/lib/experiment-metrics.ts');
 const tracker = new ExperimentMetricsTracker();
@@ -257,14 +257,14 @@ git commit -m "feat: establish promotion criteria and metrics tracking"
 ## Task 2: Implement feature flag system
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/feature-flags.ts`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/components/FeatureFlag.tsx`
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/(app)/browser/page.tsx:1-50`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/feature-flags.ts`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/components/FeatureFlag.tsx`
+- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/(app)/browser/page.tsx:1-50`
 
 **Step 1: Create feature flag manager**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/feature-flags.ts
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/feature-flags.ts
 export type FeatureFlag = 'enhanced-explorer' | 'catalog-browser' | 'my-list-sidebar';
 
 export interface FeatureFlagConfig {
@@ -402,7 +402,7 @@ export const featureFlags = new FeatureFlagManager();
 **Step 2: Create FeatureFlag React component**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/components/FeatureFlag.tsx
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/components/FeatureFlag.tsx
 'use client';
 
 import { ReactNode } from 'react';
@@ -434,7 +434,7 @@ export default function FeatureFlagWrapper({
 **Step 3: Integrate feature flags into browser page**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/(app)/browser/page.tsx
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/(app)/browser/page.tsx
 'use client';
 
 import FeatureFlagWrapper from '@/components/FeatureFlag';
@@ -479,7 +479,7 @@ export default function BrowserPage() {
 **Step 4: Create admin panel for managing feature flags**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/admin/feature-flags/page.tsx
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/admin/feature-flags/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -576,7 +576,7 @@ export default function FeatureFlagsAdminPage() {
 **Step 5: Test feature flag system**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run dev &
 # Visit http://localhost:3001/admin/feature-flags
 # Toggle flags and verify browser page changes
@@ -598,23 +598,23 @@ git commit -m "feat: implement feature flag system for gradual rollout"
 ## Task 3: Create production-ready components from sandbox
 
 **Files:**
-- Copy: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/` → `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/features/browser/`
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/features/browser/EnhancedExplorer/index.tsx`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/features/browser/EnhancedExplorer/package.json`
+- Copy: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/` → `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/features/browser/`
+- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/features/browser/EnhancedExplorer/index.tsx`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/features/browser/EnhancedExplorer/package.json`
 
 **Step 1: Copy and refactor enhanced-explorer**
 
 ```bash
 # Copy sandbox to features directory
-mkdir -p /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app/src/features/browser
-cp -r /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/enhanced-explorer \
-      /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app/src/features/browser/EnhancedExplorer
+mkdir -p /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/features/browser
+cp -r /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/enhanced-explorer \
+      /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/features/browser/EnhancedExplorer
 ```
 
 **Step 2: Create feature package manifest**
 
 ```json
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/features/browser/EnhancedExplorer/package.json
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/features/browser/EnhancedExplorer/package.json
 {
   "name": "@loomis/browser-enhanced-explorer",
   "version": "1.0.0",
@@ -648,7 +648,7 @@ Key changes needed:
 6. Add comprehensive prop types
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/features/browser/EnhancedExplorer/index.tsx
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/features/browser/EnhancedExplorer/index.tsx
 'use client';
 
 import { Suspense } from 'react';
@@ -742,7 +742,7 @@ function ErrorFallback() {
 **Step 4: Run bundle analysis**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run build -- --analyze
 # Check bundle size for EnhancedExplorer feature
 ```
@@ -760,14 +760,14 @@ git commit -m "feat: create production-ready components from sandbox"
 ## Task 4: Implement performance monitoring
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/performance-monitor.ts`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/scripts/run-lighthouse.mjs`
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/package.json:scripts`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/performance-monitor.ts`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/scripts/run-lighthouse.mjs`
+- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/package.json:scripts`
 
 **Step 1: Create performance monitor**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/performance-monitor.ts
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/performance-monitor.ts
 export interface PerformanceMetrics {
   timestamp: Date;
   pageLoadTime: number; // ms
@@ -868,7 +868,7 @@ export const performanceMonitor = new PerformanceMonitor();
 **Step 2: Create Lighthouse CI script**
 
 ```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/scripts/run-lighthouse.mjs
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/scripts/run-lighthouse.mjs
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
@@ -962,7 +962,7 @@ runLighthouse().catch(console.error);
 **Step 3: Add npm scripts**
 
 ```json
-// In /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/package.json
+// In /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/package.json
 {
   "scripts": {
     "lighthouse": "node scripts/run-lighthouse.mjs",
@@ -975,7 +975,7 @@ runLighthouse().catch(console.error);
 **Step 4: Run Lighthouse audit**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run lighthouse
 ```
 
@@ -994,14 +994,14 @@ git commit -m "feat: implement performance monitoring and Lighthouse CI"
 ## Task 5: Create promotion pipeline
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/scripts/promotion-pipeline.mjs`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/.github/workflows/promotion.yml`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/promotion-manager.ts`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/scripts/promotion-pipeline.mjs`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/.github/workflows/promotion.yml`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/promotion-manager.ts`
 
 **Step 1: Create promotion manager**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/promotion-manager.ts
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/promotion-manager.ts
 import { ExperimentMetricsTracker } from './experiment-metrics';
 import { featureFlags, FeatureFlag } from './feature-flags';
 import { performanceMonitor } from './performance-monitor';
@@ -1105,7 +1105,7 @@ export const promotionManager = new PromotionManager();
 **Step 2: Create promotion pipeline script**
 
 ```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/scripts/promotion-pipeline.mjs
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/scripts/promotion-pipeline.mjs
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
@@ -1228,7 +1228,7 @@ runPromotionPipeline().catch(console.error);
 **Step 3: Create GitHub Actions workflow**
 
 ```yaml
-# /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/.github/workflows/promotion.yml
+# /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/.github/workflows/promotion.yml
 name: Experiment Promotion Pipeline
 
 on:
@@ -1305,7 +1305,7 @@ jobs:
 **Step 4: Test promotion pipeline**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 node scripts/promotion-pipeline.mjs
 ```
 
@@ -1324,14 +1324,14 @@ git commit -m "feat: create automated promotion pipeline"
 ## Task 6: Implement staged rollout and monitoring
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/rollout-manager.ts`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/components/RolloutMonitor.tsx`
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/admin/rollout/page.tsx`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/rollout-manager.ts`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/components/RolloutMonitor.tsx`
+- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/admin/rollout/page.tsx`
 
 **Step 1: Create rollout manager**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/rollout-manager.ts
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/rollout-manager.ts
 export interface RolloutStage {
   percentage: number;
   duration: number; // hours
@@ -1478,7 +1478,7 @@ export const rolloutManager = new RolloutManager();
 **Step 2: Create rollout monitor component**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/components/RolloutMonitor.tsx
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/components/RolloutMonitor.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -1630,7 +1630,7 @@ function MetricCard({ label, value, threshold, isGood }: any) {
 **Step 3: Create rollout admin page**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/admin/rollout/page.tsx
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/admin/rollout/page.tsx
 'use client';
 
 import RolloutMonitor from '@/components/RolloutMonitor';
@@ -1669,7 +1669,7 @@ export default function RolloutAdminPage() {
 **Step 4: Test rollout system**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run dev &
 # Visit http://localhost:3001/admin/rollout
 ```

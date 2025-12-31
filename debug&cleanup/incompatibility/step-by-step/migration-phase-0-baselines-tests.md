@@ -16,10 +16,10 @@
 ## Task 1: Inventory what must not change
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/migration-inventory.md`
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/globals.css:1-50`
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/(app)/browser/page.tsx:1-100`
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/(app)/planner/page.tsx:1-100`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/migration-inventory.md`
+- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/globals.css:1-50`
+- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/(app)/browser/page.tsx:1-100`
+- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/(app)/planner/page.tsx:1-100`
 
 **Step 1: Create inventory document structure**
 
@@ -93,22 +93,22 @@ git commit -m "docs: create migration inventory of what must not change"
 ## Task 2: Add Vitest test runner to legacy Next.js app
 
 **Files:**
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/package.json:1-50`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/vitest.config.ts`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/tests/lib/courseUtils.test.ts`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/tests/lib/plannerStore.test.ts`
+- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/package.json:1-50`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/vitest.config.ts`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/tests/lib/courseUtils.test.ts`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/tests/lib/plannerStore.test.ts`
 
 **Step 1: Install Vitest and testing dependencies**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm install -D vitest @vitest/ui @testing-library/react @testing-library/jest-dom jsdom
 ```
 
 **Step 2: Add test script to package.json**
 
 ```json
-// In /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/package.json
+// In /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/package.json
 {
   "scripts": {
     "test": "vitest",
@@ -121,7 +121,7 @@ npm install -D vitest @vitest/ui @testing-library/react @testing-library/jest-do
 **Step 3: Create Vitest configuration**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/vitest.config.ts
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/vitest.config.ts
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 
@@ -139,7 +139,7 @@ export default defineConfig({
 **Step 4: Create test setup file**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/tests/setup.ts
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/tests/setup.ts
 import '@testing-library/jest-dom'
 import { afterEach } from 'vitest'
 import { cleanup } from '@testing-library/react'
@@ -152,7 +152,7 @@ afterEach(() => {
 **Step 5: Verify test runner installation**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run test -- --version
 ```
 
@@ -161,7 +161,7 @@ Expected: Shows Vitest version (e.g., "vitest/1.0.0")
 **Step 6: Commit test setup**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 git add package.json package-lock.json vitest.config.ts tests/
 git commit -m "test: add Vitest test runner to legacy app"
 ```
@@ -171,13 +171,13 @@ git commit -m "test: add Vitest test runner to legacy app"
 ## Task 3: Create unit tests for courseUtils.ts
 
 **Files:**
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/courseUtils.ts:1-200`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/tests/lib/courseUtils.test.ts`
+- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/courseUtils.ts:1-200`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/tests/lib/courseUtils.test.ts`
 
 **Step 1: Write failing test for canonicalizeDepartment**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/tests/lib/courseUtils.test.ts
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/tests/lib/courseUtils.test.ts
 import { describe, it, expect } from 'vitest'
 import { canonicalizeDepartment } from '../../src/lib/courseUtils'
 
@@ -212,7 +212,7 @@ describe('canonicalizeDepartment', () => {
 **Step 2: Run test to verify it fails**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run test -- tests/lib/courseUtils.test.ts
 ```
 
@@ -221,14 +221,14 @@ Expected: FAIL with "function not defined" or import error
 **Step 3: Check if function exists in source**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 grep -n "canonicalizeDepartment" src/lib/courseUtils.ts
 ```
 
 **Step 4: Write minimal implementation (if function missing)**
 
 ```typescript
-// Add to /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/courseUtils.ts
+// Add to /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/courseUtils.ts
 export function canonicalizeDepartment(dept: string): string {
   if (!dept || dept.trim() === '') return ''
   
@@ -250,7 +250,7 @@ export function canonicalizeDepartment(dept: string): string {
 **Step 5: Run test to verify it passes**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run test -- tests/lib/courseUtils.test.ts::canonicalizeDepartment
 ```
 
@@ -259,7 +259,7 @@ Expected: PASS with all 5 tests passing
 **Step 6: Write failing test for normalizeTerm**
 
 ```typescript
-// Add to /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/tests/lib/courseUtils.test.ts
+// Add to /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/tests/lib/courseUtils.test.ts
 describe('normalizeTerm', () => {
   it('handles standard term formats', () => {
     expect(normalizeTerm('FA25')).toBe('FA25')
@@ -291,7 +291,7 @@ describe('normalizeTerm', () => {
 **Step 7: Run test to verify it fails**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run test -- tests/lib/courseUtils.test.ts::normalizeTerm
 ```
 
@@ -300,7 +300,7 @@ Expected: FAIL with "function not defined"
 **Step 8: Write minimal implementation for normalizeTerm**
 
 ```typescript
-// Add to /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/courseUtils.ts
+// Add to /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/courseUtils.ts
 export function normalizeTerm(term: string): string {
   if (!term || term.trim() === '') return ''
   
@@ -331,7 +331,7 @@ export function normalizeTerm(term: string): string {
 **Step 9: Run test to verify it passes**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run test -- tests/lib/courseUtils.test.ts::normalizeTerm
 ```
 
@@ -340,7 +340,7 @@ Expected: PASS with all 5 tests passing
 **Step 10: Commit courseUtils tests**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 git add src/lib/courseUtils.ts tests/lib/courseUtils.test.ts
 git commit -m "test: add unit tests for courseUtils canonicalizeDepartment and normalizeTerm"
 ```
@@ -350,13 +350,13 @@ git commit -m "test: add unit tests for courseUtils canonicalizeDepartment and n
 ## Task 4: Create unit tests for plannerStore.ts
 
 **Files:**
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/plannerStore.ts:1-200`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/tests/lib/plannerStore.test.ts`
+- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/plannerStore.ts:1-200`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/tests/lib/plannerStore.test.ts`
 
 **Step 1: Write failing test for localStorage migration behavior**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/tests/lib/plannerStore.test.ts
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/tests/lib/plannerStore.test.ts
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { createPlannerStore } from '../../src/lib/plannerStore'
 
@@ -438,7 +438,7 @@ describe('plannerStore localStorage migration', () => {
 **Step 2: Run test to verify it fails**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run test -- tests/lib/plannerStore.test.ts
 ```
 
@@ -447,7 +447,7 @@ Expected: FAIL with import errors or function not defined
 **Step 3: Write minimal implementation for migration logic**
 
 ```typescript
-// Update /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/plannerStore.ts
+// Update /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/plannerStore.ts
 export function createPlannerStore() {
   // Migration logic
   const migrateFromPlannerV1 = () => {
@@ -522,7 +522,7 @@ export function createPlannerStore() {
 **Step 4: Run test to verify it passes**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run test -- tests/lib/plannerStore.test.ts
 ```
 
@@ -531,7 +531,7 @@ Expected: PASS with all 4 tests passing
 **Step 5: Commit plannerStore tests**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 git add src/lib/plannerStore.ts tests/lib/plannerStore.test.ts
 git commit -m "test: add unit tests for plannerStore localStorage migration"
 ```
@@ -541,8 +541,8 @@ git commit -m "test: add unit tests for plannerStore localStorage migration"
 ## Task 5: Capture baseline screenshots from legacy Next.js app
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-baseline/next/README.md`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-baseline/next/capture-script.js`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-baseline/next/README.md`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-baseline/next/capture-script.js`
 
 **Step 1: Create baseline directory structure**
 
@@ -554,7 +554,7 @@ mkdir -p "debug&cleanup/incompatibility/visual-baseline/next/{clean,populated}"
 **Step 2: Create screenshot capture instructions**
 
 ```markdown
-# /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-baseline/next/README.md
+# /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-baseline/next/README.md
 # Baseline Screenshot Capture Instructions
 
 ## Viewports
@@ -594,7 +594,7 @@ Example: `browser-1440x900-clean.png`, `planner-1440x900-populated.png`
 **Step 3: Create automated capture script (optional)**
 
 ```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-baseline/next/capture-script.js
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-baseline/next/capture-script.js
 // Puppeteer script for automated screenshot capture
 const puppeteer = require('puppeteer');
 
@@ -637,7 +637,7 @@ const routes = [
 **Step 4: Install Puppeteer if using automated script**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm install -D puppeteer
 ```
 
@@ -697,14 +697,14 @@ git commit -m "docs: capture baseline screenshots from legacy Next.js app"
 ## Task 6: Verify Phase 0 completion
 
 **Files:**
-- Check: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/package.json`
-- Check: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/tests/`
-- Check: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-baseline/next/`
+- Check: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/package.json`
+- Check: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/tests/`
+- Check: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-baseline/next/`
 
 **Step 1: Run all tests to ensure they pass**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run test:run
 ```
 

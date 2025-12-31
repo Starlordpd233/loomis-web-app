@@ -16,21 +16,21 @@
 ## Task 1: Set up screenshot capture infrastructure
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/capture-baselines.mjs`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/capture-sandbox.mjs`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/package.json`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/capture-baselines.mjs`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/capture-sandbox.mjs`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/package.json`
 
 **Step 1: Create directory structure**
 
 ```bash
-mkdir -p /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/debug\&cleanup/incompatibility/step-by-step/visual-validation/{baselines/original,baselines/sandbox,diffs,reports}
+mkdir -p /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation/{baselines/original,baselines/sandbox,diffs,reports}
 ```
 
 **Step 2: Initialize npm package for visual validation**
 
 ```json
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/package.json
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/package.json
 {
   "name": "visual-parity-validation",
   "version": "1.0.0",
@@ -54,14 +54,14 @@ mkdir -p /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/debug\&cleanup/i
 **Step 3: Install dependencies**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/debug\&cleanup/incompatibility/step-by-step/visual-validation
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation
 npm install
 ```
 
 **Step 4: Install Playwright browsers**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/debug\&cleanup/incompatibility/step-by-step/visual-validation
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation
 npx playwright install chromium
 ```
 
@@ -78,13 +78,13 @@ git commit -m "feat: set up visual parity validation infrastructure"
 ## Task 2: Capture baselines from original design ideas
 
 **Files:**
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/capture-baselines.mjs`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/config.mjs`
+- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/capture-baselines.mjs`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/config.mjs`
 
 **Step 1: Create configuration file**
 
 ```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/config.mjs
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/config.mjs
 export const VIEWPORTS = [
   { name: 'desktop', width: 1440, height: 900 }
 ];
@@ -93,7 +93,7 @@ export const DESIGN_IDEAS = [
   {
     id: 'enhanced-explorer',
     name: 'Enhanced Explorer',
-    originalPath: '/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/current',
+    originalPath: '/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current',
     originalUrl: 'http://localhost:3000', // When Vite dev server is running
     sandboxPath: '/sandbox/browser/enhanced-explorer',
     sandboxUrl: 'http://localhost:3001/sandbox/browser/enhanced-explorer',
@@ -102,7 +102,7 @@ export const DESIGN_IDEAS = [
   {
     id: 'catalog-browser',
     name: 'Catalog Browser',
-    originalPath: '/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/google-academic-catalog-browser',
+    originalPath: '/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/google-academic-catalog-browser',
     originalUrl: 'http://localhost:3000',
     sandboxPath: '/sandbox/browser/catalog-browser',
     sandboxUrl: 'http://localhost:3001/sandbox/browser/catalog-browser',
@@ -111,7 +111,7 @@ export const DESIGN_IDEAS = [
   {
     id: 'my-list-sidebar',
     name: 'My List Sidebar',
-    originalPath: '/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/my_list_sidebar',
+    originalPath: '/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/my_list_sidebar',
     originalUrl: 'http://localhost:3000',
     sandboxPath: '/sandbox/browser/my-list-sidebar',
     sandboxUrl: 'http://localhost:3001/sandbox/browser/my-list-sidebar',
@@ -123,7 +123,7 @@ export const DESIGN_IDEAS = [
 **Step 2: Create baseline capture script**
 
 ```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/capture-baselines.mjs
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/capture-baselines.mjs
 import { chromium } from 'playwright';
 import fs from 'fs-extra';
 import { DESIGN_IDEAS, VIEWPORTS } from './config.mjs';
@@ -176,7 +176,7 @@ captureBaselines().catch(console.error);
 
 ```bash
 # In separate terminal for each design idea
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/design_ideas/browser/current
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current
 npm run dev &
 # Runs on http://localhost:3000 (or check package.json for actual port)
 ```
@@ -184,7 +184,7 @@ npm run dev &
 **Step 4: Run baseline capture**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/debug\&cleanup/incompatibility/step-by-step/visual-validation
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation
 node capture-baselines.mjs
 ```
 
@@ -203,12 +203,12 @@ git commit -m "feat: capture baseline screenshots from original design ideas"
 ## Task 3: Capture sandbox implementation screenshots
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/capture-sandbox.mjs`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/capture-sandbox.mjs`
 
 **Step 1: Create sandbox capture script**
 
 ```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/capture-sandbox.mjs
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/capture-sandbox.mjs
 import { chromium } from 'playwright';
 import fs from 'fs-extra';
 import { DESIGN_IDEAS, VIEWPORTS } from './config.mjs';
@@ -257,7 +257,7 @@ captureSandbox().catch(console.error);
 **Step 2: Ensure Next.js dev server is running**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run dev &
 # Runs on http://localhost:3001
 ```
@@ -265,7 +265,7 @@ npm run dev &
 **Step 3: Run sandbox capture**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/debug\&cleanup/incompatibility/step-by-step/visual-validation
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation
 node capture-sandbox.mjs
 ```
 
@@ -284,13 +284,13 @@ git commit -m "feat: capture sandbox implementation screenshots"
 ## Task 4: Implement pixel-level comparison
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/compare.mjs`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/thresholds.mjs`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/compare.mjs`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/thresholds.mjs`
 
 **Step 1: Create comparison thresholds configuration**
 
 ```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/thresholds.mjs
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/thresholds.mjs
 export const THRESHOLDS = {
   // Pixel difference tolerance (0-1)
   pixelDiff: 0.01, // 1% of pixels can differ
@@ -318,7 +318,7 @@ export const THRESHOLDS = {
 **Step 2: Create comparison script**
 
 ```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/compare.mjs
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/compare.mjs
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 import fs from 'fs-extra';
@@ -451,7 +451,7 @@ runComparison().catch(console.error);
 **Step 3: Run comparison**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/debug\&cleanup/incompatibility/step-by-step/visual-validation
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation
 node compare.mjs
 ```
 
@@ -463,13 +463,13 @@ Create a test to verify comparison works:
 
 ```bash
 # Create a modified version of a screenshot
-cp /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/debug\&cleanup/incompatibility/step-by-step/visual-validation/baselines/sandbox/enhanced-explorer-desktop.png \
-   /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/debug\&cleanup/incompatibility/step-by-step/visual-validation/baselines/sandbox/enhanced-explorer-desktop-MODIFIED.png
+cp /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation/baselines/sandbox/enhanced-explorer-desktop.png \
+   /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation/baselines/sandbox/enhanced-explorer-desktop-MODIFIED.png
 
 # Run comparison with modified image
 node -e "
 const fs = require('fs');
-const path = '/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/baselines/sandbox/enhanced-explorer-desktop-MODIFIED.png';
+const path = '/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/baselines/sandbox/enhanced-explorer-desktop-MODIFIED.png';
 const data = fs.readFileSync(path);
 const modified = Buffer.from(data);
 modified[1000] = 255; // Change a pixel
@@ -491,13 +491,13 @@ git commit -m "feat: implement pixel-level comparison for visual parity"
 ## Task 5: Generate HTML report
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/generate-report.mjs`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/templates/report-template.html`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/generate-report.mjs`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/templates/report-template.html`
 
 **Step 1: Create HTML template**
 
 ```html
-<!-- /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/templates/report-template.html -->
+<!-- /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/templates/report-template.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -585,7 +585,7 @@ git commit -m "feat: implement pixel-level comparison for visual parity"
 **Step 2: Create report generator**
 
 ```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/generate-report.mjs
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/generate-report.mjs
 import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -688,7 +688,7 @@ generateHTMLReport().catch(console.error);
 **Step 3: Generate report**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/debug\&cleanup/incompatibility/step-by-step/visual-validation
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation
 node generate-report.mjs
 ```
 
@@ -697,7 +697,7 @@ Expected: HTML report file in reports/ directory with embedded images
 **Step 4: View report in browser**
 
 ```bash
-open /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/debug\&cleanup/incompatibility/step-by-step/visual-validation/reports/visual-parity-report-*.html
+open /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation/reports/visual-parity-report-*.html
 ```
 
 **Step 5: Commit reporting system**
@@ -713,13 +713,13 @@ git commit -m "feat: add HTML reporting for visual parity validation"
 ## Task 6: Integrate with CI/CD
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/.github/workflows/visual-parity.yml`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/ci-run.mjs`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/.github/workflows/visual-parity.yml`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/ci-run.mjs`
 
 **Step 1: Create CI runner script**
 
 ```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/ci-run.mjs
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/ci-run.mjs
 import { execSync } from 'child_process';
 import fs from 'fs-extra';
 import { fileURLToPath } from 'url';
@@ -789,7 +789,7 @@ runCICheck();
 **Step 2: Create GitHub Actions workflow**
 
 ```yaml
-# /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-validation/.github/workflows/visual-parity.yml
+# /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/.github/workflows/visual-parity.yml
 name: Visual Parity Validation
 
 on:
@@ -861,7 +861,7 @@ jobs:
 **Step 3: Test CI script locally**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/debug\&cleanup/incompatibility/step-by-step/visual-validation
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation
 node ci-run.mjs
 ```
 

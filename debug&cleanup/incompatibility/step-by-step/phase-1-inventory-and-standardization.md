@@ -16,28 +16,28 @@
 ## Task 1: Inventory design_ideas/browser/current
 
 **Files:**
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/current/package.json`
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/current/App.tsx`
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/current/README.md`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/inventory-current.md`
+- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/package.json`
+- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/App.tsx`
+- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/README.md`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/inventory-current.md`
 
 **Step 1: Examine package.json for dependencies**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/design_ideas/browser/current
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current
 cat package.json | grep -A 20 '"dependencies"'
 ```
 
 **Step 2: Check for external assets in App.tsx**
 
 ```bash
-grep -n "http\|https\|.png\|.jpg\|.svg\|.woff\|.ttf\|.otf" /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/design_ideas/browser/current/App.tsx
+grep -n "http\|https\|.png\|.jpg\|.svg\|.woff\|.ttf\|.otf" /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/App.tsx
 ```
 
 **Step 3: Check for Vite-specific imports**
 
 ```bash
-grep -n "import.meta\|vite\|@vite" /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/design_ideas/browser/current/App.tsx
+grep -n "import.meta\|vite\|@vite" /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/App.tsx
 ```
 
 **Step 4: Document findings**
@@ -79,27 +79,27 @@ git commit -m "docs: inventory design_ideas/browser/current"
 ## Task 2: Inventory design_ideas/browser/my_list_sidebar
 
 **Files:**
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/my_list_sidebar/package.json`
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/my_list_sidebar/App.tsx`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/inventory-my-list-sidebar.md`
+- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/my_list_sidebar/package.json`
+- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/my_list_sidebar/App.tsx`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/inventory-my-list-sidebar.md`
 
 **Step 1: Examine package.json**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/design_ideas/browser/my_list_sidebar
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/my_list_sidebar
 cat package.json
 ```
 
 **Step 2: Check for styled-components usage**
 
 ```bash
-grep -n "styled\|StyledComponent" /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/design_ideas/browser/my_list_sidebar/App.tsx
+grep -n "styled\|StyledComponent" /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/my_list_sidebar/App.tsx
 ```
 
 **Step 3: Check asset references**
 
 ```bash
-find /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/design_ideas/browser/my_list_sidebar -name "*.png" -o -name "*.jpg" -o -name "*.svg" -o -name "*.woff" -o -name "*.ttf"
+find /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/my_list_sidebar -name "*.png" -o -name "*.jpg" -o -name "*.svg" -o -name "*.woff" -o -name "*.ttf"
 ```
 
 **Step 4: Document findings**
@@ -137,8 +137,8 @@ git commit -m "docs: inventory design_ideas/browser/my_list_sidebar"
 ## Task 3: Create asset standardization script
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/scripts/copy-design-assets.mjs`
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/public/` (directory creation)
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/scripts/copy-design-assets.mjs`
+- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/public/` (directory creation)
 
 **Step 1: Create script skeleton**
 
@@ -232,9 +232,9 @@ git commit -m "feat: add asset standardization script"
 ## Task 4: Normalize entry point for browser/current
 
 **Files:**
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/current/App.tsx`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/current/page.tsx`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/current/components/`
+- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/App.tsx`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/current/page.tsx`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/current/components/`
 
 **Step 1: Extract root component from App.tsx**
 
@@ -246,13 +246,13 @@ git commit -m "feat: add asset standardization script"
 **Step 2: Create sandbox page structure**
 
 ```bash
-mkdir -p /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/current/components
+mkdir -p /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/current/components
 ```
 
 **Step 3: Create minimal page.tsx**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/current/page.tsx
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/current/page.tsx
 'use client';
 
 import EnhancedExplorer from './components/EnhancedExplorer';
@@ -270,7 +270,7 @@ export default function CurrentSandboxPage() {
 **Step 4: Create placeholder EnhancedExplorer component**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/current/components/EnhancedExplorer.tsx
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/current/components/EnhancedExplorer.tsx
 export default function EnhancedExplorer() {
   return (
     <div className="p-8 border border-gray-300 rounded-lg">
@@ -284,7 +284,7 @@ export default function EnhancedExplorer() {
 **Step 5: Test sandbox route**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run dev &
 # Visit http://localhost:3001/sandbox/browser/current
 ```
@@ -302,7 +302,7 @@ git commit -m "feat: create sandbox entry point for browser/current"
 ## Task 5: Update experiments.ts registry
 
 **Files:**
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/experiments.ts:15-30`
+- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/experiments.ts:15-30`
 
 **Step 1: Add current experiment metadata**
 
@@ -326,7 +326,7 @@ experiments: [
 **Step 2: Verify TypeScript compilation**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npx tsc --noEmit
 ```
 

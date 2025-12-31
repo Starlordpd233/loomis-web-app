@@ -16,20 +16,20 @@
 ## Task 1: Set up sandbox directory structure
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/catalog-browser/`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/catalog-browser/`
 
 **Step 1: Create base directories**
 
 ```bash
-mkdir -p /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/{enhanced-explorer,catalog-browser,my-list-sidebar}
+mkdir -p /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/{enhanced-explorer,catalog-browser,my-list-sidebar}
 ```
 
 **Step 2: Create layout.tsx for browser category**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/layout.tsx
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/layout.tsx
 export default function BrowserSandboxLayout({
   children,
 }: {
@@ -54,7 +54,7 @@ export default function BrowserSandboxLayout({
 **Step 3: Verify directory structure**
 
 ```bash
-find /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser -type d
+find /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser -type d
 ```
 
 **Step 4: Commit structure**
@@ -70,20 +70,20 @@ git commit -m "feat: create browser sandbox directory structure"
 ## Task 2: Rewrite styled-components to Tailwind (SearchWrapper)
 
 **Files:**
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/current/components/CoolSearchBar.tsx`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/components/CoolSearchBar.tsx`
+- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/components/CoolSearchBar.tsx`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/components/CoolSearchBar.tsx`
 
 **Step 1: Examine original styled-components usage**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/design_ideas/browser/current
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current
 grep -n "styled\|SearchWrapper" components/CoolSearchBar.tsx
 ```
 
 **Step 2: Create Tailwind version**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/components/CoolSearchBar.tsx
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/components/CoolSearchBar.tsx
 'use client';
 
 import { Search } from 'lucide-react';
@@ -158,7 +158,7 @@ export default function CoolSearchBar({
 Create test page:
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/test-search/page.tsx
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/test-search/page.tsx
 'use client';
 
 import CoolSearchBar from '../components/CoolSearchBar';
@@ -215,14 +215,14 @@ git commit -m "feat: rewrite SearchWrapper styled-component to Tailwind CSS"
 ## Task 3: Fix TypeScript types for enhanced-explorer
 
 **Files:**
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/current/types.ts`
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/types.ts`
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/page.tsx`
+- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/types.ts`
+- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/types.ts`
+- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/page.tsx`
 
 **Step 1: Copy and enhance types**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/types.ts
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/types.ts
 export interface Course {
   id: string;
   code: string;
@@ -275,7 +275,7 @@ suggestions.map((sug: AiSuggestion, idx: number) => (
 **Step 4: Add path alias to tsconfig.json**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 cat tsconfig.json | grep -A 5 '"paths"'
 ```
 
@@ -294,7 +294,7 @@ If not present, add:
 **Step 5: Test TypeScript compilation**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npx tsc --noEmit src/app/sandbox/browser/enhanced-explorer/
 ```
 
@@ -314,9 +314,9 @@ git commit -m "fix: TypeScript type safety for enhanced-explorer"
 ## Task 4: Port enhanced-explorer App.tsx to sandbox
 
 **Files:**
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/current/App.tsx` (842 lines)
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/page.tsx`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/components/`
+- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/App.tsx` (842 lines)
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/page.tsx`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/components/`
 
 **Step 1: Break down monolithic App.tsx into components**
 
@@ -331,14 +331,14 @@ Identify logical sections:
 **Step 2: Create component structure**
 
 ```bash
-mkdir -p /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/components
-touch /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/components/{Header.tsx,SearchSection.tsx,FilterControls.tsx,CourseGrid.tsx,AIAdvicePanel.tsx,CourseModal.tsx}
+mkdir -p /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/components
+touch /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/components/{Header.tsx,SearchSection.tsx,FilterControls.tsx,CourseGrid.tsx,AIAdvicePanel.tsx,CourseModal.tsx}
 ```
 
 **Step 3: Create main page.tsx**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/page.tsx
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/enhanced-explorer/page.tsx
 'use client';
 
 import { useState } from 'react';
@@ -409,7 +409,7 @@ Create minimal component implementations that render the structure without full 
 **Step 5: Test sandbox route**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run dev &
 # Visit http://localhost:3001/sandbox/browser/enhanced-explorer
 ```
@@ -427,27 +427,27 @@ git commit -m "feat: initial port of enhanced-explorer to sandbox"
 ## Task 5: Standardize icons to lucide-react
 
 **Files:**
-- Check: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/current/package.json` for icon dependencies
+- Check: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/package.json` for icon dependencies
 - Replace: Icon imports in ported components
 
 **Step 1: Check current icon usage**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/design_ideas/browser/current
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current
 grep -r "import.*icon\|Icon\|icon" components/ App.tsx
 ```
 
 **Step 2: Install lucide-react if not present**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm list lucide-react || npm install lucide-react
 ```
 
 **Step 3: Create icon mapping**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/lib/icon-mapping.ts
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/lib/icon-mapping.ts
 // Map original icon names to lucide-react equivalents
 export const iconMap = {
   // Add mappings as needed
@@ -487,7 +487,7 @@ git commit -m "feat: standardize icons to lucide-react"
 ## Task 6: Register experiments in experiments.ts
 
 **Files:**
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/sandbox/experiments.ts:15-50`
+- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/experiments.ts:15-50`
 
 **Step 1: Add enhanced-explorer experiment**
 
@@ -541,7 +541,7 @@ git commit -m "feat: standardize icons to lucide-react"
 **Step 4: Test experiments listing**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run dev &
 # Visit http://localhost:3001/sandbox
 ```

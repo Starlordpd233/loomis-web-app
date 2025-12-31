@@ -16,12 +16,12 @@
 ## Task 1: Expand Tailwind content globs
 
 **Files:**
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/tailwind.config.ts:5-7`
+- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/tailwind.config.ts:5-7`
 
 **Step 1: Backup current configuration**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 cp tailwind.config.ts tailwind.config.ts.backup
 ```
 
@@ -39,7 +39,7 @@ content: [
 **Step 3: Verify configuration syntax**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npx tailwindcss --config tailwind.config.ts --help
 ```
 
@@ -48,7 +48,7 @@ Expected: No errors, shows Tailwind CLI help
 **Step 4: Test Tailwind scanning**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npx tailwindcss --config tailwind.config.ts --content ./src/app/**/*.tsx --dry-run
 ```
 
@@ -65,13 +65,13 @@ git commit -m "feat: expand Tailwind content globs to entire app"
 ## Task 2: Create global Tailwind entry file
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/global-tailwind.css`
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/layout.tsx`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/global-tailwind.css`
+- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/layout.tsx`
 
 **Step 1: Create global Tailwind CSS file**
 
 ```css
-/* /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/global-tailwind.css */
+/* /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/global-tailwind.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -85,7 +85,7 @@ git commit -m "feat: expand Tailwind content globs to entire app"
 First, examine current layout.tsx:
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 head -50 src/app/layout.tsx
 ```
 
@@ -109,7 +109,7 @@ import './global-tailwind.css';
 **Step 5: Test build with new CSS import**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run build
 ```
 
@@ -129,19 +129,19 @@ git commit -m "feat: add global Tailwind CSS entry point"
 ## Task 3: Test Tailwind in non-sandbox routes
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/test-tailwind/page.tsx`
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/test-tailwind/layout.tsx`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/test-tailwind/page.tsx`
+- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/test-tailwind/layout.tsx`
 
 **Step 1: Create test route directory**
 
 ```bash
-mkdir -p /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app/src/app/test-tailwind
+mkdir -p /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/test-tailwind
 ```
 
 **Step 2: Create test layout (optional - uses root layout)**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/test-tailwind/layout.tsx
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/test-tailwind/layout.tsx
 export default function TestLayout({
   children,
 }: {
@@ -154,7 +154,7 @@ export default function TestLayout({
 **Step 3: Create test page with Tailwind classes**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/test-tailwind/page.tsx
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/test-tailwind/page.tsx
 export default function TestTailwindPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-8">
@@ -211,7 +211,7 @@ export default function TestTailwindPage() {
 **Step 4: Test the route**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run dev &
 # Visit http://localhost:3001/test-tailwind
 ```
@@ -237,7 +237,7 @@ git commit -m "test: add Tailwind global test route"
 ## Task 4: Check for Preflight conflicts with existing styles
 
 **Files:**
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/globals.css`
+- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/globals.css`
 - Test: Existing routes (`/browser`, `/planner`, `/onboarding`)
 
 **Step 1: Understand Preflight impact**
@@ -285,7 +285,7 @@ const config: Config = {
 **Step 5: Test with Preflight disabled**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 npm run build
 npm run dev &
 # Re-test existing routes
@@ -317,13 +317,13 @@ git commit -m "config: [enable/disable] Tailwind Preflight based on compatibilit
 ## Task 5: Verify CSS Modules compatibility
 
 **Files:**
-- Check: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/**/*.module.css`
+- Check: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/**/*.module.css`
 - Test: Any route using CSS Modules
 
 **Step 1: Find CSS Module files**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app
+cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
 find src/app -name "*.module.css" | head -10
 ```
 
@@ -332,7 +332,7 @@ find src/app -name "*.module.css" | head -10
 Create a test component that uses both CSS Modules and Tailwind:
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/test-tailwind/compatibility/page.tsx
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/test-tailwind/compatibility/page.tsx
 import styles from './compatibility.module.css';
 
 export default function CompatibilityTest() {
@@ -368,7 +368,7 @@ export default function CompatibilityTest() {
 **Step 3: Create CSS Module file**
 
 ```css
-/* /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/test-tailwind/compatibility/compatibility.module.css */
+/* /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/test-tailwind/compatibility/compatibility.module.css */
 .moduleBox {
   background-color: #ef4444; /* Tailwind red-500 */
   color: white;
@@ -402,7 +402,7 @@ echo "CSS Modules and Tailwind compatibility test passed on $(date)" >> "debug&c
 **Step 7: Clean up test routes (optional)**
 
 ```bash
-rm -rf /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/loomis-course-app/src/app/test-tailwind
+rm -rf /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/test-tailwind
 git add -u
 git commit -m "test: remove Tailwind test routes after verification"
 ```
