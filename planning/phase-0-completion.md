@@ -9,8 +9,8 @@
 ## 📊 Metrics
 - Test coverage: courseUtils and plannerStore core functions (15 tests passed)
 - Screenshots: 
-  - Clean: 18 files (6 routes * 3 viewports)
-  - Populated: 18 files (6 routes * 3 viewports)
+  - Clean: 6 files (6 routes * 1 viewport)
+  - Populated: 6 files (6 routes * 1 viewport)
 - Inventory: 6 core routes documented
 
 ## 🛑 CHECKPOINT READY

@@ -4,8 +4,6 @@ const fs = require('fs');
 const path = require('path');
 
 const viewports = [
-    { width: 375, height: 812, name: '375x812' },
-    { width: 768, height: 1024, name: '768x1024' },
     { width: 1440, height: 900, name: '1440x900' }
 ];
 

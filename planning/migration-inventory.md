@@ -3,12 +3,12 @@
 ## Core Routes
 | Route | Data Dependencies | Storage Keys Used | Cookie Usage | Non-default CSS Behaviors | Must-Match Screenshots |
 |-------|-------------------|-------------------|--------------|--------------------------|------------------------|
-| `/` | None | None | None | Custom backgrounds, animations | 375x812, 768x1024, 1440x900 |
-| `/login` | None | None | None | Form styling, transitions | 375x812, 768x1024, 1440x900 |
-| `/onboarding` | `catalogPrefs` localStorage | `catalogPrefs` | `onboardingIntroSeen` | Wizard layout, stepper | 375x812, 768x1024, 1440x900 |
-| `/browser` | `CATALOG_PATHS` JSON files | `plan` | `catalogPrefs` | Top padding, fixed headers | 375x812, 768x1024, 1440x900 |
-| `/planner` | None | `plannerV1`, `plan`, `plannerV2` | None | Grid layout, print styles | 375x812, 768x1024, 1440x900 |
-| `/sandbox` | None | None | None | Toolbar, experiment layout | 375x812, 768x1024, 1440x900 |
+| `/` | None | None | None | Custom backgrounds, animations | 1440x900 |
+| `/login` | None | None | None | Form styling, transitions | 1440x900 |
+| `/onboarding` | `catalogPrefs` localStorage | `catalogPrefs` | `onboardingIntroSeen` | Wizard layout, stepper | 1440x900 |
+| `/browser` | `CATALOG_PATHS` JSON files | `plan` | `catalogPrefs` | Top padding, fixed headers | 1440x900 |
+| `/planner` | None | `plannerV1`, `plan`, `plannerV2` | None | Grid layout, print styles | 1440x900 |
+| `/sandbox` | None | None | None | Toolbar, experiment layout | 1440x900 |
 
 ## Global CSS Variables (from globals.css)
 - `--background`
