@@ -19,7 +19,7 @@
 - Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/current/package.json`
 - Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/current/App.tsx`
 - Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/current/README.md`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/step-by-step/inventory-current.md`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/inventory-current.md`
 
 **Step 1: Examine package.json for dependencies**
 
@@ -70,7 +70,7 @@ grep -n "import.meta\|vite\|@vite" /Users/MatthewLi/Desktop/Senior\ Year/clubs/w
 
 ```bash
 cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-git add debug&cleanup/incompatibility/step-by-step/inventory-current.md
+git add debug&cleanup/incompatibility/inventory-current.md
 git commit -m "docs: inventory design_ideas/browser/current"
 ```
 
@@ -81,7 +81,7 @@ git commit -m "docs: inventory design_ideas/browser/current"
 **Files:**
 - Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/my_list_sidebar/package.json`
 - Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/design_ideas/browser/my_list_sidebar/App.tsx`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/step-by-step/inventory-my-list-sidebar.md`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/inventory-my-list-sidebar.md`
 
 **Step 1: Examine package.json**
 
@@ -128,7 +128,7 @@ find /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc/design_ideas/browser
 
 ```bash
 cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-git add debug&cleanup/incompatibility/step-by-step/inventory-my-list-sidebar.md
+git add debug&cleanup/incompatibility/inventory-my-list-sidebar.md
 git commit -m "docs: inventory design_ideas/browser/my_list_sidebar"
 ```
 

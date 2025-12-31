@@ -1130,7 +1130,7 @@ async function runPromotionPipeline() {
     try {
       // 1. Run visual parity check
       console.log('  👁️  Running visual parity check...');
-      execSync(`cd ${path.join(__dirname, '../../debug&cleanup/incompatibility/step-by-step/visual-validation')} && node compare.mjs`, {
+      execSync(`cd ${path.join(__dirname, '../../debug&cleanup/incompatibility/visual-validation')} && node compare.mjs`, {
         stdio: 'pipe'
       });
       

@@ -308,7 +308,7 @@ Create note in project docs:
 ```bash
 cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
 git add loomis-course-app/tailwind.config.ts
-git add docs/TAILWIND-PREFLIGHT.md  # if created
+git add "debug&cleanup/incompatibility/TAILWIND-PREFLIGHT.md"  # if created
 git commit -m "config: [enable/disable] Tailwind Preflight based on compatibility testing"
 ```
 
@@ -396,7 +396,7 @@ Inspect elements in browser DevTools to ensure:
 
 ```bash
 cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-echo "CSS Modules and Tailwind compatibility test passed on $(date)" >> docs/TAILWIND-COMPATIBILITY.md
+echo "CSS Modules and Tailwind compatibility test passed on $(date)" >> "debug&cleanup/incompatibility/TAILWIND-COMPATIBILITY.md"
 ```
 
 **Step 7: Clean up test routes (optional)**
