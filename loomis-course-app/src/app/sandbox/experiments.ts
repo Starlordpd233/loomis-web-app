@@ -32,7 +32,17 @@ export const CATEGORIES: CategoryMeta[] = [
     name: 'Course Browser',
     icon: '📚',
     experiments: [
-      // Browser experiments will be added here via manual integration
+      {
+        name: 'Enhanced Explorer',
+        description: 'AI-enhanced course catalog explorer with Gemini integration',
+        path: '/sandbox/browser/current',
+        status: 'wip' as ExperimentStatus,
+        frameworks: ['Tailwind CSS', 'styled-components', '@google/genai'],
+        createdAt: '2025-12-31',
+        author: 'Design Ideas Team',
+        sourceRef: 'design_ideas/browser/current',
+        tags: ['ai', 'catalog', 'explorer', 'gemini'],
+      },
     ],
   },
   // Add more categories here (planner, landing, etc.)
