@@ -16,7 +16,7 @@
 ## Task 1: Inventory what must not change
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/planning/migration-inventory.md`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/migration-inventory.md`
 - Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/globals.css:1-50`
 - Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/(app)/browser/page.tsx:1-100`
 - Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/src/app/(app)/planner/page.tsx:1-100`
@@ -75,7 +75,7 @@
 
 ```bash
 cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-ls -la planning/migration-inventory.md
+ls -la "debug&cleanup/incompatibility/migration-inventory.md"
 ```
 
 Expected: File exists with 50+ lines
@@ -84,7 +84,7 @@ Expected: File exists with 50+ lines
 
 ```bash
 cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-git add planning/migration-inventory.md
+git add "debug&cleanup/incompatibility/migration-inventory.md"
 git commit -m "docs: create migration inventory of what must not change"
 ```
 
@@ -541,20 +541,20 @@ git commit -m "test: add unit tests for plannerStore localStorage migration"
 ## Task 5: Capture baseline screenshots from legacy Next.js app
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/planning/visual-baseline/next/README.md`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/planning/visual-baseline/next/capture-script.js`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-baseline/next/README.md`
+- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-baseline/next/capture-script.js`
 
 **Step 1: Create baseline directory structure**
 
 ```bash
 cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-mkdir -p planning/visual-baseline/next/{clean,populated}
+mkdir -p "debug&cleanup/incompatibility/visual-baseline/next/{clean,populated}"
 ```
 
 **Step 2: Create screenshot capture instructions**
 
 ```markdown
-# /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/planning/visual-baseline/next/README.md
+# /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-baseline/next/README.md
 # Baseline Screenshot Capture Instructions
 
 ## Viewports
@@ -594,7 +594,7 @@ Example: `browser-1440x900-clean.png`, `planner-1440x900-populated.png`
 **Step 3: Create automated capture script (optional)**
 
 ```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/planning/visual-baseline/next/capture-script.js
+// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-baseline/next/capture-script.js
 // Puppeteer script for automated screenshot capture
 const puppeteer = require('puppeteer');
 
@@ -624,7 +624,7 @@ const routes = [
       await page.goto(`http://localhost:3000${route}`);
       await page.waitForNetworkIdle();
       
-      const filename = `planning/visual-baseline/next/${route.replace(/\//g, '')}-${viewport.name}.png`;
+      const filename = `debug&cleanup/incompatibility/visual-baseline/next/${route.replace(/\//g, '')}-${viewport.name}.png`;
       await page.screenshot({ path: filename, fullPage: true });
       console.log(`Captured: ${filename}`);
     }
@@ -654,7 +654,7 @@ Instructions for manual capture:
      - Navigate to route
      - Wait for full load
      - Cmd+Shift+P → "Capture full size screenshot"
-     - Save as `planning/visual-baseline/next/clean/{route}-{viewport}.png`
+     - Save as `debug&cleanup/incompatibility/visual-baseline/next/clean/{route}-{viewport}.png`
 
 **Step 6: Capture populated state screenshots**
 
@@ -678,8 +678,8 @@ Instructions for manual capture:
 
 ```bash
 cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-ls -la planning/visual-baseline/next/clean/ | wc -l
-ls -la planning/visual-baseline/next/populated/ | wc -l
+ls -la "debug&cleanup/incompatibility/visual-baseline/next/clean/" | wc -l
+ls -la "debug&cleanup/incompatibility/visual-baseline/next/populated/" | wc -l
 ```
 
 Expected: At least 7 files in each directory (one per route)
@@ -688,7 +688,7 @@ Expected: At least 7 files in each directory (one per route)
 
 ```bash
 cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-git add planning/visual-baseline/
+git add "debug&cleanup/incompatibility/visual-baseline/"
 git commit -m "docs: capture baseline screenshots from legacy Next.js app"
 ```
 
@@ -699,7 +699,7 @@ git commit -m "docs: capture baseline screenshots from legacy Next.js app"
 **Files:**
 - Check: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/package.json`
 - Check: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/loomis-course-app/tests/`
-- Check: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/planning/visual-baseline/next/`
+- Check: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc/debug&cleanup/incompatibility/visual-baseline/next/`
 
 **Step 1: Run all tests to ensure they pass**
 
@@ -714,7 +714,7 @@ Expected: All tests pass with 0 failures
 
 ```bash
 cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-find planning/visual-baseline/next/ -name "*.png" | wc -l
+find "debug&cleanup/incompatibility/visual-baseline/next/" -name "*.png" | wc -l
 ```
 
 Expected: At least 14 PNG files (7 routes × 2 states, or 7 routes × 1 state if only clean)
@@ -723,7 +723,7 @@ Expected: At least 14 PNG files (7 routes × 2 states, or 7 routes × 1 state if
 
 ```bash
 cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-cat planning/migration-inventory.md | head -20
+cat "debug&cleanup/incompatibility/migration-inventory.md" | head -20
 ```
 
 Expected: Shows inventory table with route information
@@ -753,8 +753,8 @@ Proceed to Phase 1 (Create Vite app with same look defaults) after user approval
 
 ```bash
 cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-echo "# Phase 0 Completion Report" > planning/phase-0-completion.md
-cat >> planning/phase-0-completion.md << 'EOF'
+echo "# Phase 0 Completion Report" > "debug&cleanup/incompatibility/phase-0-completion.md"
+cat >> "debug&cleanup/incompatibility/phase-0-completion.md" << 'EOF'
 ## ✅ Completed
 - [x] Migration inventory created with all routes, storage keys, and CSS behaviors
 - [x] Vitest test runner installed in legacy Next.js app
@@ -771,7 +771,7 @@ cat >> planning/phase-0-completion.md << 'EOF'
 Proceed to Phase 1 (Create Vite app with same look defaults) after user approval.
 EOF
 
-git add planning/phase-0-completion.md
+git add "debug&cleanup/incompatibility/phase-0-completion.md"
 git commit -m "docs: add Phase 0 completion report"
 ```
 
@@ -787,8 +787,8 @@ git commit -m "docs: add Phase 0 completion report"
 
 **Verification Checklist:**
 - [ ] **Tests Passing:** Run `npm run test:run` in `loomis-course-app`. All tests must pass.
-- [ ] **Baselines Secured:** Check `planning/visual-baseline/next/`. Are screenshots present for all core routes (`/`, `/browser`, `/planner`) at all 3 viewports?
+- [ ] **Baselines Secured:** Check `debug&cleanup/incompatibility/visual-baseline/next/`. Are screenshots present for all core routes (`/`, `/browser`, `/planner`) at all 3 viewports?
 - [ ] **Data Integrity:** Verify `src/lib/courseUtils.ts` and `src/lib/plannerStore.ts` logic is covered by tests.
-- [ ] **Inventory Complete:** `planning/migration-inventory.md` contains all route dependencies and storage keys.
+- [ ] **Inventory Complete:** `debug&cleanup/incompatibility/migration-inventory.md` contains all route dependencies and storage keys.
 
 **Next Phase:** Phase 1 — Create `apps/web` (Vite) with "same look" defaults
