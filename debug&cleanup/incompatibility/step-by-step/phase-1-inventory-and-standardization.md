@@ -17,6 +17,10 @@
 
 - Phase 0 complete (baselines + tests in place)
 - Working directory: Repo root (unless otherwise specified)
+- Dev server can be started and is reachable at `http://localhost:3001` (needed for Task 4 stub verification):
+  ```bash
+  cd loomis-course-app && npm run dev
+  ```
 - Design ideas to inventory:
   - `design_ideas/browser/current`
   - `design_ideas/browser/my_list_sidebar`

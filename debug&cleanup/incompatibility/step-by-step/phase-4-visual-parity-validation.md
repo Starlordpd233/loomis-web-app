@@ -407,6 +407,7 @@ These require fixes in Phase 3:
 - [ ] Manual comparison completed for each design idea
 - [ ] README checklist updated with findings
 - [ ] No blocking visual differences (or documented as acceptable)
+- [ ] **Regression check:** Existing production routes (`/browser`, `/planner`) still match Phase 0 baselines (no regressions from Tailwind/styling changes)
 
 ---
 

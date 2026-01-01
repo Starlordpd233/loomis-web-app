@@ -36,14 +36,22 @@
 
 **Step 0: Add environment variable for feature toggle**
 
-> [!IMPORTANT]
-> Using an environment variable instead of a code constant enables runtime toggling without rebuilds — essential for safe production rollouts.
+> [!NOTE]
+> **Next.js env behavior:** `NEXT_PUBLIC_*` variables are inlined at build time into client bundles. Changing this value requires a **redeploy/rebuild** to take effect — it is not a true runtime toggle. For instant runtime switching, consider a server-side feature flag system (out of scope for this migration).
 
 Create or update `.env.local`:
 
 ```bash
 # loomis-course-app/.env.local
 NEXT_PUBLIC_ENABLE_NEW_BROWSER=true
+```
+
+**Document the variable in `.env.example`** (so future developers know it exists):
+
+```bash
+# Add to loomis-course-app/.env.example (or create if it doesn't exist)
+echo "# Feature toggle for promoted browser components (requires rebuild to change)" >> loomis-course-app/.env.example
+echo "NEXT_PUBLIC_ENABLE_NEW_BROWSER=false" >> loomis-course-app/.env.example
 ```
 
 For production deployment, set this variable in your hosting platform (Vercel, etc.) to control the rollout.
@@ -90,8 +98,8 @@ export default function BrowserPage() {
 | Local dev | `true` | Test new components |
 | Staging | `true` | Validate before prod |
 | Production (initial) | `false` | Safe default |
-| Production (rollout) | `true` | Flip when validated |
-| Production (rollback) | `false` | Instant revert if issues |
+| Production (rollout) | `true` | Flip when validated (requires redeploy) |
+| Production (rollback) | `false` | Revert if issues (requires redeploy) |
 
 **Step 2: Verify production route**
 
@@ -111,7 +119,7 @@ git commit -m "feat: wire up enhanced explorer and sidebar in production"
 
 
 
-## Task 5: Update experiments registry
+## Task 2: Update experiments registry
 
 **Goal:** Mark experiments as promoted in the sandbox registry.
 
@@ -156,7 +164,7 @@ git commit -m "docs: mark experiments as promoted"
 
 ---
 
-## Task 6: Final verification
+## Task 3: Final verification
 
 **Goal:** Ensure everything works correctly after promotion.
 
@@ -201,7 +209,7 @@ git commit -m "fix: address issues found during promotion verification"
 
 ## Acceptance Criteria
 
-- [ ] `tailwind.config.ts` includes `./src/features/**/*` in content array
+- [ ] `tailwind.config.ts` includes `./src/features/**/*` in content array (should already be done in Phase 3 Task 1; verify still true)
 - [ ] Production features directory exists with promoted components
 - [ ] Enhanced Explorer moved to `src/features/` and sandbox imports from it
 - [ ] My List Sidebar moved to `src/features/` and sandbox imports from it

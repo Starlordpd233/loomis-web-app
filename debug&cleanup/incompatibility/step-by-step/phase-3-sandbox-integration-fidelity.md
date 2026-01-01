@@ -7,7 +7,7 @@
 
 **Goal:** Port each design idea into sandbox with visual fidelity preservation, using Tailwind for layout/spacing/typography and CSS Modules for complex selectors, keyframes, and non-utility styling.
 
-**Architecture:** **Features-First.** Port design ideas directly into `src/features/` (not sandbox). Use `/sandbox/` routes only as thin import wrappers. Rewrite styled-components to Tailwind.
+**Architecture:** **Features-First.** Port design ideas into `src/features/` (production-ready code lives here). Create thin wrapper routes in `/sandbox/...` that simply import and render the feature components. This separation ensures Phase 5 promotion is trivial: production routes just import from `src/features/` the same way sandbox does, avoiding code duplication or file moves. Rewrite styled-components to Tailwind during porting.
 
 
 **Tech Stack:** Next.js 15, React 19, TypeScript, Tailwind CSS v4, CSS Modules, lucide-react
@@ -42,8 +42,12 @@
 
 ## Fallback: Styled-Components Coexistence (Escape Hatch)
 
-> [!NOTE]
-> **Use this only for genuinely complex components** where styled-components have dynamic props tightly coupled to styling logic. The primary goal remains rewriting to Tailwind.
+> [!IMPORTANT]
+> **This escape hatch should rarely be used.** The goal is to rewrite styled-components to Tailwind. Only use this fallback for genuinely complex cases where a Tailwind rewrite would take >4 hours of effort. All components using this escape hatch **must** have:
+> 1. A `// TODO: Refactor styled-components to Tailwind` comment at the top of the file
+> 2. A tracking reference (GitHub issue or task ID) in the comment so the tech debt is not forgotten
+>
+> If you find yourself reaching for this escape hatch frequently, reconsider the porting approach or accept a simpler visual approximation.
 
 If a styled-component is too complex to rewrite quickly (e.g., uses `${props => ...}` extensively for dynamic styling):
 
@@ -184,7 +188,7 @@ Based on complexity (from Phase 1 inventories):
 
 ---
 
-## Task 1b: Update Tailwind Content Config
+## Task 1: Update Tailwind Content Config
 
 **Goal:** Ensure Tailwind generates styles for the new `src/features` directory.
 
@@ -209,7 +213,7 @@ npm run build
 
 ---
 
-## Task 1: Verify sandbox structure from Phase 1
+## Task 2: Verify sandbox structure from Phase 1
 
 **Goal:** Confirm the sandbox stubs created in Phase 1 still work.
 
@@ -232,7 +236,7 @@ npm run dev
 
 ---
 
-## Task 2: Port my_list_sidebar (simpler design idea)
+## Task 3: Port my_list_sidebar (simpler design idea)
 
 **Goal:** Convert `design_ideas/browser/my_list_sidebar` to a production-ready feature component.
 
@@ -315,7 +319,7 @@ git commit -m "feat: port my_list_sidebar to src/features and wire to sandbox"
 
 ---
 
-## Task 3: Port current (enhanced explorer)
+## Task 4: Port current (enhanced explorer)
 
 **Goal:** Convert `design_ideas/browser/current` to a production-ready feature component.
 
@@ -377,7 +381,7 @@ git commit -m "feat: port enhanced-explorer to src/features and wire to sandbox"
 
 ---
 
-## Task 4: Update experiments registry (if exists)
+## Task 5: Update experiments registry (if exists)
 
 **Goal:** Register ported experiments in the sandbox registry.
 
@@ -520,7 +524,7 @@ npm run test:run -- tests/sandbox/
 - [ ] `/sandbox/browser/current` renders ported component
 - [ ] No styled-components runtime errors
 - [ ] No console errors on load
-- [ ] TypeScript compilation passes
+- [ ] TypeScript compilation passes: `cd loomis-course-app && npx tsc --noEmit`
 - [ ] Tailwind classes work in all components
 
 ---

@@ -225,7 +225,7 @@ git commit -m "test: add/update unit tests for plannerStore migration"
 
 ---
 
-## Task 4.5: Add minimal E2E Smoke Tests
+## Task 5: Add minimal E2E Smoke Tests (Optional)
 
 **Goal:** Ensure critical user flows work (behavioral invariants), not just unit logic.
 
@@ -256,7 +256,7 @@ npx playwright test
 
 ---
 
-## Task 5: Verify or capture baseline screenshots
+## Task 6: Verify or capture baseline screenshots
 
 **Goal:** Have visual baselines for core routes to compare against after styling changes.
 
@@ -337,7 +337,7 @@ git commit -m "docs: capture baseline screenshots from Next.js app"
 
 ---
 
-## Task 6: Run full verification
+## Task 7: Run full verification
 
 **Goal:** Confirm Phase 0 is complete before proceeding.
 
