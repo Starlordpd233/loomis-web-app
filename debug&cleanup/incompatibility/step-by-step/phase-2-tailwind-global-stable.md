@@ -73,7 +73,25 @@ and then immediately validate all baseline screenshots. */
 ls -la loomis-course-app/src/app/tailwind.css
 ```
 
+**Step 3: Verify dark variant hooks into `data-theme`**
+
+> [!IMPORTANT]
+> This verification ensures Tailwind's `dark:` utilities activate correctly with your theme system.
+
+1. After Task 2 (global import), create a temporary test element in any page:
+   ```tsx
+   <div className="bg-white dark:bg-black text-black dark:text-white p-4">
+     Dark mode test
+   </div>
+   ```
+
+2. Toggle theme using the app's ThemeToggle component
+3. Verify the element changes colors when `data-theme="dark"` is set on `<html>`
+
+**Why this matters:** The `@custom-variant dark (&:is([data-theme="dark"] *));` syntax is the correct **Tailwind v4** approach (not the v3 config-based `darkMode` option). This step confirms it works before proceeding.
+
 ---
+
 
 ## Task 2: Import Tailwind globally (without overriding your existing globals)
 

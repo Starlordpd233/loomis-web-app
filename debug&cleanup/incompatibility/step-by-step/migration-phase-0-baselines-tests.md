@@ -5,6 +5,13 @@
 > [!NOTE]
 > **Code Snippets Disclaimer:** Snippets illustrate intent; implement production-quality changes as needed.
 
+> [!TIP]
+> **Path Convention (applies to all phases):**
+> - **Phases 0, 2, 3, 5** use `loomis-course-app/` as working directory (app-focused tasks)
+> - **Phases 1, 4** use **Repo Root** as working directory (cross-project tasks involving `design_ideas/`)
+> - Commands prefixed with `cd loomis-course-app &&` are for npm/build operations
+> - File paths in these docs are relative to the declared working directory unless they start with `/` or `loomis-course-app/`
+
 **Goal:** Lock down behavior and visuals in the Next.js app before any styling framework changes, so regressions can be detected.
 
 **Architecture:** Ensure Vitest is configured, add/verify unit tests for critical utilities and storage logic, capture baseline screenshots for visual comparison.

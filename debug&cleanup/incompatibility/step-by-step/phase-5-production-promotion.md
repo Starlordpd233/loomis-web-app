@@ -32,10 +32,23 @@
 
 **Files:**
 - Modify: `loomis-course-app/src/app/(app)/browser/page.tsx`
+- Modify: `loomis-course-app/.env.local` (create if needed)
 
-**Step 1: Add simple rollout toggle**
+**Step 0: Add environment variable for feature toggle**
 
-To ensure safety, we'll keep the old UI available via a simple local constant or env var initially.
+> [!IMPORTANT]
+> Using an environment variable instead of a code constant enables runtime toggling without rebuilds — essential for safe production rollouts.
+
+Create or update `.env.local`:
+
+```bash
+# loomis-course-app/.env.local
+NEXT_PUBLIC_ENABLE_NEW_BROWSER=true
+```
+
+For production deployment, set this variable in your hosting platform (Vercel, etc.) to control the rollout.
+
+**Step 1: Add rollout toggle using environment variable**
 
 ```typescript
 // loomis-course-app/src/app/(app)/browser/page.tsx
@@ -44,8 +57,9 @@ To ensure safety, we'll keep the old UI available via a simple local constant or
 import { EnhancedExplorer } from '@/features/browser/enhanced-explorer';
 import { MyListSidebar } from '@/features/browser/my-list-sidebar';
 
-// Simple safety toggle. Change to true when ready to test in prod.
-const USE_NEW_EXPLORER = true; 
+// Runtime feature toggle - controlled via NEXT_PUBLIC_ENABLE_NEW_BROWSER env var
+// Set to 'true' in .env.local or hosting platform to enable
+const USE_NEW_EXPLORER = process.env.NEXT_PUBLIC_ENABLE_NEW_BROWSER === 'true';
 
 export default function BrowserPage() {
   if (USE_NEW_EXPLORER) {
@@ -68,6 +82,16 @@ export default function BrowserPage() {
   );
 }
 ```
+
+**Rollout Strategy:**
+
+| Stage | `NEXT_PUBLIC_ENABLE_NEW_BROWSER` | Purpose |
+|-------|----------------------------------|---------|
+| Local dev | `true` | Test new components |
+| Staging | `true` | Validate before prod |
+| Production (initial) | `false` | Safe default |
+| Production (rollout) | `true` | Flip when validated |
+| Production (rollback) | `false` | Instant revert if issues |
 
 **Step 2: Verify production route**
 
