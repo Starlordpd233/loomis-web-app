@@ -7,7 +7,8 @@
 
 **Goal:** Promote validated sandbox experiments to production routes.
 
-**Architecture:** Manual promotion process. Copy sandbox components to production feature directories, update navigation, verify build passes, and commit. No feature flags or rollout stages required for initial deployment.
+**Architecture:** **Wiring Only.** Since components are already in `src/features/`, this phase simply wires them into the production browser page and updates the registry.
+
 
 **Tech Stack:** Next.js 15, React 19, TypeScript, Tailwind CSS v4
 
@@ -16,7 +17,7 @@
 ## Prerequisites
 
 - Phase 4 complete (visual parity validated)
-- Working directory: `loomis-course-app/`
+- Working directory: `loomis-course-app/` (unless otherwise specified)
 - All sandbox routes render correctly:
   - `/sandbox/browser/current`
   - `/sandbox/browser/my-list-sidebar`
@@ -25,160 +26,50 @@
 
 ---
 
-## Task 1: Create production feature directory
+## Task 1: Wire up components in production
 
-**Goal:** Set up the production directory structure for promoted components.
-
-**Files:**
-- Create: `loomis-course-app/src/features/browser/`
-
-**Step 1: Create directory structure**
-
-```bash
-mkdir -p loomis-course-app/src/features/browser
-```
-
-**Step 2: Commit structure**
-
-```bash
-git add loomis-course-app/src/features/
-git commit -m "feat: create production features directory"
-```
-
----
-
-## Task 2: Promote current (Enhanced Explorer)
-
-**Goal:** Copy the validated sandbox component to production.
+**Goal:** Integrate the feature components (already living in `src/features`) into the production browser page.
 
 **Files:**
-- Copy: `loomis-course-app/src/app/sandbox/browser/current/` → `loomis-course-app/src/features/browser/enhanced-explorer/`
+- Modify: `loomis-course-app/src/app/(app)/browser/page.tsx`
 
-**Step 1: Copy sandbox to production**
+**Step 1: Add simple rollout toggle**
 
-```bash
-cp -r loomis-course-app/src/app/sandbox/browser/current loomis-course-app/src/features/browser/enhanced-explorer
-```
-
-**Step 2: Update imports if needed**
-
-Check for sandbox-specific imports that need updating:
-
-```bash
-grep -rn "sandbox" loomis-course-app/src/features/browser/enhanced-explorer/ --include="*.tsx"
-```
-
-If any sandbox-specific imports exist, update them to use relative paths.
-
-**Step 3: Create index export**
+To ensure safety, we'll keep the old UI available via a simple local constant or env var initially.
 
 ```typescript
-// loomis-course-app/src/features/browser/enhanced-explorer/index.tsx
+// loomis-course-app/src/app/(app)/browser/page.tsx
 'use client';
 
-export { default as EnhancedExplorer } from './page';
-// Or export the main component directly if page.tsx just wraps it
-```
-
-**Step 4: Verify build passes**
-
-```bash
-cd loomis-course-app
-npm run build
-```
-
-**Step 5: Commit promotion**
-
-```bash
-git add loomis-course-app/src/features/browser/enhanced-explorer/
-git commit -m "feat: promote enhanced explorer to production"
-```
-
----
-
-## Task 3: Promote my-list-sidebar
-
-**Goal:** Copy the validated sidebar component to production.
-
-**Files:**
-- Copy: `loomis-course-app/src/app/sandbox/browser/my-list-sidebar/` → `loomis-course-app/src/features/browser/my-list-sidebar/`
-
-**Step 1: Copy sandbox to production**
-
-```bash
-cp -r loomis-course-app/src/app/sandbox/browser/my-list-sidebar loomis-course-app/src/features/browser/my-list-sidebar
-```
-
-**Step 2: Update imports if needed**
-
-```bash
-grep -rn "sandbox" loomis-course-app/src/features/browser/my-list-sidebar/ --include="*.tsx"
-```
-
-**Step 3: Create index export**
-
-```typescript
-// loomis-course-app/src/features/browser/my-list-sidebar/index.tsx
-'use client';
-
-export { default as MyListSidebar } from './page';
-```
-
-**Step 4: Verify build passes**
-
-```bash
-cd loomis-course-app
-npm run build
-```
-
-**Step 5: Commit promotion**
-
-```bash
-git add loomis-course-app/src/features/browser/my-list-sidebar/
-git commit -m "feat: promote my-list-sidebar to production"
-```
-
----
-
-## Task 4: Integrate into production browser page
-
-**Goal:** Use the promoted components in the production browser route.
-
-**Files:**
-- Modify: `loomis-course-app/src/app/(app)/browser/page.tsx` (or equivalent production route)
-
-**Step 1: Check current browser page structure**
-
-```bash
-ls -la loomis-course-app/src/app/\(app\)/browser/
-cat loomis-course-app/src/app/\(app\)/browser/page.tsx | head -50
-```
-
-**Step 2: Import promoted components**
-
-Add imports at the top of the browser page:
-
-```typescript
 import { EnhancedExplorer } from '@/features/browser/enhanced-explorer';
 import { MyListSidebar } from '@/features/browser/my-list-sidebar';
-```
 
-**Step 3: Use components in the page**
+// Simple safety toggle. Change to true when ready to test in prod.
+const USE_NEW_EXPLORER = true; 
 
-Replace or augment existing browser UI with promoted components. Example:
-
-```typescript
 export default function BrowserPage() {
+  if (USE_NEW_EXPLORER) {
+    return (
+      <div className="flex min-h-screen">
+         <MyListSidebar />
+         <main className="flex-1">
+           <EnhancedExplorer />
+         </main>
+      </div>
+    );
+  }
+
+  // ... keep existing old UI code below as fallback ...
   return (
-    <div className="min-h-screen">
-      <EnhancedExplorer />
-      {/* Or integrate MyListSidebar as needed */}
+    <div>
+      <h1>Old Browser Page</h1>
+      {/* Existing code */}
     </div>
   );
 }
 ```
 
-**Step 4: Verify page renders**
+**Step 2: Verify production route**
 
 ```bash
 cd loomis-course-app
@@ -186,21 +77,15 @@ npm run dev
 # Visit http://localhost:3001/browser
 ```
 
-**Step 5: Verify build passes**
-
-```bash
-cd loomis-course-app
-npm run build
-```
-
-**Step 6: Commit integration**
+**Step 3: Commit integration**
 
 ```bash
 git add loomis-course-app/src/app/\(app\)/browser/
-git commit -m "feat: integrate promoted components into browser page"
+git commit -m "feat: wire up enhanced explorer and sidebar in production"
 ```
-
 ---
+
+
 
 ## Task 5: Update experiments registry
 
@@ -292,13 +177,14 @@ git commit -m "fix: address issues found during promotion verification"
 
 ## Acceptance Criteria
 
+- [ ] `tailwind.config.ts` includes `./src/features/**/*` in content array
 - [ ] Production features directory exists with promoted components
-- [ ] Enhanced Explorer promoted and integrated
-- [ ] My List Sidebar promoted and integrated
-- [ ] All imports updated (no sandbox references in production code)
+- [ ] Enhanced Explorer moved to `src/features/` and sandbox imports from it
+- [ ] My List Sidebar moved to `src/features/` and sandbox imports from it
+- [ ] **No duplicate code** between sandbox and production (sandbox wraps production)
 - [ ] Build passes without errors
 - [ ] Production browser page renders correctly
-- [ ] Sandbox routes still work
+- [ ] Sandbox routes still work (importing from features)
 - [ ] Experiments registry updated
 
 ---

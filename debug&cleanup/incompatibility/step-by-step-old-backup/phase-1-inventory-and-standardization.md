@@ -16,7 +16,7 @@
 ## Prerequisites
 
 - Phase 0 complete (baselines + tests in place)
-- Working directory: Repo root (unless otherwise specified)
+- Working directory: repo root
 - Design ideas to inventory:
   - `design_ideas/browser/current`
   - `design_ideas/browser/my_list_sidebar`
@@ -236,6 +236,7 @@ ls -la scripts/copy-design-assets.mjs 2>/dev/null || echo "Script does not exist
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { glob } from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -243,27 +244,6 @@ const repoRoot = path.join(__dirname, '..');
 
 const DESIGN_IDEAS = ['current', 'my_list_sidebar'];
 const ASSET_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.svg', '.gif', '.webp', '.ico'];
-
-async function copyAssetsRecursive(sourceDir, targetDir) {
-  const entries = await fs.readdir(sourceDir, { withFileTypes: true });
-  
-  for (const entry of entries) {
-    const srcPath = path.join(sourceDir, entry.name);
-    const destPath = path.join(targetDir, entry.name);
-    
-    if (entry.isDirectory()) {
-      await fs.mkdir(destPath, { recursive: true });
-      await copyAssetsRecursive(srcPath, destPath);
-    } else if (entry.isFile()) {
-       const ext = path.extname(entry.name).toLowerCase();
-       if (ASSET_EXTENSIONS.includes(ext)) {
-         await fs.mkdir(path.dirname(destPath), { recursive: true });
-         await fs.copyFile(srcPath, destPath);
-         console.log(`Copied: ${entry.name}`);
-       }
-    }
-  }
-}
 
 async function copyDesignAssets() {
   const publicRoot = path.join(repoRoot, 'loomis-course-app', 'public', 'design-ideas');
@@ -280,8 +260,23 @@ async function copyDesignAssets() {
       continue;
     }
 
-    console.log(`Processing ${designName}...`);
-    await copyAssetsRecursive(sourcePath, targetPath);
+    await fs.mkdir(targetPath, { recursive: true });
+
+    // Find and copy assets
+    const entries = await fs.readdir(sourcePath, { withFileTypes: true, recursive: true });
+    for (const entry of entries) {
+      if (!entry.isFile()) continue;
+      const ext = path.extname(entry.name).toLowerCase();
+      if (!ASSET_EXTENSIONS.includes(ext)) continue;
+
+      const fullPath = path.join(entry.parentPath || entry.path, entry.name);
+      const relativePath = path.relative(sourcePath, fullPath);
+      const targetFile = path.join(targetPath, relativePath);
+
+      await fs.mkdir(path.dirname(targetFile), { recursive: true });
+      await fs.copyFile(fullPath, targetFile);
+      console.log(`Copied: ${designName}/${relativePath}`);
+    }
   }
 
   console.log('Asset copy complete.');

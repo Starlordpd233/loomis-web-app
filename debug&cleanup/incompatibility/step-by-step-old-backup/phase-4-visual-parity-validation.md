@@ -16,7 +16,7 @@
 ## Prerequisites
 
 - Phase 3 complete (sandbox components ported and rendering)
-- Working directory: Repo root (unless otherwise specified)
+- Working directory: repo root
 - Dev server runs on port `3001` (`npm run dev` in `loomis-course-app/`)
 - Sandbox routes accessible:
   - `/sandbox/browser/current`

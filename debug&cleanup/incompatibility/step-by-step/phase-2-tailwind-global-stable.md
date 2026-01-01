@@ -20,7 +20,7 @@
 ## Prerequisites
 
 - Phase 1 complete (inventories + sandbox stubs created)
-- Working directory: `loomis-course-app/`
+- Working directory: `loomis-course-app/` (unless otherwise specified)
 - Dev server runs on port `3001` (`npm run dev`)
 - Tailwind is already in the app via PostCSS, currently used only in sandbox
 
@@ -158,17 +158,20 @@ Keep sandbox-only CSS like `.sandbox-toolbar { ... }`.
 
 **Step 2: Resolve sandbox token collisions**
 
-Pick ONE approach:
+> [!IMPORTANT]
+> **Default to scoping (Option B) to preserve fidelity.** Only delete tokens (Option A) after explicitly verifying they match `globals.css`.
 
-- **Option A (recommended now): delete the shadcn-like token blocks**
-  - Remove the `@theme inline { ... }`, `:root { ... }`, `.dark { ... }`, and `@layer base { ... }` blocks from `sandbox.css` unless you have sandbox components that explicitly depend on `bg-background`, `text-foreground`, etc.
-  - This makes sandbox styling "just Tailwind utilities + explicit CSS", and prevents confusion when promoting experiments to production.
-
-- **Option B (if you need those tokens): scope them to sandbox only**
+**Option B (recommended default): scope tokens to sandbox only**
   - Wrap sandbox routes in a container (e.g. `<div className="sandbox-scope">`) in `src/app/sandbox/layout.tsx`.
   - Change `:root { --background: ... }` → `.sandbox-scope { --background: ... }`
   - Change `.dark { ... }` → `[data-theme="dark"] .sandbox-scope { ... }`
-  - This prevents sandbox tokens from overwriting app tokens at the root level.
+  - This prevents sandbox tokens from overwriting app tokens at the root level while preserving the design idea's visual appearance.
+
+**Option A (only after verification): delete the shadcn-like token blocks**
+  - First, compare sandbox tokens against `globals.css` to confirm they match exactly.
+  - If they match: Remove the `@theme inline { ... }`, `:root { ... }`, `.dark { ... }`, and `@layer base { ... }` blocks from `sandbox.css`.
+  - If they differ: Do NOT delete. Use Option B to scope them.
+  - This makes sandbox styling "just Tailwind utilities + explicit CSS".
 
 **Step 3: Verify**
 

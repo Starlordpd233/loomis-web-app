@@ -15,7 +15,7 @@
 
 ## Prerequisites
 
-- Working directory: `loomis-course-app/` (unless otherwise specified)
+- Working directory: `loomis-course-app/`
 - Dev server runs on port `3001` (`npm run dev` → `next dev -p 3001`)
 - Existing tests may already exist in `loomis-course-app/tests/`
 - Existing baselines may exist in `debug&cleanup/incompatibility/visual-baseline/next/`
@@ -218,37 +218,6 @@ git commit -m "test: add/update unit tests for plannerStore migration"
 
 ---
 
-## Task 4.5: Add minimal E2E Smoke Tests
-
-**Goal:** Ensure critical user flows work (behavioral invariants), not just unit logic.
-
-**Files:**
-- Create: `loomis-course-app/e2e/smoke.spec.ts` (or similar)
-
-**Step 1: Install Playwright (if not present)**
-
-```bash
-cd loomis-course-app
-npm init playwright@latest
-# Follow prompts (TypeScript, tests/e2e, etc.)
-```
-
-**Step 2: Add smoke tests for invariants**
-
-Create a test file that checks:
-1.  **Onboarding Logic:** Verify `/` redirects to `/onboarding` if no cookie/storage.
-2.  **Browser Add:** Verify clicking "Add" in browser moves item to "My List".
-3.  **Planner Persistence:** Verify refreshing `/planner` keeps the grid state.
-
-**Step 3: Run smoke tests**
-
-```bash
-cd loomis-course-app
-npx playwright test
-```
-
----
-
 ## Task 5: Verify or capture baseline screenshots
 
 **Goal:** Have visual baselines for core routes to compare against after styling changes.
@@ -295,20 +264,14 @@ If baselines already exist with this structure, proceed to verification.
    - Save to `debug&cleanup/incompatibility/visual-baseline/next/clean/{route-name}-1440x900.png`
 
 4. **Populated state captures:**
-   - In regular window, set localStorage (schema matches `src/types/course.ts`):
+   - In regular window, set localStorage:
      ```javascript
-     const SLOTS = [null, null, null, null, null, null];
      localStorage.setItem('plannerV2', JSON.stringify({
-       version: 2,
-       selectedCourses: [{ title: 'CS101' }, { title: 'MATH201' }],
-       grid: {
-         Freshman: SLOTS,
-         Sophomore: SLOTS,
-         Junior: SLOTS,
-         Senior: SLOTS
-       }
-     }));
-     localStorage.setItem('catalogPrefs', JSON.stringify({ completed: true }));
+       courses: ['CS101', 'MATH201'],
+       schedule: { 'FA25': ['CS101'], 'SP26': ['MATH201'] },
+       metadata: { version: 2 }
+     }))
+     localStorage.setItem('catalogPrefs', JSON.stringify({ completed: true }))
      ```
    - Set cookie: `document.cookie = "onboardingIntroSeen=true; path=/"`
    - Capture screenshots to `debug&cleanup/incompatibility/visual-baseline/next/populated/`

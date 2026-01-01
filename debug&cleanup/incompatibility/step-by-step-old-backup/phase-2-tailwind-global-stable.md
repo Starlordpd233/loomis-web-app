@@ -1,8 +1,10 @@
-# Phase 2: Tailwind Global and Stable (Tailwind v4, Utilities-First) — Execution Plan (REWRITE)
+# Phase 2: Tailwind Global and Stable (Tailwind v4, Utilities-First)
+
+> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 > [!IMPORTANT]
-> This file is a **rewrite** of the original Phase 2 plan to match the repo’s real state:
-> - Tailwind is **v4** and currently used via **PostCSS** (`@tailwindcss/postcss`), not the Tailwind CLI.
+> This plan is aligned with the repo's real state:
+> - Tailwind is **v4** and used via **PostCSS** (`@tailwindcss/postcss`), not the Tailwind CLI.
 > - Sandbox uses **v4 CSS-first syntax** (`@import "tailwindcss"`).
 > - The main app uses **globals.css + CSS Modules**, so Tailwind **Preflight must be treated as a breaking change**.
 
@@ -12,6 +14,15 @@
 **Goal:** Make Tailwind CSS utilities available across the entire app with **zero visual regression**, while keeping sandbox experimentation reliable and avoiding token/reset collisions.
 
 **Tech Stack:** Tailwind CSS v4, Next.js 15, CSS Modules, TypeScript
+
+---
+
+## Prerequisites
+
+- Phase 1 complete (inventories + sandbox stubs created)
+- Working directory: `loomis-course-app/`
+- Dev server runs on port `3001` (`npm run dev`)
+- Tailwind is already in the app via PostCSS, currently used only in sandbox
 
 ---
 
@@ -32,7 +43,7 @@
 
 ## Task 1: Create a single Tailwind v4 entry file (global utilities, no Preflight)
 
-**Why:** One entry file avoids duplicated Tailwind generation and makes “global Tailwind” a single import.
+**Why:** One entry file avoids duplicated Tailwind generation and makes "global Tailwind" a single import.
 
 **Files:**
 - Create: `loomis-course-app/src/app/tailwind.css`
@@ -45,7 +56,7 @@ Recommended starting contents:
 /* Tailwind v4 entry (utilities-first; intentionally NO preflight) */
 @plugin "tailwindcss-animate";
 
-/* Align `dark:` with the app’s theme toggle (html/body `data-theme="dark"`) */
+/* Align `dark:` with the app's theme toggle (html/body `data-theme="dark"`) */
 @custom-variant dark (&:is([data-theme="dark"] *));
 
 @import "tailwindcss/theme";
@@ -54,6 +65,12 @@ Recommended starting contents:
 /* If you ever decide Preflight is worth it (high regression risk), add:
 @import "tailwindcss/preflight";
 and then immediately validate all baseline screenshots. */
+```
+
+**Step 2: Verify file created**
+
+```bash
+ls -la loomis-course-app/src/app/tailwind.css
 ```
 
 ---
@@ -76,9 +93,8 @@ Rationale: If Preflight is ever enabled later, importing `globals.css` after Tai
 
 **Step 2: Verify**
 
-From `loomis-course-app/`:
-
 ```bash
+cd loomis-course-app
 npm run build
 ```
 
@@ -95,7 +111,7 @@ Expected: build succeeds.
 
 **Step 1 (recommended default): keep it sandbox-focused**
 
-If you’re still only using Tailwind in `src/app/sandbox/**`, keep content limited:
+If you're still only using Tailwind in `src/app/sandbox/**`, keep content limited:
 
 ```ts
 content: ["./src/app/sandbox/**/*.{js,ts,jsx,tsx,mdx}"],
@@ -142,17 +158,20 @@ Keep sandbox-only CSS like `.sandbox-toolbar { ... }`.
 
 **Step 2: Resolve sandbox token collisions**
 
-Pick ONE approach:
+> [!IMPORTANT]
+> **Default to scoping (Option B) to preserve fidelity.** Only delete tokens (Option A) after explicitly verifying they match `globals.css`.
 
-- **Option A (recommended now): delete the shadcn-like token blocks**
-  - Remove the `@theme inline { ... }`, `:root { ... }`, `.dark { ... }`, and `@layer base { ... }` blocks from `sandbox.css` unless you have sandbox components that explicitly depend on `bg-background`, `text-foreground`, etc.
-  - This makes sandbox styling “just Tailwind utilities + explicit CSS”, and prevents confusion when promoting experiments to production.
-
-- **Option B (if you need those tokens): scope them to sandbox only**
+**Option B (recommended default): scope tokens to sandbox only**
   - Wrap sandbox routes in a container (e.g. `<div className="sandbox-scope">`) in `src/app/sandbox/layout.tsx`.
   - Change `:root { --background: ... }` → `.sandbox-scope { --background: ... }`
   - Change `.dark { ... }` → `[data-theme="dark"] .sandbox-scope { ... }`
-  - This prevents sandbox tokens from overwriting app tokens at the root level.
+  - This prevents sandbox tokens from overwriting app tokens at the root level while preserving the design idea's visual appearance.
+
+**Option A (only after verification): delete the shadcn-like token blocks**
+  - First, compare sandbox tokens against `globals.css` to confirm they match exactly.
+  - If they match: Remove the `@theme inline { ... }`, `:root { ... }`, `.dark { ... }`, and `@layer base { ... }` blocks from `sandbox.css`.
+  - If they differ: Do NOT delete. Use Option B to scope them.
+  - This makes sandbox styling "just Tailwind utilities + explicit CSS".
 
 **Step 3: Verify**
 
@@ -163,7 +182,7 @@ npm run build
 
 ---
 
-## Task 5: Create a low-risk Tailwind “smoke test” route (optional but recommended)
+## Task 5: Create a low-risk Tailwind "smoke test" route (optional but recommended)
 
 **Files:**
 - Create: `loomis-course-app/src/app/test-tailwind/page.tsx`
@@ -181,12 +200,65 @@ npm run dev
 
 Visit: `http://localhost:3001/test-tailwind`
 
+**Step 3: Clean up (optional)**
+
+After verifying Tailwind works globally, you can delete the test route:
+
+```bash
+rm -rf loomis-course-app/src/app/test-tailwind
+```
+
 ---
 
-## Verification checklist (Phase 2)
+## Verification Checklist for Phase 2
 
-- [ ] `loomis-course-app/npm run build` succeeds
+- [ ] `npm run build` succeeds in `loomis-course-app`
 - [ ] Existing routes (`/browser`, `/planner`, `/onboarding`) look unchanged (fonts, spacing, form controls)
 - [ ] `/sandbox` still renders correctly
-- [ ] Tailwind utilities work outside sandbox (via `/test-tailwind`)
+- [ ] Tailwind utilities work (via `/test-tailwind` or in sandbox)
 - [ ] No sandbox token collisions with `globals.css` (either removed or scoped)
+- [ ] No duplicate Tailwind imports in sandbox.css
+
+---
+
+## 🛑 CHECKPOINT [Phase 2]: Tailwind Global and Stable
+
+> **STOP:** Verify Tailwind is working globally without breaking existing routes.
+
+**Verification:**
+- [ ] `npm run build` passes
+- [ ] `/browser`, `/planner`, `/onboarding` look unchanged
+- [ ] `/sandbox` works with Tailwind utilities
+- [ ] No visual regressions on core routes (compare to Phase 0 baselines)
+
+**Next Phase:** Phase 3 — Sandbox Integration (fidelity-first porting of design ideas)
+
+---
+
+## Rollback
+
+If Phase 2 causes visual regressions:
+
+1. Revert layout.tsx import changes:
+   ```bash
+   git checkout HEAD -- loomis-course-app/src/app/layout.tsx
+   ```
+
+2. Revert tailwind.css:
+   ```bash
+   rm loomis-course-app/src/app/tailwind.css
+   ```
+
+3. Revert sandbox.css changes:
+   ```bash
+   git checkout HEAD -- loomis-course-app/src/app/sandbox/sandbox.css
+   ```
+
+4. Revert tailwind.config.ts:
+   ```bash
+   git checkout HEAD -- loomis-course-app/tailwind.config.ts
+   ```
+
+**If you enabled Preflight and saw regressions:**
+- Remove `@import "tailwindcss/preflight";` from tailwind.css
+- Re-run visual comparison against Phase 0 baselines

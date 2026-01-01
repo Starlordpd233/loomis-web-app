@@ -7,8 +7,7 @@
 
 **Goal:** Port each design idea into sandbox with visual fidelity preservation, using Tailwind for layout/spacing/typography and CSS Modules for complex selectors, keyframes, and non-utility styling.
 
-**Architecture:** **Features-First.** Port design ideas directly into `src/features/` (not sandbox). Use `/sandbox/` routes only as thin import wrappers. Rewrite styled-components to Tailwind.
-
+**Architecture:** Each design idea gets its own sandbox route. Rewrite styled-components to Tailwind utilities, fix TypeScript types, standardize icons to lucide-react (already in the app), and register experiments in experiments.ts.
 
 **Tech Stack:** Next.js 15, React 19, TypeScript, Tailwind CSS v4, CSS Modules, lucide-react
 
@@ -17,12 +16,12 @@
 ## Prerequisites
 
 - Phase 2 complete (Tailwind global and stable)
-- Working directory: `loomis-course-app/` (unless otherwise specified)
+- Working directory: `loomis-course-app/`
 - Dev server runs on port `3001` (`npm run dev`)
 - Inventories exist for each design idea (from Phase 1)
 - Design ideas to port:
-  - `design_ideas/browser/current` → `src/features/browser/enhanced-explorer`
-  - `design_ideas/browser/my_list_sidebar` → `src/features/browser/my-list-sidebar`
+  - `design_ideas/browser/current` → `/sandbox/browser/current`
+  - `design_ideas/browser/my_list_sidebar` → `/sandbox/browser/my-list-sidebar`
 
 ---
 
@@ -184,31 +183,6 @@ Based on complexity (from Phase 1 inventories):
 
 ---
 
-## Task 1b: Update Tailwind Content Config
-
-**Goal:** Ensure Tailwind generates styles for the new `src/features` directory.
-
-**Files:**
-- Modify: `loomis-course-app/tailwind.config.ts`
-
-**Step 1: Add features directory to content**
-
-```typescript
-content: [
-  './src/app/sandbox/**/*.{js,ts,jsx,tsx,mdx}',
-  './src/features/**/*.{js,ts,jsx,tsx,mdx}', // Add this line
-],
-```
-
-**Step 2: Verify**
-
-```bash
-cd loomis-course-app
-npm run build
-```
-
----
-
 ## Task 1: Verify sandbox structure from Phase 1
 
 **Goal:** Confirm the sandbox stubs created in Phase 1 still work.
@@ -234,12 +208,12 @@ npm run dev
 
 ## Task 2: Port my_list_sidebar (simpler design idea)
 
-**Goal:** Convert `design_ideas/browser/my_list_sidebar` to a production-ready feature component.
+**Goal:** Convert `design_ideas/browser/my_list_sidebar` to working sandbox component.
 
 **Files:**
 - Read: `design_ideas/browser/my_list_sidebar/index.html` (or App.tsx)
-- Create: `loomis-course-app/src/features/browser/my-list-sidebar/`
 - Modify: `loomis-course-app/src/app/sandbox/browser/my-list-sidebar/page.tsx`
+- Create: `loomis-course-app/src/app/sandbox/browser/my-list-sidebar/components/` (if needed)
 
 **Step 1: Analyze the original design idea**
 
@@ -248,56 +222,53 @@ ls -la design_ideas/browser/my_list_sidebar/
 cat design_ideas/browser/my_list_sidebar/index.html | head -100
 ```
 
-**Step 2: Create feature directory**
+Identify:
+- Main component structure
+- Tailwind classes used (will work directly)
+- Any external dependencies
+
+**Step 2: Create component structure**
+
+If needed, create component subdirectory:
 
 ```bash
-mkdir -p loomis-course-app/src/features/browser/my-list-sidebar/components
+mkdir -p loomis-course-app/src/app/sandbox/browser/my-list-sidebar/components
 ```
 
-**Step 3: Port the main component to `src/features`**
+**Step 3: Port the main component**
 
-Create the feature component logic here immediately (do not build in sandbox folder).
+Replace the stub in `page.tsx` with the actual ported component:
 
 ```typescript
-// loomis-course-app/src/features/browser/my-list-sidebar/MyListSidebar.tsx
+// loomis-course-app/src/app/sandbox/browser/my-list-sidebar/page.tsx
 'use client';
 
 import { useState } from 'react';
-// Import sub-components from ./components/
+// Import components from ./components/ as needed
 
-export function MyListSidebar() {
-  // Port state and logic
-  // Rewrite styled-components to Tailwind
-  // Use lucide-react icons
+export default function MyListSidebarPage() {
+  // Port state and logic from original
+  // Replace styled-components with Tailwind classes
+  // Use lucide-react icons instead of any other icon library
 
   return (
     <div className="min-h-screen">
-      {/* Component JSX */}
+      {/* Port the component structure here */}
     </div>
   );
 }
 ```
 
-Create index export:
-```typescript
-// loomis-course-app/src/features/browser/my-list-sidebar/index.ts
-export { MyListSidebar } from './MyListSidebar';
+**Step 4: Verify lucide-react is available**
+
+```bash
+cd loomis-course-app
+grep "lucide-react" package.json
 ```
 
-**Step 4: Update sandbox wrapper**
+Expected: lucide-react is listed in dependencies (already installed)
 
-Imports the feature component.
-
-```typescript
-// loomis-course-app/src/app/sandbox/browser/my-list-sidebar/page.tsx
-import { MyListSidebar } from '@/features/browser/my-list-sidebar';
-
-export default function MyListSidebarPage() {
-  return <MyListSidebar />;
-}
-```
-
-**Step 5: Verify**
+**Step 5: Test the ported component**
 
 ```bash
 cd loomis-course-app
@@ -305,61 +276,121 @@ npm run dev
 # Visit http://localhost:3001/sandbox/browser/my-list-sidebar
 ```
 
-**Step 6: Commit**
+Compare visually with the original prototype running at `design_ideas/browser/my_list_sidebar/index.html`.
+
+**Step 6: Verify build passes**
 
 ```bash
-git add loomis-course-app/src/features/browser/my-list-sidebar/
+cd loomis-course-app
+npm run build
+```
+
+**Step 7: Commit the port**
+
+```bash
 git add loomis-course-app/src/app/sandbox/browser/my-list-sidebar/
-git commit -m "feat: port my_list_sidebar to src/features and wire to sandbox"
+git commit -m "feat: port my_list_sidebar design idea to sandbox"
 ```
 
 ---
 
-## Task 3: Port current (enhanced explorer)
+## Task 3: Port current (enhanced explorer - more complex)
 
-**Goal:** Convert `design_ideas/browser/current` to a production-ready feature component.
+**Goal:** Convert `design_ideas/browser/current` to working sandbox component with styled-components rewritten to Tailwind.
 
 **Files:**
-- Read: `design_ideas/browser/current/`
-- Create: `loomis-course-app/src/features/browser/enhanced-explorer/`
+- Read: `design_ideas/browser/current/` (examine structure)
 - Modify: `loomis-course-app/src/app/sandbox/browser/current/page.tsx`
+- Create: `loomis-course-app/src/app/sandbox/browser/current/components/`
 
-**Step 1: Create feature directory**
+**Step 1: Analyze the original design idea**
 
 ```bash
-mkdir -p loomis-course-app/src/features/browser/enhanced-explorer/components
+ls -la design_ideas/browser/current/
 ```
 
-**Step 2: Port and rewrite components to `src/features`**
+Check for styled-components usage:
 
-Create components in `src/features/browser/enhanced-explorer/`.
-- Rewrite styled-components to Tailwind.
-- Use `lucide-react`.
+```bash
+grep -rn "styled\." design_ideas/browser/current/ --include="*.tsx" --include="*.jsx" | head -20
+```
 
-Example structure:
-- `EnhancedExplorer.tsx` (Main export)
-- `components/SearchBar.tsx`
-- `components/CourseCard.tsx`
+**Step 2: Create component structure**
 
-**Step 3: Create index export**
+```bash
+mkdir -p loomis-course-app/src/app/sandbox/browser/current/components
+```
+
+**Step 3: Plan the styled-components rewrite**
+
+For each styled-component found, plan the Tailwind equivalent. Example:
+
+Original styled-component:
+```javascript
+const SearchWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  transition: all 0.3s;
+
+  &:focus-within {
+    transform: scale(1.02);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+`;
+```
+
+Tailwind equivalent:
+```tsx
+<div className="relative w-full max-w-[600px] transition-all duration-300
+                focus-within:scale-[1.02] focus-within:shadow-xl">
+```
+
+**Step 4: Port and rewrite components**
+
+Create each component in `components/` directory:
+- Replace styled-components with Tailwind classes
+- Replace icon imports with lucide-react
+- Fix any TypeScript types (no `any` types)
+
+**Step 5: Handle API dependencies**
+
+If the design idea uses external APIs (e.g., Gemini):
+- Gate behind environment variable check
+- Provide mock data fallback for development
 
 ```typescript
-// loomis-course-app/src/features/browser/enhanced-explorer/index.ts
-export { EnhancedExplorer } from './EnhancedExplorer';
+const ENABLE_GEMINI = process.env.NEXT_PUBLIC_ENABLE_GEMINI === 'true';
+
+const getAiAdvice = async (query: string) => {
+  if (!ENABLE_GEMINI) {
+    return mockAiResponse; // Return mock data
+  }
+  // Real API call
+};
 ```
 
-**Step 4: Update sandbox wrapper**
+**Step 6: Create the main page**
 
 ```typescript
 // loomis-course-app/src/app/sandbox/browser/current/page.tsx
-import { EnhancedExplorer } from '@/features/browser/enhanced-explorer';
+'use client';
+
+import { useState } from 'react';
+// Import ported components
 
 export default function EnhancedExplorerPage() {
-  return <EnhancedExplorer />;
+  // State and logic ported from original
+
+  return (
+    <div className="min-h-screen">
+      {/* Ported component structure */}
+    </div>
+  );
 }
 ```
 
-**Step 5: Test and Verify**
+**Step 7: Test the ported component**
 
 ```bash
 cd loomis-course-app
@@ -367,12 +398,28 @@ npm run dev
 # Visit http://localhost:3001/sandbox/browser/current
 ```
 
-**Step 6: Commit**
+Compare visually with the original prototype.
+
+**Step 8: Verify no styled-components remain**
 
 ```bash
-git add loomis-course-app/src/features/browser/enhanced-explorer/
+grep -rn "styled\." loomis-course-app/src/app/sandbox/browser/current/ --include="*.tsx"
+```
+
+Expected: No matches (all rewritten to Tailwind)
+
+**Step 9: Verify build passes**
+
+```bash
+cd loomis-course-app
+npm run build
+```
+
+**Step 10: Commit the port**
+
+```bash
 git add loomis-course-app/src/app/sandbox/browser/current/
-git commit -m "feat: port enhanced-explorer to src/features and wire to sandbox"
+git commit -m "feat: port enhanced explorer design idea to sandbox (styled-components rewritten to Tailwind)"
 ```
 
 ---
