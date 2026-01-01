@@ -1,914 +1,435 @@
-# Phase 4: Visual Parity Validation Implementation Plan
+# Phase 4: Visual Parity Validation
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 > [!NOTE]
-> **Code Snippets Disclaimer:** The code snippets and examples provided in this plan are **informational and basic**. They are intended to illustrate concepts and provide guidance, but should **not** serve as the final functional code. Implementers should write production-quality code that goes beyond these examples, incorporating proper error handling, edge cases, and best practices appropriate for the codebase.
+> **Code Snippets Disclaimer:** Snippets illustrate intent; implement production-quality changes as needed.
 
-**Goal:** Systematically verify visual fidelity between sandbox implementations and original design ideas using screenshot comparison and automated visual regression testing.
+**Goal:** Verify sandbox implementations visually match original design ideas before promoting to production.
 
-**Architecture:** Capture baseline screenshots from original Vite apps, capture comparison screenshots from sandbox routes, implement pixel-level comparison with configurable tolerance, generate diff reports, and establish pass/fail criteria for visual parity.
+**Architecture:** Manual screenshot comparison is the primary workflow. Each design idea is compared side-by-side at desktop resolution (1440×900) in both clean and populated states. Automated Playwright/pixelmatch comparison is optional and requires network approval.
 
-**Tech Stack:** Playwright for screenshot capture, pixelmatch for image comparison, TypeScript for automation scripts, GitHub Actions for CI integration
+**Tech Stack:** Browser DevTools (screenshots), image viewer for manual comparison
 
 ---
 
-## Task 1: Set up screenshot capture infrastructure
+## Prerequisites
+
+- Phase 3 complete (sandbox components ported and rendering)
+- Working directory: repo root
+- Dev server runs on port `3001` (`npm run dev` in `loomis-course-app/`)
+- Sandbox routes accessible:
+  - `/sandbox/browser/current`
+  - `/sandbox/browser/my-list-sidebar`
+- Original design ideas can be opened in browser:
+  - `design_ideas/browser/current/index.html`
+  - `design_ideas/browser/my_list_sidebar/index.html`
+
+---
+
+## Task 1: Set up visual validation directory
+
+**Goal:** Create directory structure for storing comparison screenshots.
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/capture-baselines.mjs`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/capture-sandbox.mjs`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/package.json`
+- Create: `debug&cleanup/incompatibility/visual-validation/`
 
 **Step 1: Create directory structure**
 
 ```bash
-mkdir -p /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation/{baselines/original,baselines/sandbox,diffs,reports}
+mkdir -p debug\&cleanup/incompatibility/visual-validation/{original,sandbox,diffs}
+mkdir -p debug\&cleanup/incompatibility/visual-validation/original/{current,my-list-sidebar}
+mkdir -p debug\&cleanup/incompatibility/visual-validation/sandbox/{current,my-list-sidebar}
 ```
 
-**Step 2: Initialize npm package for visual validation**
-
-```json
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/package.json
-{
-  "name": "visual-parity-validation",
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "capture:original": "node capture-baselines.mjs",
-    "capture:sandbox": "node capture-sandbox.mjs",
-    "compare": "node compare.mjs",
-    "report": "node generate-report.mjs"
-  },
-  "dependencies": {
-    "playwright": "^1.48.0",
-    "pixelmatch": "^6.0.0",
-    "pngjs": "^7.0.0",
-    "fs-extra": "^11.2.0",
-    "chalk": "^5.3.0"
-  }
-}
-```
-
-**Step 3: Install dependencies**
+**Step 2: Create validation README**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation
-npm install
+cat > "debug&cleanup/incompatibility/visual-validation/README.md" << 'EOF'
+# Visual Parity Validation
+
+This folder stores screenshots for comparing sandbox implementations against original design ideas.
+
+## Directory Structure
+
+```
+visual-validation/
+├── original/           # Screenshots from design_ideas/browser/*
+│   ├── current/
+│   └── my-list-sidebar/
+├── sandbox/            # Screenshots from /sandbox/browser/*
+│   ├── current/
+│   └── my-list-sidebar/
+└── diffs/              # Difference images (if using automated comparison)
 ```
 
-**Step 4: Install Playwright browsers**
+## Manual Comparison Workflow
 
-```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation
-npx playwright install chromium
+1. Capture screenshots at 1440×900 desktop resolution
+2. Use clean state (initial load) and populated state (after interaction)
+3. Compare side-by-side using Preview, Figma, or any image viewer
+4. Document any differences in the comparison checklist below
+
+## Comparison Checklist
+
+### current (Enhanced Explorer)
+
+| Aspect | Match? | Notes |
+|--------|--------|-------|
+| Layout/structure | ☐ | |
+| Typography (font, size, weight) | ☐ | |
+| Colors (backgrounds, text, accents) | ☐ | |
+| Spacing (margins, padding, gaps) | ☐ | |
+| Borders and shadows | ☐ | |
+| Interactive states (hover, focus) | ☐ | |
+| Animations/transitions | ☐ | |
+
+### my-list-sidebar (My List Sidebar)
+
+| Aspect | Match? | Notes |
+|--------|--------|-------|
+| Layout/structure | ☐ | |
+| Typography (font, size, weight) | ☐ | |
+| Colors (backgrounds, text, accents) | ☐ | |
+| Spacing (margins, padding, gaps) | ☐ | |
+| Borders and shadows | ☐ | |
+| Interactive states (hover, focus) | ☐ | |
+| Animations/transitions | ☐ | |
+
+## Font Note
+
+Original design ideas may use Inter or other external fonts. Sandbox uses Proxima Nova (app's global font). Minor font rendering differences are expected and acceptable if overall visual weight and spacing are comparable.
+EOF
 ```
 
-**Step 5: Commit infrastructure setup**
+**Step 3: Commit structure**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-git add debug\&cleanup/incompatibility/step-by-step/visual-validation/
-git commit -m "feat: set up visual parity validation infrastructure"
+git add debug\&cleanup/incompatibility/visual-validation/
+git commit -m "feat: create visual validation directory structure"
 ```
 
 ---
 
-## Task 2: Capture baselines from original design ideas
+## Task 2: Capture original design idea screenshots
 
-**Files:**
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/capture-baselines.mjs`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/config.mjs`
+**Goal:** Take baseline screenshots from the original Vite/HTML design ideas.
 
-**Step 1: Create configuration file**
+**Step 1: Open current design idea**
 
-```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/config.mjs
-export const VIEWPORTS = [
-  { name: 'desktop', width: 1440, height: 900 }
-];
+Open in browser:
+```bash
+# If it's a static HTML file:
+open design_ideas/browser/current/index.html
 
-export const DESIGN_IDEAS = [
-  {
-    id: 'enhanced-explorer',
-    name: 'Enhanced Explorer',
-    originalPath: '/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current',
-    originalUrl: 'http://localhost:3000', // When Vite dev server is running
-    sandboxPath: '/sandbox/browser/enhanced-explorer',
-    sandboxUrl: 'http://localhost:3001/sandbox/browser/enhanced-explorer',
-    testStates: ['initial', 'search-focused', 'filter-expanded', 'course-selected']
-  },
-  {
-    id: 'catalog-browser',
-    name: 'Catalog Browser',
-    originalPath: '/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/google-academic-catalog-browser',
-    originalUrl: 'http://localhost:3000',
-    sandboxPath: '/sandbox/browser/catalog-browser',
-    sandboxUrl: 'http://localhost:3001/sandbox/browser/catalog-browser',
-    testStates: ['initial', 'search-active', 'filters-applied']
-  },
-  {
-    id: 'my-list-sidebar',
-    name: 'My List Sidebar',
-    originalPath: '/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/my_list_sidebar',
-    originalUrl: 'http://localhost:3000',
-    sandboxPath: '/sandbox/browser/my-list-sidebar',
-    sandboxUrl: 'http://localhost:3001/sandbox/browser/my-list-sidebar',
-    testStates: ['initial', 'item-dragging', 'sidebar-collapsed']
-  }
-];
+# If it's a Vite app (check for package.json):
+cd design_ideas/browser/current && npm run dev
+# Then visit http://localhost:5173 (default Vite port)
 ```
 
-**Step 2: Create baseline capture script**
+**Step 2: Capture desktop screenshot (1440×900)**
 
-```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/capture-baselines.mjs
-import { chromium } from 'playwright';
-import fs from 'fs-extra';
-import { DESIGN_IDEAS, VIEWPORTS } from './config.mjs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+In browser DevTools (Cmd+Option+I on Mac):
+1. Open Device Toolbar (Cmd+Shift+M)
+2. Set dimensions to 1440×900
+3. Ensure "Fit to window" is selected if needed
+4. Take screenshot:
+   - Chrome: Cmd+Shift+P → "Capture screenshot"
+   - Or right-click → "Capture node screenshot" on body
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+Save as: `debug&cleanup/incompatibility/visual-validation/original/current/desktop-clean.png`
 
-async function captureBaselines() {
-  const browser = await chromium.launch();
-  const context = await browser.newContext();
-  
-  for (const idea of DESIGN_IDEAS) {
-    console.log(`Capturing baselines for ${idea.name}...`);
-    
-    // Start Vite dev server for this design idea if not running
-    // Note: This assumes each design idea runs on localhost:3000
-    // In practice, you might need to start servers on different ports
-    
-    for (const viewport of VIEWPORTS) {
-      const page = await context.newPage();
-      await page.setViewportSize(viewport);
-      
-      // Navigate to original design idea
-      await page.goto(idea.originalUrl);
-      await page.waitForLoadState('networkidle');
-      
-      // Capture screenshot
-      const screenshotPath = join(
-        __dirname,
-        'baselines',
-        'original',
-        `${idea.id}-${viewport.name}.png`
-      );
-      await page.screenshot({ path: screenshotPath, fullPage: true });
-      console.log(`  ✓ ${viewport.name}: ${screenshotPath}`);
-      
-      await page.close();
-    }
-  }
-  
-  await browser.close();
-  console.log('Baseline capture complete!');
-}
+**Step 3: Capture populated state**
 
-captureBaselines().catch(console.error);
-```
+If the design idea has interactive states (e.g., search results, expanded filters):
+1. Trigger the state
+2. Take another screenshot
+3. Save as: `debug&cleanup/incompatibility/visual-validation/original/current/desktop-populated.png`
 
-**Step 3: Start Vite dev server for design ideas**
+**Step 4: Repeat for my_list_sidebar**
 
 ```bash
-# In separate terminal for each design idea
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current
-npm run dev &
-# Runs on http://localhost:3000 (or check package.json for actual port)
+open design_ideas/browser/my_list_sidebar/index.html
+# Or: cd design_ideas/browser/my_list_sidebar && npm run dev
 ```
 
-**Step 4: Run baseline capture**
+Save as:
+- `debug&cleanup/incompatibility/visual-validation/original/my-list-sidebar/desktop-clean.png`
+- `debug&cleanup/incompatibility/visual-validation/original/my-list-sidebar/desktop-populated.png` (if applicable)
+
+**Step 5: Commit original baselines**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation
-node capture-baselines.mjs
-```
-
-Expected: Creates PNG files in `baselines/original/` for each design idea × viewport
-
-**Step 5: Commit baselines**
-
-```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-git add debug\&cleanup/incompatibility/step-by-step/visual-validation/baselines/original/
-git commit -m "feat: capture baseline screenshots from original design ideas"
+git add debug\&cleanup/incompatibility/visual-validation/original/
+git commit -m "feat: capture original design idea baselines"
 ```
 
 ---
 
 ## Task 3: Capture sandbox implementation screenshots
 
-**Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/capture-sandbox.mjs`
+**Goal:** Take comparison screenshots from the ported sandbox routes.
 
-**Step 1: Create sandbox capture script**
-
-```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/capture-sandbox.mjs
-import { chromium } from 'playwright';
-import fs from 'fs-extra';
-import { DESIGN_IDEAS, VIEWPORTS } from './config.mjs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-async function captureSandbox() {
-  const browser = await chromium.launch();
-  const context = await browser.newContext();
-  
-  for (const idea of DESIGN_IDEAS) {
-    console.log(`Capturing sandbox for ${idea.name}...`);
-    
-    for (const viewport of VIEWPORTS) {
-      const page = await context.newPage();
-      await page.setViewportSize(viewport);
-      
-      // Navigate to sandbox route
-      await page.goto(idea.sandboxUrl);
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1000); // Allow animations to settle
-      
-      // Capture screenshot
-      const screenshotPath = join(
-        __dirname,
-        'baselines',
-        'sandbox',
-        `${idea.id}-${viewport.name}.png`
-      );
-      await page.screenshot({ path: screenshotPath, fullPage: true });
-      console.log(`  ✓ ${viewport.name}: ${screenshotPath}`);
-      
-      await page.close();
-    }
-  }
-  
-  await browser.close();
-  console.log('Sandbox capture complete!');
-}
-
-captureSandbox().catch(console.error);
-```
-
-**Step 2: Ensure Next.js dev server is running**
+**Step 1: Start Next.js dev server**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
-npm run dev &
+cd loomis-course-app
+npm run dev
 # Runs on http://localhost:3001
 ```
 
-**Step 3: Run sandbox capture**
+**Step 2: Capture sandbox current**
 
-```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation
-node capture-sandbox.mjs
-```
+Visit: `http://localhost:3001/sandbox/browser/current`
 
-Expected: Creates PNG files in `baselines/sandbox/` for each sandbox route × viewport
+In browser DevTools:
+1. Set viewport to 1440×900
+2. Take screenshot
+3. Save as: `debug&cleanup/incompatibility/visual-validation/sandbox/current/desktop-clean.png`
+
+If populated state:
+1. Trigger the same state as original
+2. Save as: `debug&cleanup/incompatibility/visual-validation/sandbox/current/desktop-populated.png`
+
+**Step 3: Capture sandbox my-list-sidebar**
+
+Visit: `http://localhost:3001/sandbox/browser/my-list-sidebar`
+
+Save as:
+- `debug&cleanup/incompatibility/visual-validation/sandbox/my-list-sidebar/desktop-clean.png`
+- `debug&cleanup/incompatibility/visual-validation/sandbox/my-list-sidebar/desktop-populated.png` (if applicable)
 
 **Step 4: Commit sandbox screenshots**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-git add debug\&cleanup/incompatibility/step-by-step/visual-validation/baselines/sandbox/
+git add debug\&cleanup/incompatibility/visual-validation/sandbox/
 git commit -m "feat: capture sandbox implementation screenshots"
 ```
 
 ---
 
-## Task 4: Implement pixel-level comparison
+## Task 4: Perform manual comparison
 
-**Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/compare.mjs`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/thresholds.mjs`
+**Goal:** Compare original and sandbox screenshots side-by-side.
 
-**Step 1: Create comparison thresholds configuration**
+**Step 1: Open both images**
 
-```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/thresholds.mjs
-export const THRESHOLDS = {
-  // Pixel difference tolerance (0-1)
-  pixelDiff: 0.01, // 1% of pixels can differ
-  
-  // Color difference tolerance (0-255)
-  colorDiff: 10,
-  
-  // Alpha channel tolerance
-  alphaDiff: 0.1,
-  
-  // Per-design idea overrides
-  overrides: {
-    'enhanced-explorer': {
-      pixelDiff: 0.02, // Slightly higher tolerance for animations
-      notes: 'Contains subtle animations that may cause timing differences'
-    },
-    'catalog-browser': {
-      pixelDiff: 0.005, // Very strict for static layouts
-      notes: 'Static layout should match exactly'
-    }
-  }
-};
-```
-
-**Step 2: Create comparison script**
-
-```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/compare.mjs
-import pixelmatch from 'pixelmatch';
-import { PNG } from 'pngjs';
-import fs from 'fs-extra';
-import { DESIGN_IDEAS, VIEWPORTS } from './config.mjs';
-import { THRESHOLDS } from './thresholds.mjs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import chalk from 'chalk';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-async function compareImages(originalPath, sandboxPath, diffPath, ideaId, viewportName) {
-  const img1 = PNG.sync.read(fs.readFileSync(originalPath));
-  const img2 = PNG.sync.read(fs.readFileSync(sandboxPath));
-  
-  const { width, height } = img1;
-  const diff = new PNG({ width, height });
-  
-  const threshold = THRESHOLDS.overrides[ideaId]?.pixelDiff || THRESHOLDS.pixelDiff;
-  const numDiffPixels = pixelmatch(
-    img1.data,
-    img2.data,
-    diff.data,
-    width,
-    height,
-    {
-      threshold: threshold,
-      includeAA: false
-    }
-  );
-  
-  const totalPixels = width * height;
-  const diffPercentage = (numDiffPixels / totalPixels) * 100;
-  
-  // Save diff image
-  if (numDiffPixels > 0) {
-    fs.writeFileSync(diffPath, PNG.sync.write(diff));
-  }
-  
-  return {
-    numDiffPixels,
-    totalPixels,
-    diffPercentage,
-    width,
-    height,
-    passed: diffPercentage <= (threshold * 100)
-  };
-}
-
-async function runComparison() {
-  const results = [];
-  const report = {
-    timestamp: new Date().toISOString(),
-    totalComparisons: 0,
-    passed: 0,
-    failed: 0,
-    details: []
-  };
-  
-  for (const idea of DESIGN_IDEAS) {
-    console.log(chalk.bold(`\nComparing ${idea.name}:`));
-    
-    for (const viewport of VIEWPORTS) {
-      const originalPath = join(
-        __dirname,
-        'baselines',
-        'original',
-        `${idea.id}-${viewport.name}.png`
-      );
-      const sandboxPath = join(
-        __dirname,
-        'baselines',
-        'sandbox',
-        `${idea.id}-${viewport.name}.png`
-      );
-      const diffPath = join(
-        __dirname,
-        'diffs',
-        `${idea.id}-${viewport.name}-diff.png`
-      );
-      
-      if (!fs.existsSync(originalPath) || !fs.existsSync(sandboxPath)) {
-        console.log(chalk.yellow(`  ⚠ ${viewport.name}: Missing images`));
-        continue;
-      }
-      
-      const comparison = await compareImages(
-        originalPath,
-        sandboxPath,
-        diffPath,
-        idea.id,
-        viewport.name
-      );
-      
-      report.totalComparisons++;
-      if (comparison.passed) {
-        report.passed++;
-        console.log(chalk.green(`  ✓ ${viewport.name}: ${comparison.diffPercentage.toFixed(2)}% diff`));
-      } else {
-        report.failed++;
-        console.log(chalk.red(`  ✗ ${viewport.name}: ${comparison.diffPercentage.toFixed(2)}% diff`));
-        console.log(chalk.gray(`     Diff saved: ${diffPath}`));
-      }
-      
-      report.details.push({
-        idea: idea.name,
-        viewport: viewport.name,
-        ...comparison,
-        diffPath: comparison.numDiffPixels > 0 ? diffPath : null
-      });
-    }
-  }
-  
-  // Save report
-  const reportPath = join(__dirname, 'reports', `comparison-${new Date().toISOString().split('T')[0]}.json`);
-  fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
-  
-  console.log(chalk.bold('\n📊 Summary:'));
-  console.log(`Total comparisons: ${report.totalComparisons}`);
-  console.log(chalk.green(`Passed: ${report.passed}`));
-  console.log(chalk.red(`Failed: ${report.failed}`));
-  console.log(`Report saved: ${reportPath}`);
-  
-  return report;
-}
-
-runComparison().catch(console.error);
-```
-
-**Step 3: Run comparison**
+Using Preview, Figma, or any image comparison tool:
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation
+# Open original and sandbox side-by-side
+open debug\&cleanup/incompatibility/visual-validation/original/current/desktop-clean.png
+open debug\&cleanup/incompatibility/visual-validation/sandbox/current/desktop-clean.png
+```
+
+**Step 2: Compare each aspect**
+
+For each design idea, check:
+
+| Aspect | What to look for |
+|--------|------------------|
+| Layout/structure | Same grid, flex, positioning |
+| Typography | Font appears similar weight, size, line-height |
+| Colors | Backgrounds, text, buttons match |
+| Spacing | Margins, padding, gaps are visually equivalent |
+| Borders/shadows | Same border styles, shadow depth |
+| Interactive states | Hover effects, focus rings behave similarly |
+
+**Step 3: Document findings**
+
+Update the checklist in `debug&cleanup/incompatibility/visual-validation/README.md` with findings.
+
+**Step 4: If differences found**
+
+For each significant difference:
+1. Document in README with specific file/line references
+2. Return to Phase 3 to fix the issue
+3. Re-capture sandbox screenshot
+4. Re-compare
+
+**Step 5: Commit comparison results**
+
+```bash
+git add debug\&cleanup/incompatibility/visual-validation/README.md
+git commit -m "docs: complete visual parity comparison"
+```
+
+---
+
+## Task 5 (Optional): Automated comparison with Playwright
+
+> [!WARNING]
+> **Requires network approval.** This task installs npm packages from the network.
+> Skip this task if network access is restricted or if manual comparison is sufficient.
+
+**Goal:** Set up automated pixel-level comparison for ongoing visual regression testing.
+
+**Files:**
+- Create: `debug&cleanup/incompatibility/visual-validation/package.json`
+- Create: `debug&cleanup/incompatibility/visual-validation/compare.mjs`
+
+**Step 1: Initialize npm package**
+
+```bash
+cd debug\&cleanup/incompatibility/visual-validation
+
+cat > package.json << 'EOF'
+{
+  "name": "visual-parity-validation",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "capture:original": "node capture-original.mjs",
+    "capture:sandbox": "node capture-sandbox.mjs",
+    "compare": "node compare.mjs"
+  }
+}
+EOF
+```
+
+**Step 2: Install dependencies (REQUIRES NETWORK)**
+
+```bash
+npm install playwright pixelmatch pngjs
+npx playwright install chromium
+```
+
+**Step 3: Create comparison script**
+
+```javascript
+// debug&cleanup/incompatibility/visual-validation/compare.mjs
+import pixelmatch from 'pixelmatch';
+import { PNG } from 'pngjs';
+import fs from 'fs';
+import path from 'path';
+
+const DESIGN_IDEAS = ['current', 'my-list-sidebar'];
+const THRESHOLD = 0.01; // 1% pixel difference tolerance
+
+async function compare() {
+  let allPassed = true;
+
+  for (const idea of DESIGN_IDEAS) {
+    const originalPath = `original/${idea}/desktop-clean.png`;
+    const sandboxPath = `sandbox/${idea}/desktop-clean.png`;
+    const diffPath = `diffs/${idea}-diff.png`;
+
+    if (!fs.existsSync(originalPath) || !fs.existsSync(sandboxPath)) {
+      console.log(`⚠ ${idea}: Missing screenshots`);
+      continue;
+    }
+
+    const img1 = PNG.sync.read(fs.readFileSync(originalPath));
+    const img2 = PNG.sync.read(fs.readFileSync(sandboxPath));
+
+    const { width, height } = img1;
+    const diff = new PNG({ width, height });
+
+    const numDiffPixels = pixelmatch(
+      img1.data, img2.data, diff.data,
+      width, height,
+      { threshold: 0.1 }
+    );
+
+    const diffPercent = (numDiffPixels / (width * height)) * 100;
+    const passed = diffPercent <= (THRESHOLD * 100);
+
+    if (passed) {
+      console.log(`✓ ${idea}: ${diffPercent.toFixed(2)}% diff (PASS)`);
+    } else {
+      console.log(`✗ ${idea}: ${diffPercent.toFixed(2)}% diff (FAIL)`);
+      fs.mkdirSync('diffs', { recursive: true });
+      fs.writeFileSync(diffPath, PNG.sync.write(diff));
+      console.log(`  Diff saved: ${diffPath}`);
+      allPassed = false;
+    }
+  }
+
+  if (!allPassed) {
+    console.log('\n❌ Visual parity check failed');
+    process.exit(1);
+  }
+
+  console.log('\n✅ All visual parity checks passed');
+}
+
+compare().catch(console.error);
+```
+
+**Step 4: Run comparison**
+
+```bash
+cd debug\&cleanup/incompatibility/visual-validation
 node compare.mjs
 ```
 
-Expected: Output showing pass/fail for each comparison, diff images for failures
-
-**Step 4: Test with intentional failure**
-
-Create a test to verify comparison works:
+**Step 5: Commit automation (if used)**
 
 ```bash
-# Create a modified version of a screenshot
-cp /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation/baselines/sandbox/enhanced-explorer-desktop.png \
-   /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation/baselines/sandbox/enhanced-explorer-desktop-MODIFIED.png
-
-# Run comparison with modified image
-node -e "
-const fs = require('fs');
-const path = '/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/baselines/sandbox/enhanced-explorer-desktop-MODIFIED.png';
-const data = fs.readFileSync(path);
-const modified = Buffer.from(data);
-modified[1000] = 255; // Change a pixel
-fs.writeFileSync(path, modified);
-console.log('Modified pixel for testing');
-"
-```
-
-**Step 5: Commit comparison infrastructure**
-
-```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-git add debug\&cleanup/incompatibility/step-by-step/visual-validation/{compare.mjs,thresholds.mjs}
-git commit -m "feat: implement pixel-level comparison for visual parity"
+git add debug\&cleanup/incompatibility/visual-validation/{package.json,compare.mjs}
+git commit -m "feat: add optional automated visual comparison"
 ```
 
 ---
 
-## Task 5: Generate HTML report
+## Acceptance Criteria
 
-**Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/generate-report.mjs`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/templates/report-template.html`
+For each design idea (current, my-list-sidebar):
 
-**Step 1: Create HTML template**
+- [ ] Original screenshot captured at 1440×900
+- [ ] Sandbox screenshot captured at 1440×900
+- [ ] Manual comparison completed
+- [ ] All checklist items pass (or documented acceptable differences)
 
-```html
-<!-- /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/templates/report-template.html -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visual Parity Validation Report</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 2rem; }
-        .header { background: #f8f9fa; padding: 2rem; border-radius: 8px; margin-bottom: 2rem; }
-        .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
-        .stat { background: white; padding: 1.5rem; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; }
-        .stat.passed { border-left: 4px solid #10b981; }
-        .stat.failed { border-left: 4px solid #ef4444; }
-        .stat.total { border-left: 4px solid #3b82f6; }
-        .comparison { background: white; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 1.5rem; padding: 1.5rem; }
-        .comparison.passed { border-left: 4px solid #10b981; }
-        .comparison.failed { border-left: 4px solid #ef4444; }
-        .images { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; }
-        .image-container { text-align: center; }
-        .image-container img { max-width: 100%; border: 1px solid #e5e7eb; border-radius: 4px; }
-        .diff-badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem; font-weight: 500; }
-        .diff-badge.passed { background: #d1fae5; color: #065f46; }
-        .diff-badge.failed { background: #fee2e2; color: #991b1b; }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>Visual Parity Validation Report</h1>
-        <p>Generated on {{timestamp}}</p>
-    </div>
-    
-    <div class="summary">
-        <div class="stat total">
-            <h3>Total Comparisons</h3>
-            <p style="font-size: 2rem; font-weight: bold;">{{totalComparisons}}</p>
-        </div>
-        <div class="stat passed">
-            <h3>Passed</h3>
-            <p style="font-size: 2rem; font-weight: bold; color: #10b981;">{{passed}}</p>
-        </div>
-        <div class="stat failed">
-            <h3>Failed</h3>
-            <p style="font-size: 2rem; font-weight: bold; color: #ef4444;">{{failed}}</p>
-        </div>
-    </div>
-    
-    <h2>Comparison Details</h2>
-    
-    {{#each details}}
-    <div class="comparison {{#if passed}}passed{{else}}failed{{/if}}">
-        <h3>{{idea}} - {{viewport}}</h3>
-        <p>
-            <span class="diff-badge {{#if passed}}passed{{else}}failed{{/if}}">
-                {{#if passed}}✓ PASSED{{else}}✗ FAILED{{/if}}
-            </span>
-            <span style="margin-left: 1rem;">
-                {{diffPercentage}}% different ({{numDiffPixels}}/{{totalPixels}} pixels)
-            </span>
-        </p>
-        
-        <div class="images">
-            <div class="image-container">
-                <p><strong>Original</strong></p>
-                <img src="data:image/png;base64,{{originalBase64}}" alt="Original design">
-            </div>
-            <div class="image-container">
-                <p><strong>Sandbox</strong></p>
-                <img src="data:image/png;base64,{{sandboxBase64}}" alt="Sandbox implementation">
-            </div>
-            <div class="image-container">
-                <p><strong>Difference</strong></p>
-                {{#if diffBase64}}
-                <img src="data:image/png;base64,{{diffBase64}}" alt="Difference map">
-                {{else}}
-                <p style="color: #6b7280;">No differences detected</p>
-                {{/if}}
-            </div>
-        </div>
-    </div>
-    {{/each}}
-</body>
-</html>
-```
+### Expected Acceptable Differences
 
-**Step 2: Create report generator**
+These differences are expected and acceptable:
+- Font rendering (Inter → Proxima Nova)
+- Minor anti-aliasing differences between browsers
+- Timing of animations (if captured mid-animation)
 
-```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/generate-report.mjs
-import fs from 'fs-extra';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+### Unacceptable Differences
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-async function generateHTMLReport() {
-  // Find latest comparison report
-  const reportsDir = join(__dirname, 'reports');
-  const reportFiles = fs.readdirSync(reportsDir)
-    .filter(f => f.endsWith('.json'))
-    .sort()
-    .reverse();
-  
-  if (reportFiles.length === 0) {
-    console.error('No comparison reports found');
-    return;
-  }
-  
-  const latestReport = reportFiles[0];
-  const reportPath = join(reportsDir, latestReport);
-  const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
-  
-  // Read template
-  const templatePath = join(__dirname, 'templates', 'report-template.html');
-  let template = fs.readFileSync(templatePath, 'utf8');
-  
-  // Prepare template data
-  const templateData = {
-    timestamp: new Date(report.timestamp).toLocaleString(),
-    totalComparisons: report.totalComparisons,
-    passed: report.passed,
-    failed: report.failed,
-    details: []
-  };
-  
-  // Process each comparison
-  for (const detail of report.details) {
-    const detailWithImages = { ...detail };
-    
-    // Convert images to base64 for embedding
-    const originalPath = join(__dirname, 'baselines', 'original', `${detail.idea.toLowerCase().replace(/\s+/g, '-')}-${detail.viewport}.png`);
-    const sandboxPath = join(__dirname, 'baselines', 'sandbox', `${detail.idea.toLowerCase().replace(/\s+/g, '-')}-${detail.viewport}.png`);
-    
-    if (fs.existsSync(originalPath)) {
-      detailWithImages.originalBase64 = fs.readFileSync(originalPath, 'base64');
-    }
-    if (fs.existsSync(sandboxPath)) {
-      detailWithImages.sandboxBase64 = fs.readFileSync(sandboxPath, 'base64');
-    }
-    if (detail.diffPath && fs.existsSync(detail.diffPath)) {
-      detailWithImages.diffBase64 = fs.readFileSync(detail.diffPath, 'base64');
-    }
-    
-    templateData.details.push(detailWithImages);
-  }
-  
-  // Replace template variables (simple string replacement)
-  template = template.replace('{{timestamp}}', templateData.timestamp);
-  template = template.replace('{{totalComparisons}}', templateData.totalComparisons);
-  template = template.replace('{{passed}}', templateData.passed);
-  template = template.replace('{{failed}}', templateData.failed);
-  
-  // Replace details section (more complex)
-  let detailsHTML = '';
-  for (const detail of templateData.details) {
-    let detailHTML = template.match(/{{#each details}}([\s\S]*?){{\/each}}/)[1];
-    
-    // Replace detail variables
-    detailHTML = detailHTML.replace(/{{idea}}/g, detail.idea);
-    detailHTML = detailHTML.replace(/{{viewport}}/g, detail.viewport);
-    detailHTML = detailHTML.replace(/{{diffPercentage}}/g, detail.diffPercentage.toFixed(2));
-    detailHTML = detailHTML.replace(/{{numDiffPixels}}/g, detail.numDiffPixels.toLocaleString());
-    detailHTML = detailHTML.replace(/{{totalPixels}}/g, detail.totalPixels.toLocaleString());
-    detailHTML = detailHTML.replace(/{{originalBase64}}/g, detail.originalBase64 || '');
-    detailHTML = detailHTML.replace(/{{sandboxBase64}}/g, detail.sandboxBase64 || '');
-    detailHTML = detailHTML.replace(/{{diffBase64}}/g, detail.diffBase64 || '');
-    
-    // Conditional classes
-    detailHTML = detailHTML.replace(/{{#if passed}}/g, detail.passed ? '' : '<!--');
-    detailHTML = detailHTML.replace(/{{else}}/g, detail.passed ? '-->' : '');
-    detailHTML = detailHTML.replace(/{{\/if}}/g, detail.passed ? '' : '-->');
-    
-    detailsHTML += detailHTML;
-  }
-  
-  template = template.replace(/{{#each details}}[\s\S]*?{{\/each}}/, detailsHTML);
-  
-  // Write HTML report
-  const htmlReportPath = join(__dirname, 'reports', `visual-parity-report-${new Date().toISOString().split('T')[0]}.html`);
-  fs.writeFileSync(htmlReportPath, template);
-  
-  console.log(`HTML report generated: ${htmlReportPath}`);
-  console.log(`Open in browser: file://${htmlReportPath}`);
-}
-
-generateHTMLReport().catch(console.error);
-```
-
-**Step 3: Generate report**
-
-```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation
-node generate-report.mjs
-```
-
-Expected: HTML report file in reports/ directory with embedded images
-
-**Step 4: View report in browser**
-
-```bash
-open /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation/reports/visual-parity-report-*.html
-```
-
-**Step 5: Commit reporting system**
-
-```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-git add debug\&cleanup/incompatibility/step-by-step/visual-validation/{generate-report.mjs,templates/}
-git commit -m "feat: add HTML reporting for visual parity validation"
-```
+These require fixes in Phase 3:
+- Layout structure mismatches
+- Wrong colors
+- Missing elements
+- Broken interactivity
+- Significant spacing differences (>4px)
 
 ---
 
-## Task 6: Integrate with CI/CD
+## Verification Checklist for Phase 4
 
-**Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/.github/workflows/visual-parity.yml`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/ci-run.mjs`
-
-**Step 1: Create CI runner script**
-
-```javascript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/ci-run.mjs
-import { execSync } from 'child_process';
-import fs from 'fs-extra';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-async function runCICheck() {
-  console.log('🚀 Starting visual parity CI check');
-  
-  try {
-    // 1. Install dependencies
-    console.log('📦 Installing dependencies...');
-    execSync('npm install', { cwd: __dirname, stdio: 'inherit' });
-    
-    // 2. Install Playwright
-    console.log('🌐 Installing Playwright browsers...');
-    execSync('npx playwright install chromium', { cwd: __dirname, stdio: 'inherit' });
-    
-    // 3. Start servers (in background)
-    console.log('🖥️ Starting development servers...');
-    // Note: In CI, you'd need to start both Vite and Next.js dev servers
-    // This is simplified - real CI would use docker-compose or similar
-    
-    // 4. Run comparisons
-    console.log('🔍 Running visual comparisons...');
-    execSync('node compare.mjs', { cwd: __dirname, stdio: 'inherit' });
-    
-    // 5. Check results
-    const reportsDir = join(__dirname, 'reports');
-    const reportFiles = fs.readdirSync(reportsDir)
-      .filter(f => f.endsWith('.json'))
-      .sort()
-      .reverse();
-    
-    if (reportFiles.length === 0) {
-      throw new Error('No comparison report generated');
-    }
-    
-    const latestReport = JSON.parse(
-      fs.readFileSync(join(reportsDir, reportFiles[0]), 'utf8')
-    );
-    
-    console.log('\n📊 CI Results:');
-    console.log(`Total comparisons: ${latestReport.totalComparisons}`);
-    console.log(`Passed: ${latestReport.passed}`);
-    console.log(`Failed: ${latestReport.failed}`);
-    
-    // Fail CI if any comparisons failed
-    if (latestReport.failed > 0) {
-      console.error('❌ Visual parity check failed!');
-      process.exit(1);
-    }
-    
-    console.log('✅ All visual parity checks passed!');
-    process.exit(0);
-    
-  } catch (error) {
-    console.error('❌ CI check failed:', error.message);
-    process.exit(1);
-  }
-}
-
-runCICheck();
-```
-
-**Step 2: Create GitHub Actions workflow**
-
-```yaml
-# /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/visual-validation/.github/workflows/visual-parity.yml
-name: Visual Parity Validation
-
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
-  schedule:
-    - cron: '0 0 * * *'  # Daily check
-
-jobs:
-  visual-parity:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: |
-        cd debug&cleanup/incompatibility/visual-validation
-        npm ci
-    
-    - name: Install Playwright browsers
-      run: |
-        cd debug&cleanup/incompatibility/visual-validation
-        npx playwright install chromium
-    
-    - name: Start Next.js dev server
-      run: |
-        cd loomis-course-app
-        npm run dev &
-        sleep 10  # Wait for server to start
-    
-    - name: Start Vite dev servers
-      run: |
-        # Start each design idea's Vite server
-        cd design_ideas/browser/current
-        npm run dev &
-        sleep 5
-        
-        cd ../google-academic-catalog-browser
-        npm run dev &
-        sleep 5
-        
-        cd ../my_list_sidebar
-        npm run dev &
-        sleep 5
-    
-    - name: Run visual parity check
-      run: |
-        cd debug&cleanup/incompatibility/visual-validation
-        node ci-run.mjs
-    
-    - name: Upload report artifact
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: visual-parity-report
-        path: debug&cleanup/incompatibility/visual-validation/reports/
-        retention-days: 30
-```
-
-**Step 3: Test CI script locally**
-
-```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/debug\&cleanup/incompatibility/step-by-step/visual-validation
-node ci-run.mjs
-```
-
-**Step 4: Commit CI integration**
-
-```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-git add debug\&cleanup/incompatibility/step-by-step/visual-validation/{.github/,ci-run.mjs}
-git commit -m "feat: add CI integration for visual parity validation"
-```
+- [ ] Visual validation directory exists with screenshots
+- [ ] Original baselines captured for both design ideas
+- [ ] Sandbox screenshots captured for both design ideas
+- [ ] Manual comparison completed for each design idea
+- [ ] README checklist updated with findings
+- [ ] No blocking visual differences (or documented as acceptable)
 
 ---
 
-## Visual Parity Acceptance Criteria
+## 🛑 CHECKPOINT [Phase 4]: Visual Parity Complete
 
-### For Each Design Idea
+> **STOP:** Verify all design ideas pass visual comparison before proceeding.
 
-- [ ] **Desktop viewport (1440×900)**: ≤1% pixel difference from original
-- [ ] **Interactive states**: Test key interactive states match (hover, focus, active)
-- [ ] **Animation timing**: CSS transitions/animation durations match within 10%
-- [ ] **Font rendering**: Same font family, weight, and size rendering
-- [ ] **Color accuracy**: Colors match within perceptual difference threshold
-- [ ] **Layout spacing**: Margin/padding differences ≤2px
+**Verification:**
+- [ ] `current` passes visual comparison (or differences documented as acceptable)
+- [ ] `my-list-sidebar` passes visual comparison (or differences documented as acceptable)
+- [ ] README checklist completed
+- [ ] No console errors on sandbox routes
 
-### Overall Validation
-
-- [ ] All three design ideas pass visual parity check
-- [ ] CI pipeline passes with zero failures
-- [ ] HTML report generated with embedded comparison images
-- [ ] Diff images available for any failures
-- [ ] Historical tracking of visual drift over time
+**Next Phase:** Phase 5 — Production Promotion
 
 ---
 
-## Next Phase Handoff
+## Rollback
 
-After completing Phase 4, proceed to **Phase 5: Production Promotion** which includes:
-1. Promoting sandbox experiments to production routes
-2. Updating navigation and feature flags
-3. Performance optimization and bundle analysis
-4. User acceptance testing workflow
+If visual comparison reveals significant issues:
 
-**Verification Checklist for Phase 4:**
-- [ ] `npm run dev` starts both Next.js and design idea Vite servers
-- [ ] Baseline screenshots captured for all design ideas × viewports
-- [ ] Sandbox screenshots captured for all routes × viewports  
-- [ ] Pixel comparison runs without errors
-- [ ] HTML report generates successfully
-- [ ] CI script executes locally
-- [ ] All visual parity acceptance criteria documented
+1. Return to Phase 3 to fix styling issues
+2. Re-capture sandbox screenshots
+3. Re-run comparison
+
+Screenshots are non-destructive; simply overwrite with new captures after fixes.

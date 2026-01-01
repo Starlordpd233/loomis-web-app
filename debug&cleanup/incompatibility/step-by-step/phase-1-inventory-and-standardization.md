@@ -1,76 +1,137 @@
-# Phase 1: Inventory and Standardization Implementation Plan
+# Phase 1: Inventory and Standardization of Design Ideas
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 > [!NOTE]
-> **Code Snippets Disclaimer:** The code snippets and examples provided in this plan are **informational and basic**. They are intended to illustrate concepts and provide guidance, but should **not** serve as the final functional code. Implementers should write production-quality code that goes beyond these examples, incorporating proper error handling, edge cases, and best practices appropriate for the codebase.
+> **Code Snippets Disclaimer:** Snippets illustrate intent; implement production-quality changes as needed.
 
-**Goal:** Create a reliable intake path for design ideas by inventorying each design idea, standardizing external assets and fonts, and normalizing entry points.
+**Goal:** Turn exported design prototypes into a clean intake queue for sandbox porting by inventorying each design idea, identifying what needs localization, and documenting a porting strategy.
 
-**Architecture:** Systematic analysis of existing design_ideas to identify framework, assets, and dependencies. Copy local assets to app public directory, replace external URLs with local paths, and ensure each design idea has a single root React component for sandbox mounting.
+**Architecture:** Analyze each design idea in `design_ideas/browser/` to understand framework, assets, and dependencies. Document what needs to change for Next.js sandbox integration. Create asset standardization tooling if local assets need copying.
 
-**Tech Stack:** Next.js 15, React 19, TypeScript, Tailwind CSS, CSS Modules
+**Tech Stack:** Next.js 15, React 19, TypeScript, Tailwind CSS v4
+
+---
+
+## Prerequisites
+
+- Phase 0 complete (baselines + tests in place)
+- Working directory: repo root
+- Design ideas to inventory:
+  - `design_ideas/browser/current`
+  - `design_ideas/browser/my_list_sidebar`
+
+---
+
+## Critical warnings for design ideas
+
+> [!WARNING]
+> The design ideas use patterns that are **NOT production-safe**:
+>
+> 1. **Tailwind CDN** (`<script src="https://cdn.tailwindcss.com">`) — Do NOT copy into Next.js
+> 2. **External fonts** (e.g., Google Fonts for Inter) — Use app's Proxima Nova instead
+> 3. **Importmaps** — Not supported in Next.js; convert to npm dependencies
+> 4. **Client-side secrets** (e.g., `GEMINI_API_KEY`) — Do NOT commit real secrets
+
+When porting to sandbox, these patterns must be replaced with production-safe alternatives.
 
 ---
 
 ## Task 1: Inventory design_ideas/browser/current
 
+**Goal:** Document the `current` design idea's structure, dependencies, and porting complexity.
+
 **Files:**
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/package.json`
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/App.tsx`
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/README.md`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/inventory-current.md`
+- Read: `design_ideas/browser/current/index.html`
+- Read: `design_ideas/browser/current/App.tsx` (or main component)
+- Check: `design_ideas/browser/current/package.json` (if exists)
+- Create: `debug&cleanup/incompatibility/inventory-current.md`
 
-**Step 1: Examine package.json for dependencies**
-
-```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current
-cat package.json | grep -A 20 '"dependencies"'
-```
-
-**Step 2: Check for external assets in App.tsx**
+**Step 1: Check if it's a Vite app or static HTML**
 
 ```bash
-grep -n "http\|https\|.png\|.jpg\|.svg\|.woff\|.ttf\|.otf" /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/App.tsx
+ls -la design_ideas/browser/current/
 ```
 
-**Step 3: Check for Vite-specific imports**
+Look for: `package.json`, `vite.config.*`, or just `index.html` with inline scripts.
+
+**Step 2: Examine index.html for external dependencies**
 
 ```bash
-grep -n "import.meta\|vite\|@vite" /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/App.tsx
+grep -n "cdn\|googleapis\|unpkg\|jsdelivr\|script src" design_ideas/browser/current/index.html
 ```
 
-**Step 4: Document findings**
+Document what external resources are used (Tailwind CDN, fonts, importmaps).
 
-```markdown
-# Design Idea: browser/current
-
-## Framework
-- React: 18.3.1
-- Build tool: Vite
-- Styling: Tailwind CSS
-- Icons: lucide-react
-
-## Dependencies
-- @google/genai: 1.34.0
-- react-hook-form: 7.69.0
-- @radix-ui/react-* components
-- styled-components: 6.1.8
-
-## Assets
-- Local: Check components directory
-- External: TBD from grep results
-
-## Entry Point
-- Single App.tsx component (842 lines)
-- Needs component extraction for sandbox mounting
-```
-
-**Step 5: Commit inventory**
+**Step 3: Check for styled-components usage**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-git add debug&cleanup/incompatibility/inventory-current.md
+grep -rn "styled\." design_ideas/browser/current/ --include="*.tsx" --include="*.jsx" | head -20
+```
+
+If styled-components are used, they must be rewritten to Tailwind utilities or CSS Modules.
+
+**Step 4: Check for API keys or secrets**
+
+```bash
+grep -rn "API_KEY\|SECRET\|GEMINI" design_ideas/browser/current/ --include="*.tsx" --include="*.jsx" --include="*.ts" --include="*.js"
+```
+
+If found, ensure sandbox uses environment variables or mock data.
+
+**Step 5: Identify local assets**
+
+```bash
+find design_ideas/browser/current/ -name "*.png" -o -name "*.jpg" -o -name "*.svg" -o -name "*.ico"
+```
+
+These may need to be copied to `loomis-course-app/public/`.
+
+**Step 6: Create inventory document**
+
+```bash
+cat > "debug&cleanup/incompatibility/inventory-current.md" << 'EOF'
+# Design Idea Inventory: browser/current
+
+## Overview
+- **Location:** `design_ideas/browser/current/`
+- **Type:** [Vite app | Static HTML with importmaps]
+- **Main component:** [e.g., App.tsx, 842 lines]
+
+## External Dependencies (must be replaced)
+- [ ] Tailwind CDN — Replace with app's Tailwind v4 build
+- [ ] Inter font (Google Fonts) — Use app's Proxima Nova
+- [ ] [Other CDN libraries if any]
+
+## NPM Dependencies (may need installing)
+- `lucide-react` — Already in app
+- `styled-components` — Rewrite to Tailwind/CSS Modules
+- `@google/genai` — [requires network approval to install; or mock for sandbox]
+- `react-hook-form` — [check if already in app]
+- [Other dependencies...]
+
+## Local Assets
+- [List any images/icons that need copying]
+
+## API/Secret Dependencies
+- [ ] `GEMINI_API_KEY` — Must use env var or mock data
+
+## Porting Complexity: [Easy | Medium | Hard]
+- Reason: [e.g., "Requires styled-components rewrite + API mocking"]
+
+## Porting Strategy
+1. Create sandbox route at `/sandbox/browser/current`
+2. Rewrite styled-components to Tailwind utilities
+3. Replace CDN scripts with app's Tailwind build
+4. Use Proxima Nova (already global) instead of Inter
+5. Mock Gemini API or gate behind env var
+EOF
+```
+
+**Step 7: Commit inventory**
+
+```bash
+git add "debug&cleanup/incompatibility/inventory-current.md"
 git commit -m "docs: inventory design_ideas/browser/current"
 ```
 
@@ -78,69 +139,96 @@ git commit -m "docs: inventory design_ideas/browser/current"
 
 ## Task 2: Inventory design_ideas/browser/my_list_sidebar
 
+**Goal:** Document the `my_list_sidebar` design idea.
+
 **Files:**
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/my_list_sidebar/package.json`
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/my_list_sidebar/App.tsx`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/debug&cleanup/incompatibility/inventory-my-list-sidebar.md`
+- Read: `design_ideas/browser/my_list_sidebar/index.html`
+- Read: `design_ideas/browser/my_list_sidebar/` main component
+- Create: `debug&cleanup/incompatibility/inventory-my-list-sidebar.md`
 
-**Step 1: Examine package.json**
-
-```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/my_list_sidebar
-cat package.json
-```
-
-**Step 2: Check for styled-components usage**
+**Step 1: Check structure**
 
 ```bash
-grep -n "styled\|StyledComponent" /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/my_list_sidebar/App.tsx
+ls -la design_ideas/browser/my_list_sidebar/
 ```
 
-**Step 3: Check asset references**
+**Step 2: Examine external dependencies**
 
 ```bash
-find /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/my_list_sidebar -name "*.png" -o -name "*.jpg" -o -name "*.svg" -o -name "*.woff" -o -name "*.ttf"
+grep -n "cdn\|googleapis\|unpkg\|script src" design_ideas/browser/my_list_sidebar/index.html
 ```
 
-**Step 4: Document findings**
-
-```markdown
-# Design Idea: browser/my_list_sidebar
-
-## Framework
-- React: (check package.json)
-- Build tool: Vite
-- Styling: Tailwind CSS + styled-components?
-
-## Dependencies
-- TBD from package.json
-
-## Assets
-- Local images/svgs: (from find results)
-- External fonts: TBD
-
-## Entry Point
-- App.tsx component
-- Check line count for extraction needs
-```
-
-**Step 5: Commit inventory**
+**Step 3: Check for styled-components**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-git add debug&cleanup/incompatibility/inventory-my-list-sidebar.md
+grep -rn "styled\." design_ideas/browser/my_list_sidebar/ --include="*.tsx" --include="*.jsx" | head -10
+```
+
+**Step 4: Identify local assets**
+
+```bash
+find design_ideas/browser/my_list_sidebar/ -name "*.png" -o -name "*.jpg" -o -name "*.svg"
+```
+
+**Step 5: Create inventory document**
+
+```bash
+cat > "debug&cleanup/incompatibility/inventory-my-list-sidebar.md" << 'EOF'
+# Design Idea Inventory: browser/my_list_sidebar
+
+## Overview
+- **Location:** `design_ideas/browser/my_list_sidebar/`
+- **Type:** [Vite app | Static HTML with importmaps]
+- **Main component:** [e.g., App.tsx]
+
+## External Dependencies (must be replaced)
+- [ ] Tailwind CDN — Replace with app's Tailwind v4 build
+- [ ] [Fonts if any] — Use app's Proxima Nova
+
+## NPM Dependencies
+- `lucide-react` — Already in app
+- [Other dependencies...]
+
+## Local Assets
+- [List any images/icons]
+
+## API/Secret Dependencies
+- [None | List any]
+
+## Porting Complexity: [Easy | Medium | Hard]
+- Reason: [e.g., "Simple Tailwind-only, minimal dependencies"]
+
+## Porting Strategy
+1. Create sandbox route at `/sandbox/browser/my-list-sidebar`
+2. Replace CDN Tailwind with app's Tailwind build
+3. Convert icons to lucide-react
+4. Use Proxima Nova instead of external font
+EOF
+```
+
+**Step 6: Commit inventory**
+
+```bash
+git add "debug&cleanup/incompatibility/inventory-my-list-sidebar.md"
 git commit -m "docs: inventory design_ideas/browser/my_list_sidebar"
 ```
 
 ---
 
-## Task 3: Create asset standardization script
+## Task 3: Create asset standardization script (if needed)
+
+**Goal:** If design ideas have local assets (images, icons) that need to be copied to Next.js public folder, create a script to automate this.
 
 **Files:**
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/scripts/copy-design-assets.mjs`
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/public/` (directory creation)
+- Create: `scripts/copy-design-assets.mjs`
 
-**Step 1: Create script skeleton**
+**Step 1: Check if script already exists**
+
+```bash
+ls -la scripts/copy-design-assets.mjs 2>/dev/null || echo "Script does not exist yet"
+```
+
+**Step 2: If local assets exist and need copying, create the script**
 
 ```javascript
 #!/usr/bin/env node
@@ -148,213 +236,221 @@ git commit -m "docs: inventory design_ideas/browser/my_list_sidebar"
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { glob } from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const repoRoot = path.join(__dirname, '..');
+
+const DESIGN_IDEAS = ['current', 'my_list_sidebar'];
+const ASSET_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.svg', '.gif', '.webp', '.ico'];
 
 async function copyDesignAssets() {
-  const designIdeasRoot = path.join(__dirname, '..', 'design_ideas');
-  const publicRoot = path.join(__dirname, '..', 'loomis-course-app', 'public', 'design-ideas');
-  
-  console.log('Starting asset standardization...');
-  
-  // Ensure public directory exists
+  const publicRoot = path.join(repoRoot, 'loomis-course-app', 'public', 'design-ideas');
   await fs.mkdir(publicRoot, { recursive: true });
-  
-  // TODO: Implement asset discovery and copying
+
+  for (const designName of DESIGN_IDEAS) {
+    const sourcePath = path.join(repoRoot, 'design_ideas', 'browser', designName);
+    const targetPath = path.join(publicRoot, designName);
+
+    try {
+      await fs.access(sourcePath);
+    } catch {
+      console.log(`Skipping ${designName}: source does not exist`);
+      continue;
+    }
+
+    await fs.mkdir(targetPath, { recursive: true });
+
+    // Find and copy assets
+    const entries = await fs.readdir(sourcePath, { withFileTypes: true, recursive: true });
+    for (const entry of entries) {
+      if (!entry.isFile()) continue;
+      const ext = path.extname(entry.name).toLowerCase();
+      if (!ASSET_EXTENSIONS.includes(ext)) continue;
+
+      const fullPath = path.join(entry.parentPath || entry.path, entry.name);
+      const relativePath = path.relative(sourcePath, fullPath);
+      const targetFile = path.join(targetPath, relativePath);
+
+      await fs.mkdir(path.dirname(targetFile), { recursive: true });
+      await fs.copyFile(fullPath, targetFile);
+      console.log(`Copied: ${designName}/${relativePath}`);
+    }
+  }
+
+  console.log('Asset copy complete.');
 }
 
 copyDesignAssets().catch(console.error);
 ```
 
-**Step 2: Run script to verify structure**
+**Step 3: Run script**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
 node scripts/copy-design-assets.mjs
 ```
 
-Expected: Creates `loomis-course-app/public/design-ideas/` directory
-
-**Step 3: Implement asset discovery for current design idea**
-
-Add to script:
-```javascript
-async function copyAssetsForDesign(designName, sourcePath) {
-  const targetPath = path.join(publicRoot, designName);
-  await fs.mkdir(targetPath, { recursive: true });
-  
-  // Copy image assets
-  const imageExtensions = ['.png', '.jpg', '.jpeg', '.svg', '.gif', '.webp'];
-  for (const ext of imageExtensions) {
-    const imageFiles = await findFiles(sourcePath, `*${ext}`);
-    for (const imageFile of imageFiles) {
-      const relativePath = path.relative(sourcePath, imageFile);
-      const targetFile = path.join(targetPath, relativePath);
-      await fs.mkdir(path.dirname(targetFile), { recursive: true });
-      await fs.copyFile(imageFile, targetFile);
-      console.log(`Copied: ${relativePath}`);
-    }
-  }
-  
-  // Copy font assets
-  const fontExtensions = ['.woff', '.woff2', '.ttf', '.otf', '.eot'];
-  for (const ext of fontExtensions) {
-    const fontFiles = await findFiles(sourcePath, `*${ext}`);
-    for (const fontFile of fontFiles) {
-      const relativePath = path.relative(sourcePath, fontFile);
-      const targetFile = path.join(targetPath, relativePath);
-      await fs.mkdir(path.dirname(targetFile), { recursive: true });
-      await fs.copyFile(fontFile, targetFile);
-      console.log(`Copied font: ${relativePath}`);
-    }
-  }
-}
-```
-
-**Step 4: Test with current design idea**
+**Step 4: Verify assets copied**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-node scripts/copy-design-assets.mjs --design current
+ls -la loomis-course-app/public/design-ideas/
 ```
 
-**Step 5: Commit script**
+**Step 5: Commit script and assets**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-git add scripts/copy-design-assets.mjs
+git add scripts/copy-design-assets.mjs loomis-course-app/public/design-ideas/
 git commit -m "feat: add asset standardization script"
 ```
 
 ---
 
-## Task 4: Normalize entry point for browser/current
+## Task 4: Create sandbox entry points (stubs)
+
+**Goal:** Create placeholder sandbox routes so the porting process has a target location.
 
 **Files:**
-- Read: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/design_ideas/browser/current/App.tsx`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/current/page.tsx`
-- Create: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/current/components/`
+- Create: `loomis-course-app/src/app/sandbox/browser/current/page.tsx`
+- Create: `loomis-course-app/src/app/sandbox/browser/my-list-sidebar/page.tsx`
 
-**Step 1: Extract root component from App.tsx**
-
-```typescript
-// Read the App.tsx file and identify the main component
-// Current App.tsx is 842 lines - needs extraction
-```
-
-**Step 2: Create sandbox page structure**
+**Step 1: Create directory structure**
 
 ```bash
-mkdir -p /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/current/components
+mkdir -p loomis-course-app/src/app/sandbox/browser/current
+mkdir -p loomis-course-app/src/app/sandbox/browser/my-list-sidebar
 ```
 
-**Step 3: Create minimal page.tsx**
+**Step 2: Create stub for current**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/current/page.tsx
+// loomis-course-app/src/app/sandbox/browser/current/page.tsx
 'use client';
-
-import EnhancedExplorer from './components/EnhancedExplorer';
 
 export default function CurrentSandboxPage() {
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <h1 className="text-2xl font-bold mb-4">Enhanced Explorer (Sandbox)</h1>
-      <EnhancedExplorer />
+    <div className="min-h-screen p-8">
+      <h1 className="text-2xl font-bold mb-4">Enhanced Explorer (Sandbox Stub)</h1>
+      <div className="p-4 border border-gray-300 rounded-lg">
+        <p className="text-gray-600">Placeholder for design_ideas/browser/current</p>
+        <p className="text-sm text-gray-500 mt-2">
+          Porting status: Not started. See inventory-current.md for strategy.
+        </p>
+      </div>
     </div>
   );
 }
 ```
 
-**Step 4: Create placeholder EnhancedExplorer component**
+**Step 3: Create stub for my-list-sidebar**
 
 ```typescript
-// /Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/browser/current/components/EnhancedExplorer.tsx
-export default function EnhancedExplorer() {
+// loomis-course-app/src/app/sandbox/browser/my-list-sidebar/page.tsx
+'use client';
+
+export default function MyListSidebarSandboxPage() {
   return (
-    <div className="p-8 border border-gray-300 rounded-lg">
-      <p className="text-gray-600">Enhanced Explorer component placeholder</p>
-      <p className="text-sm text-gray-500">Original: design_ideas/browser/current/App.tsx (842 lines)</p>
+    <div className="min-h-screen p-8">
+      <h1 className="text-2xl font-bold mb-4">My List Sidebar (Sandbox Stub)</h1>
+      <div className="p-4 border border-gray-300 rounded-lg">
+        <p className="text-gray-600">Placeholder for design_ideas/browser/my_list_sidebar</p>
+        <p className="text-sm text-gray-500 mt-2">
+          Porting status: Not started. See inventory-my-list-sidebar.md for strategy.
+        </p>
+      </div>
     </div>
   );
 }
 ```
 
-**Step 5: Test sandbox route**
+**Step 4: Verify routes work**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
-npm run dev &
+cd loomis-course-app
+npm run dev
 # Visit http://localhost:3001/sandbox/browser/current
+# Visit http://localhost:3001/sandbox/browser/my-list-sidebar
 ```
 
-**Step 6: Commit entry point**
+**Step 5: Commit stubs**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
-git add loomis-course-app/src/app/sandbox/browser/current/
-git commit -m "feat: create sandbox entry point for browser/current"
+git add loomis-course-app/src/app/sandbox/browser/
+git commit -m "feat: create sandbox entry stubs for design ideas"
 ```
 
 ---
 
-## Task 5: Update experiments.ts registry
+## Task 5: Update experiments registry (optional)
+
+**Goal:** Register the new sandbox experiments in the registry if one exists.
 
 **Files:**
-- Modify: `/Users/MatthewLi/Desktop/Senior Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app/src/app/sandbox/experiments.ts:15-30`
+- Check: `loomis-course-app/src/app/sandbox/experiments.ts`
 
-**Step 1: Add current experiment metadata**
-
-```typescript
-// In CATEGORIES array, browser experiments section
-experiments: [
-  {
-    name: 'Enhanced Explorer',
-    description: 'AI-enhanced course catalog explorer with Gemini integration',
-    path: '/sandbox/browser/current',
-    status: 'wip' as ExperimentStatus,
-    frameworks: ['Tailwind CSS', 'styled-components', '@google/genai'],
-    createdAt: new Date().toISOString(),
-    author: 'Design Ideas Team',
-    sourceRef: 'design_ideas/browser/current',
-    tags: ['ai', 'catalog', 'explorer'],
-  },
-],
-```
-
-**Step 2: Verify TypeScript compilation**
+**Step 1: Check if registry exists**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc-solve-incompatibility/loomis-course-app
-npx tsc --noEmit
+ls -la loomis-course-app/src/app/sandbox/experiments.ts 2>/dev/null || echo "No experiments registry"
 ```
 
-Expected: No type errors
+**Step 2: If exists, add entries for the new experiments**
 
-**Step 3: Check sandbox index page**
+Add entries for:
+- `Enhanced Explorer` at `/sandbox/browser/current`
+- `My List Sidebar` at `/sandbox/browser/my-list-sidebar`
+
+**Step 3: Verify build passes**
 
 ```bash
-# Restart dev server if needed
-# Visit http://localhost:3001/sandbox
+cd loomis-course-app
+npm run build
 ```
 
-**Step 4: Commit registry update**
+**Step 4: Commit if registry updated**
 
 ```bash
-cd /Users/MatthewLi/Desktop/Senior\ Year/clubs/web_dev_lc
 git add loomis-course-app/src/app/sandbox/experiments.ts
-git commit -m "feat: register enhanced explorer in experiments"
+git commit -m "feat: register design idea experiments in sandbox"
 ```
 
 ---
 
 ## Verification Checklist for Phase 1
 
-- [ ] `npm run dev` starts without errors
-- [ ] `npm run build` completes successfully
-- [ ] `/sandbox/browser/current` route renders placeholder
-- [ ] `/sandbox` index shows Enhanced Explorer entry
-- [ ] Asset script creates `public/design-ideas/current/` directory
-- [ ] Inventory documents created for both design ideas
-- [ ] No new runtime dependencies added to package.json
+- [ ] Inventory document exists for `browser/current`
+- [ ] Inventory document exists for `browser/my_list_sidebar`
+- [ ] Each inventory lists: external dependencies, npm dependencies, local assets, porting complexity
+- [ ] Asset script exists (if local assets need copying)
+- [ ] Sandbox stub routes render at `/sandbox/browser/current` and `/sandbox/browser/my-list-sidebar`
+- [ ] `npm run build` passes in `loomis-course-app`
+
+---
+
+## 🛑 CHECKPOINT [Phase 1]: Inventory Complete
+
+> **STOP:** Verify all design ideas have inventory documents before proceeding.
+
+**Verification:**
+- [ ] `debug&cleanup/incompatibility/inventory-current.md` exists with porting strategy
+- [ ] `debug&cleanup/incompatibility/inventory-my-list-sidebar.md` exists with porting strategy
+- [ ] Sandbox stubs render correctly
+- [ ] Build passes
+
+**Next Phase:** Phase 2 — Tailwind Global and Stable
+
+---
+
+## Rollback
+
+If anything breaks during Phase 1:
+
+1. Remove sandbox stubs:
+   ```bash
+   rm -rf loomis-course-app/src/app/sandbox/browser/current
+   rm -rf loomis-course-app/src/app/sandbox/browser/my-list-sidebar
+   ```
+
+2. Inventory documents are safe to delete (they're just documentation).
+
+Phase 1 is primarily additive, so rollback is low-risk.

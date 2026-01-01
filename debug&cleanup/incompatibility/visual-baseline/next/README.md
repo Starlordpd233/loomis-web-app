@@ -1,16 +1,16 @@
 # Visual Baseline Screenshots
 
-This directory contains baseline screenshots captured from the legacy Next.js application for visual regression testing during migration.
+This directory contains baseline screenshots captured from the Next.js application for visual comparison during design idea porting.
 
 ## Purpose
 
-These screenshots serve as the "ground truth" for how the legacy app looks. During and after migration to the new Vite app, we can compare new screenshots against these baselines to detect unintended visual changes.
+These screenshots serve as the "ground truth" for how the existing app looks. During Phase 4 (Visual Parity Validation), we compare sandbox screenshots against these baselines to verify visual fidelity.
 
 ## Directory Structure
 
 ```
 visual-baseline/next/
-├── capture-script.js    # Automated capture script
+├── capture-script.js    # Automated capture script (optional)
 ├── README.md            # This file
 ├── clean/               # Screenshots with empty localStorage
 │   ├── index-1440x900.png
@@ -46,83 +46,50 @@ Screenshots are captured in two states:
 
 ## Viewports
 
-Currently capturing at desktop resolution only:
-- **Desktop**: 1440×900 (typical laptop)
+Desktop resolution only (project is desktop-focused):
+- **Desktop**: 1440×900
 
-> The project is desktop-only, so mobile/tablet viewports are not captured.
+## Manual Capture (Recommended)
 
-## Running the Capture Script
+For Phase 4 visual comparison, manual screenshot capture is preferred:
 
-### Prerequisites
-
-1. Install dependencies (in `loomis-course-app/`):
+1. Start the Next.js dev server:
    ```bash
-   npm install -D puppeteer
-   ```
-
-2. Start the dev server:
-   ```bash
+   cd loomis-course-app
    npm run dev
+   # Runs on http://localhost:3001
    ```
 
-### Basic Usage
+2. Open each route in browser:
+   - `http://localhost:3001/browser`
+   - `http://localhost:3001/planner`
+   - etc.
 
-From this directory (`planning/visual-baseline/next/`):
+3. In browser DevTools (Cmd+Option+I):
+   - Open Device Toolbar (Cmd+Shift+M)
+   - Set dimensions to 1440×900
+   - Capture screenshot: Cmd+Shift+P → "Capture screenshot"
+
+4. Save to appropriate directory:
+   - `clean/` for empty localStorage state
+   - `populated/` for state with sample data
+
+## Automated Capture (Optional)
+
+If `capture-script.js` is available:
 
 ```bash
+# Prerequisites: npm install -D puppeteer
+cd debug\&cleanup/incompatibility/visual-baseline/next
+
 # Capture both clean and populated states
 node capture-script.js
 
 # Only capture clean state
 node capture-script.js --clean-only
 
-# Only capture populated state
-node capture-script.js --populated-only
-
 # Use a custom base URL
 BASE_URL=http://localhost:3002 node capture-script.js
-```
-
-### Expected Output
-
-```
-╔════════════════════════════════════════════════════════════╗
-║           Visual Baseline Capture Script                   ║
-╚════════════════════════════════════════════════════════════╝
-
-[12:00:00] 🚀 Base URL: http://localhost:3001
-[12:00:00] 📐 Viewports: 1440x900
-[12:00:00] 🗂️ Routes: 6 routes to capture
-
-[12:00:01] 📸 Starting capture for CLEAN state...
-[12:00:02] ✅ Captured: index-1440x900.png (clean)
-[12:00:03] ✅ Captured: login-1440x900.png (clean)
-...
-
-╔════════════════════════════════════════════════════════════╗
-║                        Summary                             ║
-╚════════════════════════════════════════════════════════════╝
-
-[12:00:15] ✅ Successful: 11
-[12:00:15] ⏭️ Skipped: 1
-[12:00:15] ❌ Failed: 0
-[12:00:15] 🎉 All captures completed successfully!
-```
-
-## Troubleshooting
-
-### "Cannot reach server" error
-- Make sure the dev server is running: `npm run dev`
-- Check the port matches (default: 3001)
-
-### Screenshots are blank or too small
-- The script validates file size (minimum 5KB)
-- Increase `animationWaitMs` in the script if pages have slow animations
-
-### Puppeteer installation issues
-On macOS, you may need:
-```bash
-brew install chromium
 ```
 
 ## Naming Convention
@@ -140,10 +107,33 @@ Files are named: `{route}-{viewport}.png`
 
 ## Usage in Migration
 
-During Phase 4 (Visual Parity Validation), these baselines will be compared against screenshots from the new Vite app using tools like:
+During **Phase 4 (Visual Parity Validation)**, these baselines are compared against sandbox screenshots:
 
-- [pixelmatch](https://github.com/mapbox/pixelmatch) - pixel-level comparison
-- [reg-cli](https://github.com/reg-viz/reg-cli) - visual regression reports
-- Manual visual inspection
+### Manual Comparison (Primary)
+1. Open baseline and sandbox screenshots side-by-side
+2. Use Preview, Figma, or any image comparison tool
+3. Check layout, typography, colors, spacing, borders/shadows
+4. Document findings in Phase 4 checklist
 
-A difference threshold will be configured to allow minor variations (e.g., anti-aliasing differences) while catching significant layout changes.
+### Automated Comparison (Optional)
+If network access is available, pixelmatch can be used for pixel-level comparison:
+```bash
+# Requires: npm install pixelmatch pngjs
+node compare.mjs
+```
+
+## Troubleshooting
+
+### "Cannot reach server" error
+- Make sure the dev server is running: `npm run dev`
+- Check the port matches (default: 3001)
+
+### Screenshots are blank or too small
+- The script validates file size (minimum 5KB)
+- Increase `animationWaitMs` in the script if pages have slow animations
+
+### Puppeteer installation issues
+On macOS, you may need:
+```bash
+brew install chromium
+```

@@ -5,7 +5,7 @@
 - [x] Vitest test runner installed in legacy Next.js app
 - [x] Unit tests for courseUtils.ts (canonicalizeDepartment, normalizeTerm, deriveTags, flattenDatabase, formatGrades, filterCourses)
 - [x] Unit tests for plannerStore.ts (localStorage migration behavior, load/save, error handling)
-- [x] Baseline screenshots captured for all core routes at desktop viewport (Clean & Populated)
+- [x] Baseline screenshots captured for all core routes at desktop viewport (1440×900)
 
 ## ✅ Code Quality Upgrade (Post-Execution)
 All Phase 0 scripts and code upgraded from basic/informational to industry-standard:
@@ -20,10 +20,18 @@ All Phase 0 scripts and code upgraded from basic/informational to industry-stand
 ## 📊 Metrics
 - Test coverage: courseUtils and plannerStore core functions
 - **Total tests: 72 (up from 15)**
-- Screenshots: 
-  - Clean: 6 files (6 routes × 1 viewport)
+- Screenshots:
+  - Clean: 6 files (6 routes × 1 viewport at 1440×900)
   - Populated: 5 files (5 routes × 1 viewport, onboarding skipped)
 - Inventory: 6 core routes documented
 
 ## 🛑 CHECKPOINT READY
-Proceed to Phase 1 (Create Vite app with same look defaults) after user approval.
+Proceed to Phase 1 (Inventory and Standardization of Design Ideas) after user approval.
+
+---
+
+## Related Documentation
+
+- **Step-by-step plans:** `debug&cleanup/incompatibility/step-by-step/`
+- **Visual baselines:** `debug&cleanup/incompatibility/visual-baseline/next/`
+- **Migration workflow:** `planning/migrate-nextjs-to-vite-composable.md`
