@@ -331,6 +331,53 @@ git commit -m "feat: copy design idea assets to public directory"
 
 ---
 
+## Task 4.5: Security Hygiene Audit
+
+**Goal:** Quick security check before creating sandbox stubs to prevent accidental porting of unsafe patterns.
+
+> [!WARNING]
+> **Do this before Task 5.** These checks catch issues early rather than discovering them mid-port in Phase 3.
+
+**Step 1: Audit copy-design-assets script for unsafe patterns**
+
+```bash
+# Check if script uses shell execution
+grep -n "exec\\|spawn\\|child_process\\|\\$(" scripts/copy-design-assets.mjs
+```
+
+If the script shells out to commands, verify:
+- No user input is interpolated into shell commands (command injection risk)
+- Paths are properly escaped/sanitized
+- Error handling exists for failed commands
+
+**Step 2: Confirm no client-side Gemini SDK imports in design ideas**
+
+```bash
+# Check for direct Gemini SDK usage that would be unsafe to port
+grep -rn "@google/genai\\|gemini-api\\|GenerativeModel" design_ideas/ --include="*.tsx" --include="*.ts" --include="*.jsx" --include="*.js"
+```
+
+If found, add to the inventory document as **DO NOT PORT DIRECTLY**. Phase 3's "Gemini Integration Architecture" section has the safe pattern.
+
+**Step 3: Check for hardcoded API keys (should already be in gitignore)**
+
+```bash
+# Look for potential hardcoded keys
+grep -rn "AIza\\|sk-\\|GEMINI.*=.*['\"]" design_ideas/ --include="*.tsx" --include="*.ts" --include="*.js" --include="*.env*"
+```
+
+If any real keys are found:
+1. Immediately rotate the exposed key
+2. Remove from version control: `git filter-branch` or `git-filter-repo`
+3. Add pattern to `.gitignore`
+
+**Checklist (confirm before Task 5):**
+- [ ] `copy-design-assets.mjs` has no unsafe shell execution (or is sanitized)
+- [ ] No client-side Gemini SDK imports to accidentally port
+- [ ] No hardcoded API keys in design ideas
+
+---
+
 ## Task 5: Create sandbox entry points (stubs)
 
 **Goal:** Create placeholder sandbox routes so the porting process has a target location.

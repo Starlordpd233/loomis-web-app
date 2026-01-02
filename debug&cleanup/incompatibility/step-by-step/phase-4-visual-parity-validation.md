@@ -308,7 +308,15 @@ git commit -m "docs: complete visual parity comparison"
 
 ---
 
-## Task 5 (Optional): Automated comparison with Puppeteer
+## Task 5 (Optional but Recommended): Automated comparison with Puppeteer
+
+> [!NOTE]
+> **Primary workflow:** Manual comparison (Tasks 1-4) is sufficient for most migrations.
+> 
+> **When to automate:** Consider this task if:
+> - You expect multiple iterations of styling fixes
+> - Multiple team members need to verify parity independently
+> - You want CI-level regression detection in the future
 
 > [!NOTE]
 > **Prefer existing workflow.** Use the Puppeteer baseline workflow from Phase 0 (`debug&cleanup/incompatibility/visual-baseline/next/capture-script.js`) to maintain consistency. Avoid introducing Playwright unless you intentionally standardize on it for the entire project.
@@ -319,6 +327,8 @@ git commit -m "docs: complete visual parity comparison"
 > - Use consistent viewport (1440×900)
 > - Wait for network idle and fonts to load
 > - Consider adding `--deterministic` flag to capture script
+
+**Minimum viable automation:** Even just scripting "capture one screenshot per route" saves time on repeated comparisons.
 
 **Goal:** Set up automated pixel-level comparison for ongoing visual regression testing.
 

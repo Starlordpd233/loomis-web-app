@@ -76,7 +76,7 @@ For production deployment, set this variable in your hosting platform (Vercel, e
 import { EnhancedExplorer } from '@/features/browser/enhanced-explorer';
 import { MyListSidebar } from '@/features/browser/my-list-sidebar';
 
-// Runtime feature toggle - controlled via NEXT_PUBLIC_ENABLE_NEW_BROWSER env var
+// Build-time feature toggle - controlled via NEXT_PUBLIC_ENABLE_NEW_BROWSER env var
 // Set to 'true' in .env.local or hosting platform to enable
 const USE_NEW_EXPLORER = process.env.NEXT_PUBLIC_ENABLE_NEW_BROWSER === 'true';
 
@@ -328,3 +328,27 @@ If promoted components cause issues in production:
 
 > [!TIP]
 > **Keep legacy code path intact** until confidence is high. The feature toggle allows instant rollback via rebuild without code changes.
+
+---
+
+## Future Enhancement: Runtime Feature Flags
+
+> [!NOTE]
+> **Out of scope for this migration, but documented for future reference.**
+
+If rebuild-only toggles become operationally painful (e.g., you need instant rollback without redeploying), consider implementing a runtime feature flag system:
+
+**Option A: Cookie/Middleware-based**
+- Set a cookie (`feature_new_browser=true`) via middleware or admin panel
+- Middleware reads cookie and sets a header or rewrites the route
+- Allows instant toggle without rebuild
+
+**Option B: Remote config service**
+- Use LaunchDarkly, Split.io, or a custom config endpoint
+- Client or server fetches flag state at runtime
+- More infrastructure overhead, but supports gradual rollout (%)
+
+**When to implement:**
+- After the migration is stable in production for 2+ weeks
+- If you need A/B testing or gradual percentage rollout
+- If deploy times are too slow for comfortable rollback

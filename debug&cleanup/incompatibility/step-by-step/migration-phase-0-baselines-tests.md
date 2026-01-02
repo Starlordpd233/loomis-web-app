@@ -209,6 +209,66 @@ Key scenarios to test:
 3. Existing `plan` data → migrates to plannerV2
 4. Existing plannerV2 data → preserves it
 
+**Step 3.5 (Required): Add corrupted/legacy storage cases**
+
+> [!IMPORTANT]
+> **Corrupted localStorage must never crash the UI.** These tests ensure graceful degradation when users have malformed data from bugs, old versions, or manual tampering.
+
+Add test cases for:
+
+```typescript
+describe('plannerStore - corrupted/legacy data handling', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('handles invalid JSON in plannerV2 gracefully', () => {
+    localStorage.setItem('plannerV2', 'not valid json {{{');
+    // Should not throw, should fall back to defaults
+    const store = initPlannerStore();
+    expect(store).toBeDefined();
+    expect(store.version).toBe(2);
+  });
+
+  it('handles invalid JSON in plan gracefully', () => {
+    localStorage.setItem('plan', '[invalid array');
+    const store = initPlannerStore();
+    expect(store).toBeDefined();
+  });
+
+  it('handles wrong shape (missing required fields)', () => {
+    localStorage.setItem('plannerV2', JSON.stringify({
+      version: 2,
+      // missing selectedCourses and grid
+    }));
+    const store = initPlannerStore();
+    expect(store.selectedCourses).toEqual([]); // defaults to empty
+    expect(store.grid).toBeDefined();
+  });
+
+  it('handles legacy version numbers', () => {
+    localStorage.setItem('plannerV2', JSON.stringify({
+      version: 1, // old version in v2 key
+      courses: ['CS101'],
+    }));
+    const store = initPlannerStore();
+    expect(store.version).toBe(2); // upgraded
+  });
+
+  it('handles null/undefined values in data', () => {
+    localStorage.setItem('plannerV2', JSON.stringify({
+      version: 2,
+      selectedCourses: null,
+      grid: undefined,
+    }));
+    const store = initPlannerStore();
+    expect(Array.isArray(store.selectedCourses)).toBe(true);
+  });
+});
+```
+
+**Expected behavior:** **No crash**, recover to safe defaults or ignore bad data.
+
 Use `beforeEach` to clear localStorage:
 
 ```typescript

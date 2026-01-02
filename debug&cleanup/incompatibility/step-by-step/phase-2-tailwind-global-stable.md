@@ -266,6 +266,66 @@ npm run build
 
 ---
 
+## Regression Checkpoint (Required After Task 4)
+
+> [!IMPORTANT]
+> **Stop-the-line check:** Before proceeding to Phase 3, verify that Phase 2 changes have not regressed core production routes. This checkpoint prevents cascading issues in later phases.
+
+**Step 1: Compare core routes against Phase 0 baselines**
+
+Manual comparison is sufficient:
+
+1. Start dev server: `cd loomis-course-app && npm run dev`
+2. Visit each core route (`/`, `/login`, `/onboarding`, `/browser`, `/planner`)
+3. Compare visually against Phase 0 screenshots in `debug&cleanup/incompatibility/visual-baseline/next/clean/`
+4. Look for: font changes, color shifts, layout breaks, unexpected spacing
+
+**Expected:** No visible differences from Phase 0 baselines.
+
+**Step 2 (Optional but Recommended): Playwright navigation test**
+
+If you want automated verification, add a simple Playwright test:
+
+```typescript
+// e2e/css-leak.spec.ts
+import { test, expect } from '@playwright/test';
+
+test('sandbox CSS does not leak to production routes', async ({ page }) => {
+  // Visit sandbox first (loads sandbox.css)
+  await page.goto('/sandbox');
+  await page.waitForLoadState('networkidle');
+  
+  // Navigate to production route
+  await page.goto('/browser');
+  await page.waitForLoadState('networkidle');
+  
+  // Assert key tokens remain correct (adjust selectors and values for your app)
+  const body = page.locator('body');
+  const bgColor = await body.evaluate((el) => 
+    getComputedStyle(el).getPropertyValue('--background')
+  );
+  
+  // Should match globals.css value, not sandbox override
+  expect(bgColor.trim()).not.toBe(''); // Has a value
+  // Add more specific assertions as needed
+});
+```
+
+Run with:
+```bash
+cd loomis-course-app
+npx playwright test e2e/css-leak.spec.ts
+```
+
+**Step 3: Gate for Phase 3**
+
+| Outcome | Action |
+|---------|--------|
+| ✅ No regressions | Proceed to Phase 3 |
+| ❌ Regressions found | Stop, investigate, and fix before Phase 3 |
+
+---
+
 ## Task 5: Create a low-risk Tailwind "smoke test" route (optional but recommended)
 
 **Files:**

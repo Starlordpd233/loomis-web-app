@@ -49,11 +49,47 @@
 
 **Default policy:** sandbox experiments must not write to production keys like `plan`, `plannerV2`, `catalogPrefs`, or `onboardingIntroSeen`.
 
-Recommended approaches (pick one and document it in the PR):
-1. **Prefixed keys:** use a `sandbox:<experimentId>:...` prefix for any localStorage usage in sandbox-only code.
-2. **Separate browser profile:** use a dedicated Chrome profile (or Incognito) for sandbox work so production data is never at risk.
+> [!IMPORTANT]
+> **Enforcement by construction:** Sandbox code **must use the shared `sandboxStorage` helper** below. This ensures prefixing is automatic—no policy-only reliance that developers can accidentally bypass.
 
-Only touch production keys during **Phase 5 Storage Compatibility** verification.
+**Step 1: Create the shared storage wrapper**
+
+```typescript
+// loomis-course-app/src/lib/sandboxStorage.ts
+const SANDBOX_PREFIX = 'sandbox:';
+
+export const sandboxStorage = {
+  getItem(key: string): string | null {
+    return localStorage.getItem(`${SANDBOX_PREFIX}${key}`);
+  },
+  setItem(key: string, value: string): void {
+    localStorage.setItem(`${SANDBOX_PREFIX}${key}`, value);
+  },
+  removeItem(key: string): void {
+    localStorage.removeItem(`${SANDBOX_PREFIX}${key}`);
+  },
+  /** Clears ALL sandbox-prefixed keys (useful for test cleanup) */
+  clearAll(): void {
+    Object.keys(localStorage)
+      .filter((k) => k.startsWith(SANDBOX_PREFIX))
+      .forEach((k) => localStorage.removeItem(k));
+  },
+};
+```
+
+**Step 2: Use in sandbox components**
+
+```typescript
+// In any sandbox experiment component
+import { sandboxStorage } from '@/lib/sandboxStorage';
+
+// Writes to 'sandbox:myExperiment:settings' in localStorage
+sandboxStorage.setItem('myExperiment:settings', JSON.stringify(settings));
+```
+
+**Alternative approaches (if wrapper doesn't fit your architecture):**
+1. **Separate browser profile:** use a dedicated Chrome profile (or Incognito) for sandbox work so production data is never at risk.
+2. **Prefixed keys (manual):** use a `sandbox:<experimentId>:...` prefix manually—but this relies on developer discipline.
 
 ---
 
@@ -530,17 +566,56 @@ git commit -m "feat: update experiment registry after porting"
    ```typescript
    // loomis-course-app/src/app/api/gemini/route.ts
    import { NextRequest, NextResponse } from 'next/server';
+   import { z } from 'zod';
+   
+   // Request validation schema
+   const GeminiRequestSchema = z.object({
+     prompt: z.string().min(1).max(2000),
+     context: z.string().max(500).optional(),
+   });
+   
+   // Timeout helper
+   const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> =>
+     Promise.race([
+       promise,
+       new Promise<never>((_, reject) =>
+         setTimeout(() => reject(new Error('Gemini timeout')), ms)
+       ),
+     ]);
    
    export async function POST(request: NextRequest) {
-     // Only this server-side code can access the real API key
      const apiKey = process.env.GEMINI_API_KEY;
      if (!apiKey) {
        return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
      }
      
-     const body = await request.json();
-     // Call Gemini API here...
-     return NextResponse.json({ response: '...' });
+     // Validate request body
+     let body;
+     try {
+       body = GeminiRequestSchema.parse(await request.json());
+     } catch (e) {
+       return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+     }
+     
+     // PAYLOAD STRATEGY: Server reads catalog from local JSON, not from client
+     // This prevents clients from sending arbitrarily large payloads
+     const catalog = await import('@/data/catalog.json');
+     
+     try {
+       const response = await withTimeout(
+         callGeminiAPI(apiKey, body.prompt, catalog),
+         10000 // 10 second timeout
+       );
+       return NextResponse.json({ response });
+     } catch (e) {
+       const message = e instanceof Error ? e.message : 'Gemini call failed';
+       return NextResponse.json({ error: message }, { status: 500 });
+     }
+   }
+   
+   async function callGeminiAPI(apiKey: string, prompt: string, catalog: unknown) {
+     // Actual Gemini SDK call here
+     // ...
    }
    ```
 
@@ -549,6 +624,7 @@ git commit -m "feat: update experiment registry after porting"
    // In your component
    const response = await fetch('/api/gemini', {
      method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({ prompt: '...' }),
    });
    ```
@@ -556,6 +632,96 @@ git commit -m "feat: update experiment registry after porting"
 3. **Standardize env var naming to `GEMINI_API_KEY`** (the prototype uses `API_KEY`)
 
 4. **Mock mode for parity testing:** Add a `MOCK_GEMINI=true` env var to return static responses during visual testing
+
+**Data Flow Diagram:**
+
+```mermaid
+flowchart LR
+  Client[Client] -->|"POST /api/gemini"| ApiGemini["NextRouteHandler(/api/gemini)"]
+  ApiGemini -->|"read_catalog"| Catalog["CatalogData(local_JSON_or_import)"]
+  ApiGemini -->|"call"| Gemini[Gemini_API]
+  Gemini --> ApiGemini
+  ApiGemini -->|"JSON response"| Client
+```
+
+---
+
+## Sandbox Error Boundary (Recommended)
+
+**Goal:** Prevent sandbox experiment failures from crashing the entire `/sandbox` route subtree.
+
+> [!TIP]
+> Wrapping sandbox routes with an error boundary ensures that if an experiment has a runtime error, users still see a friendly fallback UI rather than a blank page.
+
+**Step 1: Create a sandbox error boundary component**
+
+```typescript
+// loomis-course-app/src/app/sandbox/components/SandboxErrorBoundary.tsx
+'use client';
+
+import { Component, ReactNode } from 'react';
+
+interface Props {
+  children: ReactNode;
+  experimentName?: string;
+}
+
+interface State {
+  hasError: boolean;
+  error?: Error;
+}
+
+export class SandboxErrorBoundary extends Component<Props, State> {
+  state: State = { hasError: false };
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-red-50">
+          <div className="text-center p-8">
+            <h2 className="text-xl font-bold text-red-600 mb-2">
+              Sandbox Experiment Error
+            </h2>
+            <p className="text-gray-600 mb-4">
+              {this.props.experimentName ?? 'This experiment'} encountered an error.
+            </p>
+            <pre className="text-sm bg-red-100 p-4 rounded text-left overflow-auto max-w-lg">
+              {this.state.error?.message}
+            </pre>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              Reload
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+```
+
+**Step 2: Wrap sandbox experiment routes**
+
+```typescript
+// loomis-course-app/src/app/sandbox/browser/current/page.tsx
+import { SandboxErrorBoundary } from '@/app/sandbox/components/SandboxErrorBoundary';
+import { EnhancedExplorer } from '@/features/browser/enhanced-explorer';
+
+export default function EnhancedExplorerPage() {
+  return (
+    <SandboxErrorBoundary experimentName="Enhanced Explorer">
+      <EnhancedExplorer />
+    </SandboxErrorBoundary>
+  );
+}
+```
 
 ---
 
