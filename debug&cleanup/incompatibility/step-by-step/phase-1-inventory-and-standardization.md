@@ -16,7 +16,7 @@
 ## Prerequisites
 
 - Phase 0 complete (baselines + tests in place)
-- Working directory: Repo root (unless otherwise specified)
+- Working directory: **Repo Root**
 - Dev server can be started and is reachable at `http://localhost:3001` (needed for Task 4 stub verification):
   ```bash
   cd loomis-course-app && npm run dev
@@ -24,6 +24,7 @@
 - Design ideas to inventory:
   - `design_ideas/browser/current`
   - `design_ideas/browser/my_list_sidebar`
+  - `design_ideas/sandbox/sandbox-landing-page`
 
 ---
 
@@ -219,82 +220,32 @@ git commit -m "docs: inventory design_ideas/browser/my_list_sidebar"
 
 ---
 
-## Task 3: Create asset standardization script (if needed)
+## Task 3: Use asset standardization script (if needed)
 
-**Goal:** If design ideas have local assets (images, icons) that need to be copied to Next.js public folder, create a script to automate this.
+**Goal:** If design ideas have local assets (images, icons) that need to be copied to Next.js public folder, use the existing standardization script.
 
 **Files:**
-- Create: `scripts/copy-design-assets.mjs`
+- Check: `scripts/copy-design-assets.mjs`
 
-**Step 1: Check if script already exists**
+**Step 1: Check if script exists**
 
 ```bash
-ls -la scripts/copy-design-assets.mjs 2>/dev/null || echo "Script does not exist yet"
+ls -la scripts/copy-design-assets.mjs
 ```
 
-**Step 2: If local assets exist and need copying, create the script**
+The script already exists and supports these CLI options:
+- `--design <name>` — Only process specific design idea (e.g., `current`, `my_list_sidebar`)
+- `--dry-run` — Preview without copying
+- `--clean` — Remove existing assets first
+- `--verbose, -v` — Show detailed output
 
-```javascript
-#!/usr/bin/env node
-// scripts/copy-design-assets.mjs
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
+**Step 2: Preview assets (dry run)**
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const repoRoot = path.join(__dirname, '..');
-
-const DESIGN_IDEAS = ['current', 'my_list_sidebar'];
-const ASSET_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.svg', '.gif', '.webp', '.ico'];
-
-async function copyAssetsRecursive(sourceDir, targetDir) {
-  const entries = await fs.readdir(sourceDir, { withFileTypes: true });
-  
-  for (const entry of entries) {
-    const srcPath = path.join(sourceDir, entry.name);
-    const destPath = path.join(targetDir, entry.name);
-    
-    if (entry.isDirectory()) {
-      await fs.mkdir(destPath, { recursive: true });
-      await copyAssetsRecursive(srcPath, destPath);
-    } else if (entry.isFile()) {
-       const ext = path.extname(entry.name).toLowerCase();
-       if (ASSET_EXTENSIONS.includes(ext)) {
-         await fs.mkdir(path.dirname(destPath), { recursive: true });
-         await fs.copyFile(srcPath, destPath);
-         console.log(`Copied: ${entry.name}`);
-       }
-    }
-  }
-}
-
-async function copyDesignAssets() {
-  const publicRoot = path.join(repoRoot, 'loomis-course-app', 'public', 'design-ideas');
-  await fs.mkdir(publicRoot, { recursive: true });
-
-  for (const designName of DESIGN_IDEAS) {
-    const sourcePath = path.join(repoRoot, 'design_ideas', 'browser', designName);
-    const targetPath = path.join(publicRoot, designName);
-
-    try {
-      await fs.access(sourcePath);
-    } catch {
-      console.log(`Skipping ${designName}: source does not exist`);
-      continue;
-    }
-
-    console.log(`Processing ${designName}...`);
-    await copyAssetsRecursive(sourcePath, targetPath);
-  }
-
-  console.log('Asset copy complete.');
-}
-
-copyDesignAssets().catch(console.error);
+```bash
+node scripts/copy-design-assets.mjs --dry-run --verbose
 ```
 
-**Step 3: Run script**
+**Step 3: Run script to copy assets**
 
 ```bash
 node scripts/copy-design-assets.mjs
@@ -306,11 +257,11 @@ node scripts/copy-design-assets.mjs
 ls -la loomis-course-app/public/design-ideas/
 ```
 
-**Step 5: Commit script and assets**
+**Step 5: Commit assets (if any copied)**
 
 ```bash
-git add scripts/copy-design-assets.mjs loomis-course-app/public/design-ideas/
-git commit -m "feat: add asset standardization script"
+git add loomis-course-app/public/design-ideas/
+git commit -m "feat: copy design idea assets to public directory"
 ```
 
 ---
@@ -390,33 +341,36 @@ git commit -m "feat: create sandbox entry stubs for design ideas"
 
 ---
 
-## Task 5: Update experiments registry (optional)
+## Task 5: Update experiments registry
 
-**Goal:** Register the new sandbox experiments in the registry if one exists.
+**Goal:** Register the new sandbox experiments in the registry.
+
+> [!IMPORTANT]
+> **This task is required** since the registry exists at `loomis-course-app/src/app/sandbox/experiments.ts`.
 
 **Files:**
-- Check: `loomis-course-app/src/app/sandbox/experiments.ts`
+- Modify: `loomis-course-app/src/app/sandbox/experiments.ts`
 
-**Step 1: Check if registry exists**
+**Step 1: Check registry structure**
 
 ```bash
-ls -la loomis-course-app/src/app/sandbox/experiments.ts 2>/dev/null || echo "No experiments registry"
+head -50 loomis-course-app/src/app/sandbox/experiments.ts
 ```
 
-**Step 2: If exists, add entries for the new experiments**
+**Step 2: Add entries for new experiments**
 
 Add entries for:
-- `Enhanced Explorer` at `/sandbox/browser/current`
+- `Enhanced Explorer` at `/sandbox/browser/current` (already exists, verify)
 - `My List Sidebar` at `/sandbox/browser/my-list-sidebar`
+- `Sandbox Landing Page` at `/sandbox/landing` (if porting this prototype)
 
 **Step 3: Verify build passes**
 
 ```bash
-cd loomis-course-app
-npm run build
+cd loomis-course-app && npm run build
 ```
 
-**Step 4: Commit if registry updated**
+**Step 4: Commit registry update**
 
 ```bash
 git add loomis-course-app/src/app/sandbox/experiments.ts

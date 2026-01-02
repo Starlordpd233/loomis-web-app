@@ -17,12 +17,12 @@
 ## Prerequisites
 
 - Phase 4 complete (visual parity validated)
-- Working directory: `loomis-course-app/` (unless otherwise specified)
+- Working directory: **Repo Root**
 - All sandbox routes render correctly:
   - `/sandbox/browser/current`
   - `/sandbox/browser/my-list-sidebar`
 - Visual comparison passed for both design ideas
-- Build passes: `npm run build`
+- Build passes: `cd loomis-course-app && npm run build`
 
 ---
 
@@ -49,9 +49,15 @@ NEXT_PUBLIC_ENABLE_NEW_BROWSER=true
 **Document the variable in `.env.example`** (so future developers know it exists):
 
 ```bash
-# Add to loomis-course-app/.env.example (or create if it doesn't exist)
-echo "# Feature toggle for promoted browser components (requires rebuild to change)" >> loomis-course-app/.env.example
-echo "NEXT_PUBLIC_ENABLE_NEW_BROWSER=false" >> loomis-course-app/.env.example
+# Create loomis-course-app/.env.example (correct location for Next.js)
+cat >> loomis-course-app/.env.example << 'EOF'
+# Feature toggle for promoted browser components
+# NOTE: This is a BUILD-TIME toggle. Changing requires rebuild/redeploy.
+NEXT_PUBLIC_ENABLE_NEW_BROWSER=false
+
+# Gemini API key for AI features (server-side only, never exposed to client)
+GEMINI_API_KEY=
+EOF
 ```
 
 For production deployment, set this variable in your hosting platform (Vercel, etc.) to control the rollout.
@@ -93,13 +99,16 @@ export default function BrowserPage() {
 
 **Rollout Strategy:**
 
-| Stage | `NEXT_PUBLIC_ENABLE_NEW_BROWSER` | Purpose |
-|-------|----------------------------------|---------|
-| Local dev | `true` | Test new components |
-| Staging | `true` | Validate before prod |
+> [!WARNING]
+> **Build-Time Toggle:** `NEXT_PUBLIC_ENABLE_NEW_BROWSER` is inlined at build time. Changing the value **requires a rebuild and redeploy** to take effect. This is NOT a runtime toggle.
+
+| Stage | `NEXT_PUBLIC_ENABLE_NEW_BROWSER` | Action Required |
+|-------|----------------------------------|----------------|
+| Local dev | `true` | `npm run dev` |
+| Staging | `true` | Rebuild + deploy |
 | Production (initial) | `false` | Safe default |
-| Production (rollout) | `true` | Flip when validated (requires redeploy) |
-| Production (rollback) | `false` | Revert if issues (requires redeploy) |
+| Production (rollout) | `true` | Rebuild + redeploy |
+| Production (rollback) | `false` | Rebuild + redeploy |
 
 **Step 2: Verify production route**
 
@@ -161,6 +170,31 @@ npm run dev
 git add loomis-course-app/src/app/sandbox/experiments.ts
 git commit -m "docs: mark experiments as promoted"
 ```
+
+---
+
+## Storage Compatibility Checklist
+
+**Goal:** Ensure promoted components preserve existing user data and don't break returning users.
+
+> [!IMPORTANT]
+> **Before promoting to production,** verify these storage keys are handled correctly by the new components.
+
+| Storage Key | Type | Purpose | Must Preserve? |
+|-------------|------|---------|---------------|
+| `plannerV2` | localStorage | User's course grid data | ✅ Required |
+| `plan` | localStorage | Legacy selected courses (read by `/browser`) | ✅ Required |
+| `catalogPrefs` | localStorage + cookie | User preferences | ✅ Required |
+| `onboardingIntroSeen` | cookie | Skip onboarding for returning users | ✅ Required |
+| `theme` | localStorage | User's theme preference | ✅ Required |
+
+**Verification Steps:**
+
+1. Load production with existing user data in localStorage
+2. Navigate to `/browser` with new components enabled
+3. Verify "My List" shows existing saved courses
+4. Add/remove courses, refresh, verify persistence
+5. Toggle theme, verify it persists across pages
 
 ---
 
@@ -266,3 +300,6 @@ If promoted components cause issues in production:
    - `/sandbox/browser/my-list-sidebar`
 
 4. Investigate and fix issues in sandbox before re-promoting.
+
+> [!TIP]
+> **Keep legacy code path intact** until confidence is high. The feature toggle allows instant rollback via rebuild without code changes.

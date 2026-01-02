@@ -7,10 +7,9 @@
 
 > [!TIP]
 > **Path Convention (applies to all phases):**
-> - **Phases 0, 2, 3, 5** use `loomis-course-app/` as working directory (app-focused tasks)
-> - **Phases 1, 4** use **Repo Root** as working directory (cross-project tasks involving `design_ideas/`)
-> - Commands prefixed with `cd loomis-course-app &&` are for npm/build operations
-> - File paths in these docs are relative to the declared working directory unless they start with `/` or `loomis-course-app/`
+> - **All phases** use **Repo Root** as working directory for consistency
+> - Commands use `cd loomis-course-app && ...` for Next.js/npm operations
+> - File paths are relative to repo root unless they start with `/`
 
 **Goal:** Lock down behavior and visuals in the Next.js app before any styling framework changes, so regressions can be detected.
 
@@ -22,8 +21,8 @@
 
 ## Prerequisites
 
-- Working directory: `loomis-course-app/` (unless otherwise specified)
-- Dev server runs on port `3001` (`npm run dev` → `next dev -p 3001`)
+- Working directory: **Repo Root**
+- Dev server runs on port `3001` (`cd loomis-course-app && npm run dev` → `next dev -p 3001`)
 - Existing tests may already exist in `loomis-course-app/tests/`
 - Existing baselines may exist in `debug&cleanup/incompatibility/visual-baseline/next/`
 
@@ -302,8 +301,10 @@ If baselines already exist with this structure, proceed to verification.
    - Save to `debug&cleanup/incompatibility/visual-baseline/next/clean/{route-name}-1440x900.png`
 
 4. **Populated state captures:**
-   - In regular window, set localStorage (schema matches `src/types/course.ts`):
+   - In regular window, set localStorage (schema matches `loomis-course-app/src/types/course.ts` — see `PlannerV2State` and `PlanItem` types):
      ```javascript
+     // Schema: PlannerV2State from src/types/course.ts
+     // Note: PlanItem requires only { title: string } at minimum
      const SLOTS = [null, null, null, null, null, null];
      localStorage.setItem('plannerV2', JSON.stringify({
        version: 2,
@@ -315,10 +316,17 @@ If baselines already exist with this structure, proceed to verification.
          Senior: SLOTS
        }
      }));
+     // Also set 'plan' key (legacy format still read by /browser page)
+     localStorage.setItem('plan', JSON.stringify([{ title: 'CS101' }, { title: 'MATH201' }]));
      localStorage.setItem('catalogPrefs', JSON.stringify({ completed: true }));
      ```
    - Set cookie: `document.cookie = "onboardingIntroSeen=true; path=/"`
    - Capture screenshots to `debug&cleanup/incompatibility/visual-baseline/next/populated/`
+
+> [!NOTE]
+> **Baseline Capture Script:** An automated capture script exists at `debug&cleanup/incompatibility/visual-baseline/next/capture-script.js`. Currently it captures **clean state only**. For populated state, either:
+> - (Preferred) Enhance the script to support `--populated` flag with localStorage seeding, or
+> - (Fallback) Use manual capture as described above until script is upgraded
 
 **Step 4: Verify screenshot count**
 
@@ -334,6 +342,23 @@ Expected: At least 7 files in `clean/` and `populated/` each (one per route)
 git add "debug&cleanup/incompatibility/visual-baseline/"
 git commit -m "docs: capture baseline screenshots from Next.js app"
 ```
+
+---
+
+## Behavioral Invariants Smoke Checklist
+
+**Goal:** Even if E2E automation (Task 5) is skipped, manually verify these critical behaviors still work correctly.
+
+| Invariant | How to Verify | Expected Behavior |
+|-----------|---------------|-------------------|
+| Onboarding redirect | Clear cookies/storage, visit `/` | Redirects to `/onboarding` |
+| `plan` persistence | Add courses on `/browser`, refresh | "My List" preserves added courses |
+| `plannerV2` load/migrate | Open `/planner` with seeded `plannerV2` data | Grid shows seeded courses |
+| Theme toggle readability | Toggle theme (light/dark/system) | All text remains readable, no invisible elements |
+| Print mode | Open `/planner`, print preview (Cmd+P) | Layout is print-friendly, no cut-off content |
+
+> [!TIP]
+> Run this checklist once before any Phase 2+ changes. If any fail, fix before proceeding.
 
 ---
 

@@ -20,8 +20,8 @@
 ## Prerequisites
 
 - Phase 1 complete (inventories + sandbox stubs created)
-- Working directory: `loomis-course-app/` (unless otherwise specified)
-- Dev server runs on port `3001` (`npm run dev`)
+- Working directory: **Repo Root**
+- Dev server runs on port `3001` (`cd loomis-course-app && npm run dev`)
 - Tailwind is already in the app via PostCSS, currently used only in sandbox
 
 ---
@@ -37,7 +37,20 @@
    - Sandbox currently redefines some of these in `src/app/sandbox/sandbox.css`. This plan removes or scopes that so global tokens remain the source of truth.
 
 3. **Dark mode selector (recommended: follow `data-theme`)**
-   - The app toggles theme via `data-theme` (`src/app/ThemeToggle.tsx`), not a `.dark` class.
+   - The app toggles theme via `data-theme` (`loomis-course-app/src/app/ThemeToggle.tsx`), not a `.dark` class.
+
+> [!WARNING]
+> **Current Repo State Conflict:** `loomis-course-app/src/app/sandbox/sandbox.css` currently defines:
+> - `:root { --background: ... }` (same tokens as `globals.css`)
+> - `@custom-variant dark (&:is(.dark *));` (uses `.dark` class, NOT `data-theme`)
+>
+> This conflicts with the app's `data-theme` approach in `ThemeToggle.tsx`. Phase 2 must resolve this before Tailwind is made global.
+
+> [!IMPORTANT]
+> **Chosen Policy: Tailwind `dark:` is Explicit-Only**
+> - Tailwind dark utilities activate ONLY when `data-theme="dark"` is set explicitly
+> - System preference mode (`prefers-color-scheme: dark`) will NOT trigger Tailwind `dark:` utilities
+> - This prevents unexpected styling changes when users have system dark mode enabled
 
 ---
 
@@ -180,10 +193,19 @@ Keep sandbox-only CSS like `.sandbox-toolbar { ... }`.
 > **Default to scoping (Option B) to preserve fidelity.** Only delete tokens (Option A) after explicitly verifying they match `globals.css`.
 
 **Option B (recommended default): scope tokens to sandbox only**
-  - Wrap sandbox routes in a container (e.g. `<div className="sandbox-scope">`) in `src/app/sandbox/layout.tsx`.
+  - Wrap sandbox routes in a container (e.g. `<div className="sandbox-scope">`) in `loomis-course-app/src/app/sandbox/layout.tsx`.
   - Change `:root { --background: ... }` → `.sandbox-scope { --background: ... }`
   - Change `.dark { ... }` → `[data-theme="dark"] .sandbox-scope { ... }`
   - This prevents sandbox tokens from overwriting app tokens at the root level while preserving the design idea's visual appearance.
+
+> [!TIP]
+> **Sandbox Layout Wrapper Example:**
+> ```tsx
+> // loomis-course-app/src/app/sandbox/layout.tsx
+> export default function SandboxLayout({ children }: { children: React.ReactNode }) {
+>   return <div className="sandbox-scope">{children}</div>;
+> }
+> ```
 
 **Option A (only after verification): delete the shadcn-like token blocks**
   - First, compare sandbox tokens against `globals.css` to confirm they match exactly.

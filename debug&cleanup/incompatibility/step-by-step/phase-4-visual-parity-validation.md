@@ -5,9 +5,13 @@
 > [!NOTE]
 > **Code Snippets Disclaimer:** Snippets illustrate intent; implement production-quality changes as needed.
 
-**Goal:** Verify sandbox implementations visually match original design ideas before promoting to production.
+**Goal:** Verify sandbox implementations visually match original design ideas before promoting to production. Also verify production routes have no regressions from Phase 0 baselines.
 
-**Architecture:** Manual screenshot comparison is the primary workflow. Each design idea is compared side-by-side at desktop resolution (1440×900) in both clean and populated states. Automated Playwright/pixelmatch comparison is optional and requires network approval.
+**Architecture:** Manual screenshot comparison is the primary workflow. Two types of comparisons:
+1. **Parity:** Sandbox vs original prototypes (are new components faithful?)
+2. **Regression:** Production routes vs Phase 0 baselines (did Tailwind changes break anything?)
+
+Capture at desktop resolution (1440×900) in both clean and populated states. Automated Playwright/pixelmatch comparison is optional.
 
 **Tech Stack:** Browser DevTools (screenshots), image viewer for manual comparison
 
@@ -16,8 +20,8 @@
 ## Prerequisites
 
 - Phase 3 complete (sandbox components ported and rendering)
-- Working directory: Repo root (unless otherwise specified)
-- Dev server runs on port `3001` (`npm run dev` in `loomis-course-app/`)
+- Working directory: **Repo Root**
+- Dev server runs on port `3001` (`cd loomis-course-app && npm run dev`)
 - Sandbox routes accessible:
   - `/sandbox/browser/current`
   - `/sandbox/browser/my-list-sidebar`
@@ -256,11 +260,17 @@ git commit -m "docs: complete visual parity comparison"
 
 ---
 
-## Task 5 (Optional): Automated comparison with Playwright
+## Task 5 (Optional): Automated comparison with Puppeteer
 
-> [!WARNING]
-> **Requires network approval.** This task installs npm packages from the network.
-> Skip this task if network access is restricted or if manual comparison is sufficient.
+> [!NOTE]
+> **Prefer existing workflow.** Use the Puppeteer baseline workflow from Phase 0 (`debug&cleanup/incompatibility/visual-baseline/next/capture-script.js`) to maintain consistency. Avoid introducing Playwright unless you intentionally standardize on it for the entire project.
+
+> [!TIP]
+> **Deterministic Capture Guidance:**
+> - Disable CSS animations during capture (add `* { animation: none !important; transition: none !important; }` via page.addStyleTag)
+> - Use consistent viewport (1440×900)
+> - Wait for network idle and fonts to load
+> - Consider adding `--deterministic` flag to capture script
 
 **Goal:** Set up automated pixel-level comparison for ongoing visual regression testing.
 
@@ -407,7 +417,7 @@ These require fixes in Phase 3:
 - [ ] Manual comparison completed for each design idea
 - [ ] README checklist updated with findings
 - [ ] No blocking visual differences (or documented as acceptable)
-- [ ] **Regression check:** Existing production routes (`/browser`, `/planner`) still match Phase 0 baselines (no regressions from Tailwind/styling changes)
+- [ ] **Regression check:** Existing production routes (`/browser`, `/planner`, `/onboarding`) still match Phase 0 baselines (no regressions from Tailwind/styling changes)
 
 ---
 

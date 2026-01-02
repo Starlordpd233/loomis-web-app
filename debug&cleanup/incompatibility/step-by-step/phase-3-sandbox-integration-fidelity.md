@@ -17,12 +17,15 @@
 ## Prerequisites
 
 - Phase 2 complete (Tailwind global and stable)
-- Working directory: `loomis-course-app/` (unless otherwise specified)
-- Dev server runs on port `3001` (`npm run dev`)
+- Working directory: **Repo Root**
+- Dev server runs on port `3001` (`cd loomis-course-app && npm run dev`)
 - Inventories exist for each design idea (from Phase 1)
 - Design ideas to port:
   - `design_ideas/browser/current` → `src/features/browser/enhanced-explorer`
   - `design_ideas/browser/my_list_sidebar` → `src/features/browser/my-list-sidebar`
+
+> [!NOTE]
+> **Existing Sandbox Experiment:** There is already a placeholder sandbox experiment at `loomis-course-app/src/app/sandbox/browser/current/page.tsx`. This plan treats that as a starting point.
 
 ---
 
@@ -33,7 +36,7 @@
 >
 > 1. **No external font fetches** — Use Proxima Nova (already global in `globals.css`)
 > 2. **No Tailwind CDN** — Use the app's Tailwind v4 build (set up in Phase 2)
-> 3. **Rewrite styled-components** — Convert to Tailwind utilities or CSS Modules (see fallback below for complex cases)
+> 3. **Rewrite styled-components** — Convert to Tailwind utilities or CSS Modules. The escape hatch below exists, but it must be treated as an **absolute last resort**.
 > 4. **Standardize icons** — Use `lucide-react` (already installed in app)
 > 5. **No real secrets** — Use environment variables or mock data for APIs
 > 6. **Use absolute imports (`@/...`)** — All imports must use the `@/` path alias (e.g., `@/components/Button`). This ensures Phase 5 file moves don't break imports.
@@ -42,14 +45,36 @@
 
 ## Fallback: Styled-Components Coexistence (Escape Hatch)
 
-> [!IMPORTANT]
-> **This escape hatch should rarely be used.** The goal is to rewrite styled-components to Tailwind. Only use this fallback for genuinely complex cases where a Tailwind rewrite would take >4 hours of effort. All components using this escape hatch **must** have:
-> 1. A `// TODO: Refactor styled-components to Tailwind` comment at the top of the file
-> 2. A tracking reference (GitHub issue or task ID) in the comment so the tech debt is not forgotten
+> [!WARNING]
+> **ABSOLUTE LAST RESORT — avoid almost always.** Phase 3’s intended outcome is **Tailwind + CSS Modules**, with **zero styled-components**.
 >
-> If you find yourself reaching for this escape hatch frequently, reconsider the porting approach or accept a simpler visual approximation.
+> Only use this escape hatch if it is **ABSOLUTELY necessary** to unblock the migration.
+>
+> **“Absolutely necessary” means:** after a time-boxed rewrite attempt, you cannot achieve acceptable fidelity/functionality using Tailwind + CSS Modules (and a reasonable approximation is not acceptable), and keeping styled-components is the only practical path forward.
+>
+> **Before you adopt this escape hatch, you MUST:**
+> 1. **Attempt the rewrite first (time-boxed)**: spend ~2–4 hours trying Tailwind + CSS Modules.
+> 2. **Try standard alternatives**:
+>    - CSS Modules for complex selectors, keyframes, pseudo-elements
+>    - Conditional `className` composition (`clsx`, `cva`, ternaries)
+>    - `data-*` attributes + CSS Modules for state-driven styling
+>    - Minimal inline styles only for truly dynamic values (e.g., computed widths)
+> 3. **Document why this is unavoidable**: include reason + tracking ID + removal criteria (Step 0 template below).
+>
+> **Exit requirement:** if you use this escape hatch, plan and schedule its removal. Do not let styled-components become the default styling system for features.
 
-If a styled-component is too complex to rewrite quickly (e.g., uses `${props => ...}` extensively for dynamic styling):
+If—and only if—you determine the escape hatch is absolutely necessary (criteria above), proceed with the steps below.
+
+**Step 0: Document the exception (required)**
+
+Add this comment block at the top of any file that uses styled-components:
+
+```ts
+// ESCAPE_HATCH(styled-components): ABSOLUTE_LAST_RESORT
+// Reason: <why Tailwind/CSS Modules could not replicate this component quickly/safely>
+// Tracking: <issue-id-or-task-id>
+// Removal: <criteria/date/phase when this must be rewritten to Tailwind>
+```
 
 **Step 1: Install styled-components registry for Next.js App Router**
 
@@ -92,16 +117,19 @@ export default function StyledComponentsRegistry({
 }
 ```
 
-**Step 3: Wrap sandbox layout with the registry**
+**Step 3: Scope the registry as narrowly as possible (recommended)**
 
 ```typescript
-// loomis-course-app/src/app/sandbox/layout.tsx
+// Prefer wrapping only the experiment route tree that needs styled-components,
+// rather than the entire /sandbox section.
+//
+// Example: loomis-course-app/src/app/sandbox/browser/current/layout.tsx
 import StyledComponentsRegistry from '@/lib/styled-components-registry';
 
-export default function SandboxLayout({ children }) {
+export default function CurrentSandboxLayout({ children }: { children: React.ReactNode }) {
   return (
     <StyledComponentsRegistry>
-      {children}
+      <div className="sandbox-scope">{children}</div>
     </StyledComponentsRegistry>
   );
 }
@@ -109,7 +137,7 @@ export default function SandboxLayout({ children }) {
 
 **Step 4: Mark component for later refactoring**
 
-Add a `// TODO: Refactor styled-components to Tailwind` comment at the top of any component using this fallback.
+Add the explicit escape-hatch comment from **Step 0** at the top of any component using styled-components. A plain TODO is not sufficient—capture **why** it’s necessary and **how/when** it will be removed.
 
 ---
 
@@ -434,6 +462,48 @@ git commit -m "feat: update experiment registry after porting"
 
 ---
 
+## Gemini Integration Architecture
+
+**Goal:** Securely integrate Gemini AI capabilities without exposing secrets on the client.
+
+> [!CAUTION]
+> **Never call Gemini from client components with real API keys.** Client-side code is visible to users and secrets will be exposed.
+
+**Recommended Pattern:**
+
+1. **Create a Next.js Route Handler (server-side)**
+   ```typescript
+   // loomis-course-app/src/app/api/gemini/route.ts
+   import { NextRequest, NextResponse } from 'next/server';
+   
+   export async function POST(request: NextRequest) {
+     // Only this server-side code can access the real API key
+     const apiKey = process.env.GEMINI_API_KEY;
+     if (!apiKey) {
+       return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
+     }
+     
+     const body = await request.json();
+     // Call Gemini API here...
+     return NextResponse.json({ response: '...' });
+   }
+   ```
+
+2. **Call the route handler from client components**
+   ```typescript
+   // In your component
+   const response = await fetch('/api/gemini', {
+     method: 'POST',
+     body: JSON.stringify({ prompt: '...' }),
+   });
+   ```
+
+3. **Standardize env var naming to `GEMINI_API_KEY`** (the prototype uses `API_KEY`)
+
+4. **Mock mode for parity testing:** Add a `MOCK_GEMINI=true` env var to return static responses during visual testing
+
+---
+
 ## Fidelity Checklist
 
 For each ported experiment, verify:
@@ -467,7 +537,8 @@ For each ported experiment, verify:
 - [ ] Click handlers work
 
 ### Technical Quality
-- [ ] No styled-components imports remain (unless using fallback escape hatch)
+- [ ] **Preferred:** No styled-components imports remain
+  - [ ] **If escape hatch was used (absolute last resort):** usage is narrowly scoped, includes the `ESCAPE_HATCH(styled-components)` comment + tracking reference, and has an explicit removal plan (do not allow it to become permanent)
 - [ ] All icons use lucide-react
 - [ ] No external font fetches
 - [ ] No Tailwind CDN usage
@@ -496,7 +567,7 @@ For **current** (enhanced explorer):
 // loomis-course-app/tests/sandbox/my-list-sidebar.test.tsx
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import MyListSidebar from '@/features/browser/my-list-sidebar';
+import { MyListSidebar } from '@/features/browser/my-list-sidebar';
 
 describe('MyListSidebar', () => {
   it('adds item to list when add button clicked', () => {
@@ -536,7 +607,8 @@ npm run test:run -- tests/sandbox/
 **Verification:**
 - [ ] `my_list_sidebar` is ported and renders
 - [ ] `current` is ported and renders
-- [ ] styled-components fully rewritten to Tailwind
+- [ ] **Preferred:** styled-components fully rewritten to Tailwind (escape hatch avoided)
+  - [ ] **If escape hatch was used (absolute last resort):** scoped narrowly + tracked + scheduled for removal before Phase 5 promotion
 - [ ] Build passes
 - [ ] No console errors
 
