@@ -62,6 +62,11 @@ EOF
 
 For production deployment, set this variable in your hosting platform (Vercel, etc.) to control the rollout.
 
+> [!IMPORTANT]
+> **Gemini security invariant:** `GEMINI_API_KEY` must remain server-only.
+> - Never introduce `NEXT_PUBLIC_GEMINI_API_KEY`
+> - Ensure any Gemini calls happen via a Route Handler (e.g., `loomis-course-app/src/app/api/gemini/route.ts`) or are mocked
+
 **Step 1: Add rollout toggle using environment variable**
 
 ```typescript
@@ -118,6 +123,12 @@ npm run dev
 # Visit http://localhost:3001/browser
 ```
 
+**Step 2.5 (Required if Enhanced Explorer uses Gemini): Verify the server boundary**
+
+- Confirm the client only calls `POST /api/gemini` (no direct SDK calls from client, no inlined keys)
+- Confirm `process.env.GEMINI_API_KEY` is only referenced in server code (Route Handler)
+- In dev/staging, prefer a `MOCK_GEMINI=true` mode for visual parity testing unless you intentionally want live responses
+
 **Step 3: Commit integration**
 
 ```bash
@@ -155,6 +166,8 @@ git commit -m "feat: wire up enhanced explorer and sidebar in production"
   promotedTo: '/browser',
 },
 ```
+
+If you also ported `sandbox-landing-page`, keep it sandbox-only by default (do not mark it as “promoted” unless you intentionally replaced `/sandbox`).
 
 **Step 2: Verify sandbox index still works**
 
@@ -248,6 +261,8 @@ git commit -m "fix: address issues found during promotion verification"
 - [ ] Enhanced Explorer moved to `src/features/` and sandbox imports from it
 - [ ] My List Sidebar moved to `src/features/` and sandbox imports from it
 - [ ] **No duplicate code** between sandbox and production (sandbox wraps production)
+- [ ] No client-side Gemini secret exposure (Route Handler only; no `NEXT_PUBLIC_GEMINI_*`)
+- [ ] Build-time toggle behavior understood (rebuild required for rollout/rollback)
 - [ ] Build passes without errors
 - [ ] Production browser page renders correctly
 - [ ] Sandbox routes still work (importing from features)
@@ -277,6 +292,16 @@ git commit -m "fix: address issues found during promotion verification"
 - [ ] No console errors
 
 **Migration Complete:** After Phase 5, the design ideas have been successfully ported from Vite prototypes to Next.js production components.
+
+---
+
+## Post-Promotion Cleanup (Optional, Recommended)
+
+**Goal:** Remove migration scaffolding once confidence is high.
+
+- Archive or clearly label sandbox experiments that are now promoted (keep `/sandbox` routes if they’re useful for future prototyping).
+- If you used the styled-components escape hatch, schedule and complete its removal before you consider the migration “done”.
+- Document a follow-up for a true runtime feature flag (cookie/server-based) if rebuild-only toggles are operationally painful.
 
 ---
 

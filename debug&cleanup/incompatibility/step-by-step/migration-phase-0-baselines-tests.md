@@ -83,13 +83,22 @@ Expected: Scripts like `"test": "vitest"` and `"test:run": "vitest run"`
 ls -la vitest.config.ts
 ```
 
+**Step 2.5 (Recommended): Ensure coverage includes `src/features/`**
+
+> [!NOTE]
+> Coverage is optional (`--coverage`), but once Phase 3 adds `src/features/` code, you want coverage to include it.
+
+In `loomis-course-app/vitest.config.ts`, ensure `test.coverage.include` includes:
+- `src/lib/**/*.{ts,tsx}`
+- `src/features/**/*.{ts,tsx}`
+
 **Step 3: If missing, install Vitest (requires network approval)**
 
 > **Requires network approval:** The following npm install requires network access.
 
 ```bash
 cd loomis-course-app
-npm install -D vitest @vitest/ui @testing-library/react @testing-library/jest-dom jsdom
+npm install -D vitest @vitest/ui @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom
 ```
 
 Then create `vitest.config.ts` and add test scripts to `package.json`.
@@ -283,6 +292,16 @@ If baselines already exist with this structure, proceed to verification.
 **Step 3: If baselines are missing or incomplete, capture them**
 
 **Manual capture method (no network required):**
+
+> [!IMPORTANT]
+> **Capture order matters (avoid polluted baselines):**
+> - The `/sandbox` route currently imports `src/app/sandbox/sandbox.css`, which (today) contains global selectors like `:root` and `.dark`.
+> - In Next.js App Router, CSS loaded for one route segment can remain in the client during navigation.
+>
+> To avoid accidentally capturing production routes with sandbox tokens applied:
+> - Capture production routes (`/`, `/login`, `/onboarding`, `/browser`, `/planner`) **before** visiting `/sandbox`, or
+> - Use a fresh Incognito window for production routes and a separate Incognito window for `/sandbox`, or
+> - Capture `/sandbox` **last**.
 
 1. Start Next.js dev server:
    ```bash

@@ -17,7 +17,7 @@
 
 - Phase 0 complete (baselines + tests in place)
 - Working directory: **Repo Root**
-- Dev server can be started and is reachable at `http://localhost:3001` (needed for Task 4 stub verification):
+- Dev server can be started and is reachable at `http://localhost:3001` (needed for Task 5 stub verification):
   ```bash
   cd loomis-course-app && npm run dev
   ```
@@ -37,6 +37,7 @@
 > 2. **External fonts** (e.g., Google Fonts for Inter) — Use app's Proxima Nova instead
 > 3. **Importmaps** — Not supported in Next.js; convert to npm dependencies
 > 4. **Client-side secrets** (e.g., `GEMINI_API_KEY`) — Do NOT commit real secrets
+> 5. **Vite env injection (DO NOT PORT)** — Many exports inline keys via `vite.config.ts` (e.g. `process.env.API_KEY`). In Next.js, secrets must stay server-side (Route Handler) or be mocked.
 
 When porting to sandbox, these patterns must be replaced with production-safe alternatives.
 
@@ -220,7 +221,71 @@ git commit -m "docs: inventory design_ideas/browser/my_list_sidebar"
 
 ---
 
-## Task 3: Use asset standardization script (if needed)
+## Task 3: Inventory design_ideas/sandbox/sandbox-landing-page
+
+**Goal:** Decide what to do with the sandbox landing-page prototype and prevent it from silently falling out of scope.
+
+> [!IMPORTANT]
+> The Next.js app already has a real sandbox index at `loomis-course-app/src/app/sandbox/page.tsx`. Treat this design idea as:
+> - **Option A (recommended default):** an *optional* sandbox UX experiment (it never gets “promoted” to production), or
+> - **Option B:** a replacement for the sandbox index UI (only if you explicitly want that).
+
+**Files:**
+- Read: `design_ideas/sandbox/sandbox-landing-page/`
+- Create: `debug&cleanup/incompatibility/inventory-sandbox-landing-page.md`
+
+**Step 1: Inspect structure + dependencies**
+
+```bash
+ls -la design_ideas/sandbox/sandbox-landing-page/
+cat design_ideas/sandbox/sandbox-landing-page/package.json
+```
+
+**Step 2: Flag any secret exposure patterns**
+
+```bash
+rg -n "process\\.env\\.(API_KEY|GEMINI_API_KEY)|GEMINI_API_KEY|API_KEY" -S design_ideas/sandbox/sandbox-landing-page | head -n 50
+```
+
+If you see Vite env injection (`vite.config.ts`), document it as **DO NOT PORT** as-is.
+
+**Step 3: Create the inventory document**
+
+```bash
+cat > "debug&cleanup/incompatibility/inventory-sandbox-landing-page.md" << 'EOF'
+# Design Idea Inventory: sandbox/sandbox-landing-page
+
+## Overview
+- **Location:** `design_ideas/sandbox/sandbox-landing-page/`
+- **Type:** Vite app (AI Studio export)
+- **Intended destination in Next.js:** [OPTION A: separate sandbox experiment route | OPTION B: replace `/sandbox` index]
+
+## Security / Secrets (critical)
+- [ ] **DO NOT PORT** any `vite.config.ts` replacements like `process.env.API_KEY` into client bundles.
+- [ ] If Gemini is needed, use a server Route Handler (`/api/gemini`) or mock responses.
+
+## Dependencies / Assets
+- [List any local assets that need copying into `loomis-course-app/public/`]
+
+## Porting Decision
+- [ ] Option A (recommended): implement at `/sandbox/landing` (dev-only experiment)
+- [ ] Option B: refactor `src/app/sandbox/page.tsx` to match this design (intentional replacement)
+
+## Notes
+- This is a sandbox UX improvement only; it should **not** be part of Phase 5 production promotion unless you explicitly decide otherwise.
+EOF
+```
+
+**Step 4: Commit inventory**
+
+```bash
+git add "debug&cleanup/incompatibility/inventory-sandbox-landing-page.md"
+git commit -m "docs: inventory design_ideas/sandbox/sandbox-landing-page"
+```
+
+---
+
+## Task 4: Use asset standardization script (if needed)
 
 **Goal:** If design ideas have local assets (images, icons) that need to be copied to Next.js public folder, use the existing standardization script.
 
@@ -266,19 +331,21 @@ git commit -m "feat: copy design idea assets to public directory"
 
 ---
 
-## Task 4: Create sandbox entry points (stubs)
+## Task 5: Create sandbox entry points (stubs)
 
 **Goal:** Create placeholder sandbox routes so the porting process has a target location.
 
 **Files:**
 - Create: `loomis-course-app/src/app/sandbox/browser/current/page.tsx`
 - Create: `loomis-course-app/src/app/sandbox/browser/my-list-sidebar/page.tsx`
+- (Optional) Create: `loomis-course-app/src/app/sandbox/landing/page.tsx` (if you chose Option A in Task 3)
 
 **Step 1: Create directory structure**
 
 ```bash
 mkdir -p loomis-course-app/src/app/sandbox/browser/current
 mkdir -p loomis-course-app/src/app/sandbox/browser/my-list-sidebar
+mkdir -p loomis-course-app/src/app/sandbox/landing
 ```
 
 **Step 2: Create stub for current**
@@ -323,6 +390,29 @@ export default function MyListSidebarSandboxPage() {
 }
 ```
 
+**Step 3.5 (Optional): Create stub for sandbox landing page**
+
+If you chose **Option A** (separate experiment route), create a stub at `/sandbox/landing`:
+
+```typescript
+// loomis-course-app/src/app/sandbox/landing/page.tsx
+'use client';
+
+export default function SandboxLandingStubPage() {
+  return (
+    <div className="min-h-screen p-8">
+      <h1 className="text-2xl font-bold mb-4">Sandbox Landing Page (Stub)</h1>
+      <div className="p-4 border border-gray-300 rounded-lg">
+        <p className="text-gray-600">Placeholder for design_ideas/sandbox/sandbox-landing-page</p>
+        <p className="text-sm text-gray-500 mt-2">
+          Porting status: Not started. See inventory-sandbox-landing-page.md for decision + strategy.
+        </p>
+      </div>
+    </div>
+  );
+}
+```
+
 **Step 4: Verify routes work**
 
 ```bash
@@ -330,18 +420,21 @@ cd loomis-course-app
 npm run dev
 # Visit http://localhost:3001/sandbox/browser/current
 # Visit http://localhost:3001/sandbox/browser/my-list-sidebar
+# Visit http://localhost:3001/sandbox/landing (if created)
 ```
 
 **Step 5: Commit stubs**
 
 ```bash
 git add loomis-course-app/src/app/sandbox/browser/
+# If created:
+git add loomis-course-app/src/app/sandbox/landing/
 git commit -m "feat: create sandbox entry stubs for design ideas"
 ```
 
 ---
 
-## Task 5: Update experiments registry
+## Task 6: Update experiments registry
 
 **Goal:** Register the new sandbox experiments in the registry.
 
@@ -362,7 +455,7 @@ head -50 loomis-course-app/src/app/sandbox/experiments.ts
 Add entries for:
 - `Enhanced Explorer` at `/sandbox/browser/current` (already exists, verify)
 - `My List Sidebar` at `/sandbox/browser/my-list-sidebar`
-- `Sandbox Landing Page` at `/sandbox/landing` (if porting this prototype)
+- `Sandbox Landing Page` at `/sandbox/landing` (if you chose Option A in Task 3)
 
 **Step 3: Verify build passes**
 
@@ -383,9 +476,11 @@ git commit -m "feat: register design idea experiments in sandbox"
 
 - [ ] Inventory document exists for `browser/current`
 - [ ] Inventory document exists for `browser/my_list_sidebar`
+- [ ] Inventory document exists for `sandbox/sandbox-landing-page` (decision recorded)
 - [ ] Each inventory lists: external dependencies, npm dependencies, local assets, porting complexity
 - [ ] Asset script exists (if local assets need copying)
 - [ ] Sandbox stub routes render at `/sandbox/browser/current` and `/sandbox/browser/my-list-sidebar`
+- [ ] `/sandbox/landing` stub renders (if you chose Option A)
 - [ ] `npm run build` passes in `loomis-course-app`
 
 ---
@@ -397,6 +492,7 @@ git commit -m "feat: register design idea experiments in sandbox"
 **Verification:**
 - [ ] `debug&cleanup/incompatibility/inventory-current.md` exists with porting strategy
 - [ ] `debug&cleanup/incompatibility/inventory-my-list-sidebar.md` exists with porting strategy
+- [ ] `debug&cleanup/incompatibility/inventory-sandbox-landing-page.md` exists with decision + strategy
 - [ ] Sandbox stubs render correctly
 - [ ] Build passes
 
@@ -412,6 +508,7 @@ If anything breaks during Phase 1:
    ```bash
    rm -rf loomis-course-app/src/app/sandbox/browser/current
    rm -rf loomis-course-app/src/app/sandbox/browser/my-list-sidebar
+   rm -rf loomis-course-app/src/app/sandbox/landing
    ```
 
 2. Inventory documents are safe to delete (they're just documentation).

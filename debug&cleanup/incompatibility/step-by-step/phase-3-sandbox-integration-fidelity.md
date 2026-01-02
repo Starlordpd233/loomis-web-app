@@ -23,6 +23,7 @@
 - Design ideas to port:
   - `design_ideas/browser/current` → `src/features/browser/enhanced-explorer`
   - `design_ideas/browser/my_list_sidebar` → `src/features/browser/my-list-sidebar`
+  - (Optional) `design_ideas/sandbox/sandbox-landing-page` → `/sandbox/landing` (sandbox UX only; no production promotion by default)
 
 > [!NOTE]
 > **Existing Sandbox Experiment:** There is already a placeholder sandbox experiment at `loomis-course-app/src/app/sandbox/browser/current/page.tsx`. This plan treats that as a starting point.
@@ -38,8 +39,21 @@
 > 2. **No Tailwind CDN** — Use the app's Tailwind v4 build (set up in Phase 2)
 > 3. **Rewrite styled-components** — Convert to Tailwind utilities or CSS Modules. The escape hatch below exists, but it must be treated as an **absolute last resort**.
 > 4. **Standardize icons** — Use `lucide-react` (already installed in app)
-> 5. **No real secrets** — Use environment variables or mock data for APIs
+> 5. **No client-side secrets (Gemini is server-only)** — **DO NOT PORT** `design_ideas/browser/current/services/geminiService.ts` or any Vite env injection (`process.env.API_KEY`). Use a Next.js Route Handler (`/api/gemini`) or mock responses.
 > 6. **Use absolute imports (`@/...`)** — All imports must use the `@/` path alias (e.g., `@/components/Button`). This ensures Phase 5 file moves don't break imports.
+> 7. **Storage safety** — Sandbox experiments must not corrupt production localStorage. Default to isolated/prefixed keys for sandbox, and only touch production keys during explicit Phase 5 compatibility work.
+
+---
+
+## Storage Safety (Required Guardrail)
+
+**Default policy:** sandbox experiments must not write to production keys like `plan`, `plannerV2`, `catalogPrefs`, or `onboardingIntroSeen`.
+
+Recommended approaches (pick one and document it in the PR):
+1. **Prefixed keys:** use a `sandbox:<experimentId>:...` prefix for any localStorage usage in sandbox-only code.
+2. **Separate browser profile:** use a dedicated Chrome profile (or Incognito) for sandbox work so production data is never at risk.
+
+Only touch production keys during **Phase 5 Storage Compatibility** verification.
 
 ---
 
@@ -62,6 +76,12 @@
 > 3. **Document why this is unavoidable**: include reason + tracking ID + removal criteria (Step 0 template below).
 >
 > **Exit requirement:** if you use this escape hatch, plan and schedule its removal. Do not let styled-components become the default styling system for features.
+
+> [!CAUTION]
+> **Hydration/streaming risk (React 19 + Next.js App Router):** styled-components SSR integration is easy to get subtly wrong. If you use this escape hatch:
+> - Validate in a production build (`npm run build` + `next start`), not just `npm run dev`
+> - Scope the registry to the smallest route subtree possible
+> - Treat any hydration mismatch warnings as a stop-the-line issue
 
 If—and only if—you determine the escape hatch is absolutely necessary (criteria above), proceed with the steps below.
 
@@ -213,6 +233,7 @@ Based on complexity (from Phase 1 inventories):
 
 1. **`my_list_sidebar`** (simpler: mostly Tailwind + lucide icons)
 2. **`current`** (harder: styled-components + Gemini API integration)
+3. **`sandbox-landing-page`** (optional: sandbox UX only; do not promote unless intentionally replacing `/sandbox`)
 
 ---
 
@@ -260,6 +281,7 @@ cd loomis-course-app
 npm run dev
 # Visit http://localhost:3001/sandbox/browser/current
 # Visit http://localhost:3001/sandbox/browser/my-list-sidebar
+# Visit http://localhost:3001/sandbox/landing (if created in Phase 1)
 ```
 
 ---
@@ -297,7 +319,7 @@ Create the feature component logic here immediately (do not build in sandbox fol
 import { useState } from 'react';
 // Import sub-components from ./components/
 
-export function MyListSidebar() {
+export function MyListSidebar(): JSX.Element {
   // Port state and logic
   // Rewrite styled-components to Tailwind
   // Use lucide-react icons
@@ -324,7 +346,7 @@ Imports the feature component.
 // loomis-course-app/src/app/sandbox/browser/my-list-sidebar/page.tsx
 import { MyListSidebar } from '@/features/browser/my-list-sidebar';
 
-export default function MyListSidebarPage() {
+export default function MyListSidebarPage(): JSX.Element {
   return <MyListSidebar />;
 }
 ```
@@ -368,6 +390,13 @@ Create components in `src/features/browser/enhanced-explorer/`.
 - Rewrite styled-components to Tailwind.
 - Use `lucide-react`.
 
+**Step 2.5 (Required): Establish Gemini server boundary (or mock)**
+
+Before wiring any “AI advice” UI:
+- Do **not** port `design_ideas/browser/current/services/geminiService.ts`
+- Implement `/api/gemini` as a server Route Handler (or run in `MOCK_GEMINI=true` mode during parity work)
+- Ensure the client only calls `/api/gemini` (never reads `GEMINI_API_KEY` directly)
+
 Example structure:
 - `EnhancedExplorer.tsx` (Main export)
 - `components/SearchBar.tsx`
@@ -386,7 +415,7 @@ export { EnhancedExplorer } from './EnhancedExplorer';
 // loomis-course-app/src/app/sandbox/browser/current/page.tsx
 import { EnhancedExplorer } from '@/features/browser/enhanced-explorer';
 
-export default function EnhancedExplorerPage() {
+export default function EnhancedExplorerPage(): JSX.Element {
   return <EnhancedExplorer />;
 }
 ```
@@ -443,6 +472,8 @@ Update status from `'stub'` to `'wip'` or `'complete'`:
 },
 ```
 
+If you implemented `/sandbox/landing` (Task 6), register it here as a sandbox UX experiment (and keep it out of Phase 5 promotion by default).
+
 **Step 3: Verify sandbox index**
 
 ```bash
@@ -462,12 +493,36 @@ git commit -m "feat: update experiment registry after porting"
 
 ---
 
+## Task 6 (Optional): Port sandbox/sandbox-landing-page
+
+**Goal:** Port the sandbox landing-page prototype if you chose to include it in Phase 1 Task 3.
+
+> [!IMPORTANT]
+> This is sandbox UX only. It should not be part of Phase 5 “production promotion” unless you explicitly decide to replace the sandbox index UI.
+
+**Option A (recommended default): keep it as a sandbox experiment route**
+- Implement at: `loomis-course-app/src/app/sandbox/landing/page.tsx`
+- Treat it like any other sandbox experiment (promotion rules do not apply)
+
+**Option B: replace the sandbox index UI**
+- Refactor: `loomis-course-app/src/app/sandbox/page.tsx` to match the design idea
+- Keep the experiments registry behavior intact (categories + links)
+
+> [!WARNING]
+> If the prototype references Gemini:
+> - Do not inline keys (no `process.env.API_KEY` on client)
+> - Use the “Gemini Integration Architecture” pattern below or mock mode
+
+---
+
 ## Gemini Integration Architecture
 
 **Goal:** Securely integrate Gemini AI capabilities without exposing secrets on the client.
 
 > [!CAUTION]
 > **Never call Gemini from client components with real API keys.** Client-side code is visible to users and secrets will be exposed.
+>
+> **Explicit ban:** Do **not** port `design_ideas/browser/current/services/geminiService.ts` into Next.js client code. It assumes Vite-style env injection and will expose secrets.
 
 **Recommended Pattern:**
 
@@ -565,16 +620,20 @@ For **current** (enhanced explorer):
 
 ```typescript
 // loomis-course-app/tests/sandbox/my-list-sidebar.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect } from 'vitest';
 import { MyListSidebar } from '@/features/browser/my-list-sidebar';
 
 describe('MyListSidebar', () => {
-  it('adds item to list when add button clicked', () => {
+  it('adds item to list when add button clicked', async () => {
     render(<MyListSidebar />);
+    const user = userEvent.setup();
     const addButton = screen.getByRole('button', { name: /add/i });
-    fireEvent.click(addButton);
-    expect(screen.getByText(/item added/i)).toBeInTheDocument();
+    await user.click(addButton);
+    await waitFor(() => {
+      expect(screen.getByText(/item added/i)).toBeInTheDocument();
+    });
   });
 });
 ```
@@ -593,6 +652,7 @@ npm run test:run -- tests/sandbox/
 - [ ] `npm run build` succeeds in `loomis-course-app`
 - [ ] `/sandbox/browser/my-list-sidebar` renders ported component
 - [ ] `/sandbox/browser/current` renders ported component
+- [ ] `/sandbox/landing` renders (if you chose to port sandbox-landing-page)
 - [ ] No styled-components runtime errors
 - [ ] No console errors on load
 - [ ] TypeScript compilation passes: `cd loomis-course-app && npx tsc --noEmit`
@@ -607,6 +667,7 @@ npm run test:run -- tests/sandbox/
 **Verification:**
 - [ ] `my_list_sidebar` is ported and renders
 - [ ] `current` is ported and renders
+- [ ] `sandbox-landing-page` is ported (optional; only if chosen in Phase 1)
 - [ ] **Preferred:** styled-components fully rewritten to Tailwind (escape hatch avoided)
   - [ ] **If escape hatch was used (absolute last resort):** scoped narrowly + tracked + scheduled for removal before Phase 5 promotion
 - [ ] Build passes

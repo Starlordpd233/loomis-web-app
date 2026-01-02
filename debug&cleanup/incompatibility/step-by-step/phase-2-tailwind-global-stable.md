@@ -54,6 +54,52 @@
 
 ---
 
+## Task 0 (BLOCKING): Fix sandbox.css token + dark-mode collisions
+
+> [!IMPORTANT]
+> **This must be fixed in the actual codebase before making Tailwind global.**
+>
+> Reason: in Next.js App Router, CSS loaded for one route segment can remain in the client during navigation. If `/sandbox` loads CSS that defines `:root` tokens or `.dark`, those globals can leak into production routes after you click “Back to Main App”.
+
+**Files:**
+- Modify: `loomis-course-app/src/app/sandbox/layout.tsx`
+- Modify: `loomis-course-app/src/app/sandbox/sandbox.css`
+
+**Step 1: Wrap all sandbox routes in a scoping container**
+
+In `loomis-course-app/src/app/sandbox/layout.tsx`, wrap `{children}` in a container:
+
+```tsx
+<div className="sandbox-scope">{children}</div>
+```
+
+**Step 2: Make dark-mode selector match the real theme system**
+
+In `loomis-course-app/src/app/sandbox/sandbox.css`, change:
+- `@custom-variant dark (&:is(.dark *));`
+to:
+- `@custom-variant dark (&:is([data-theme="dark"] *));`
+
+**Step 3: Scope token definitions (no more `:root` / `.dark`)**
+
+In `loomis-course-app/src/app/sandbox/sandbox.css`, change:
+- `:root { ... }` → `.sandbox-scope { ... }`
+- `.dark { ... }` → `[data-theme="dark"] .sandbox-scope { ... }`
+
+**Step 4: Scope any base-layer selectors**
+
+If `sandbox.css` contains `@layer base` rules that target `body` or `*`, rewrite them so they only affect sandbox content:
+- `* { ... }` → `.sandbox-scope * { ... }`
+- `body { ... }` → `.sandbox-scope { ... }`
+
+**Step 5: Verify the leak is gone**
+
+1. Start dev server: `cd loomis-course-app && npm run dev`
+2. Visit `/sandbox` and then click “Main App” (or navigate to `/browser`)
+3. Verify production pages still use `globals.css` tokens (no unexpected background/text changes)
+
+---
+
 ## Task 1: Create a single Tailwind v4 entry file (global utilities, no Preflight)
 
 **Why:** One entry file avoids duplicated Tailwind generation and makes "global Tailwind" a single import.
@@ -160,7 +206,7 @@ content: [
 ],
 ```
 
-**Step 3: Verify**
+**Step 3: Verify no cross-route leakage**
 
 ```bash
 cd loomis-course-app
@@ -190,28 +236,26 @@ Keep sandbox-only CSS like `.sandbox-toolbar { ... }`.
 **Step 2: Resolve sandbox token collisions**
 
 > [!IMPORTANT]
-> **Default to scoping (Option B) to preserve fidelity.** Only delete tokens (Option A) after explicitly verifying they match `globals.css`.
+> After Task 2, `sandbox.css` must be **safe to remain loaded** even if the user navigates away from `/sandbox`. That means: no app-wide token overrides and no global base rules.
 
-**Option B (recommended default): scope tokens to sandbox only**
-  - Wrap sandbox routes in a container (e.g. `<div className="sandbox-scope">`) in `loomis-course-app/src/app/sandbox/layout.tsx`.
-  - Change `:root { --background: ... }` → `.sandbox-scope { --background: ... }`
-  - Change `.dark { ... }` → `[data-theme="dark"] .sandbox-scope { ... }`
-  - This prevents sandbox tokens from overwriting app tokens at the root level while preserving the design idea's visual appearance.
+**Option A (recommended default): delete sandbox token/theme/base blocks entirely**
+  - Remove the `@theme inline { ... }`, `:root { ... }`, `.dark { ... }`, and `@layer base { ... }` blocks from `sandbox.css`.
+  - Keep only sandbox-specific plain CSS (e.g. `.sandbox-toolbar { ... }`).
+  - This is the lowest-risk approach because sandbox stops redefining any app-wide theme semantics.
 
-> [!TIP]
-> **Sandbox Layout Wrapper Example:**
-> ```tsx
-> // loomis-course-app/src/app/sandbox/layout.tsx
-> export default function SandboxLayout({ children }: { children: React.ReactNode }) {
->   return <div className="sandbox-scope">{children}</div>;
-> }
-> ```
+**Option B (only if you truly need sandbox-only tokens): keep CSS variables but scope them**
+  - Keep only the **plain CSS variable blocks**, but scope them:
+    - `:root { ... }` → `.sandbox-scope { ... }`
+    - `.dark { ... }` → `[data-theme="dark"] .sandbox-scope { ... }`
+  - Do **not** keep Tailwind directives in `sandbox.css` after Step 1:
+    - Remove `@theme inline { ... }` and `@layer base { ... }` (or move any needed theme wiring to `src/app/tailwind.css`).
+  - Ensure sandbox layout wraps children: `<div className="sandbox-scope">{children}</div>`
 
-**Option A (only after verification): delete the shadcn-like token blocks**
-  - First, compare sandbox tokens against `globals.css` to confirm they match exactly.
-  - If they match: Remove the `@theme inline { ... }`, `:root { ... }`, `.dark { ... }`, and `@layer base { ... }` blocks from `sandbox.css`.
-  - If they differ: Do NOT delete. Use Option B to scope them.
-  - This makes sandbox styling "just Tailwind utilities + explicit CSS".
+**Step 4: Verify build**
+
+1. Visit `/sandbox`, then navigate to `/browser`
+2. Confirm there is **no** unexpected theme/token change on production routes
+3. Toggle theme via `ThemeToggle` and confirm Tailwind `dark:` utilities respond to `data-theme="dark"`
 
 **Step 3: Verify**
 
@@ -257,6 +301,7 @@ rm -rf loomis-course-app/src/app/test-tailwind
 - [ ] `/sandbox` still renders correctly
 - [ ] Tailwind utilities work (via `/test-tailwind` or in sandbox)
 - [ ] No sandbox token collisions with `globals.css` (either removed or scoped)
+- [ ] Navigating `/sandbox` → `/browser` does not change theme/tokens
 - [ ] No duplicate Tailwind imports in sandbox.css
 
 ---
@@ -292,6 +337,11 @@ If Phase 2 causes visual regressions:
 3. Revert sandbox.css changes:
    ```bash
    git checkout HEAD -- loomis-course-app/src/app/sandbox/sandbox.css
+   ```
+
+4. Revert sandbox layout wrapper (if changed):
+   ```bash
+   git checkout HEAD -- loomis-course-app/src/app/sandbox/layout.tsx
    ```
 
 4. Revert tailwind.config.ts:

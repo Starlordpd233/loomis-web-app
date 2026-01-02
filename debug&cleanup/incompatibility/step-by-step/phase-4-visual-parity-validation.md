@@ -31,6 +31,45 @@ Capture at desktop resolution (1440×900) in both clean and populated states. Au
 
 ---
 
+## Task 0 (Required): Regression check vs Phase 0 baselines
+
+**Goal:** Confirm Phase 2/3 changes did not regress core production routes by comparing against Phase 0 baseline screenshots.
+
+**Files:**
+- Read: `debug&cleanup/incompatibility/visual-baseline/next/`
+- Write: `debug&cleanup/incompatibility/visual-validation/production/` (new captures)
+
+**Step 1: Confirm Phase 0 baselines exist**
+
+```bash
+ls -la "debug&cleanup/incompatibility/visual-baseline/next/clean/" | head
+ls -la "debug&cleanup/incompatibility/visual-baseline/next/populated/" | head
+```
+
+**Step 2: Capture current production route screenshots**
+
+If you haven't run Task 1 yet, create the output folders now:
+
+```bash
+mkdir -p debug\&cleanup/incompatibility/visual-validation/production/{clean,populated}
+```
+
+Using the same rules as Phase 0 (1440×900, clean + populated states), capture:
+- `/`, `/login`, `/onboarding`, `/browser`, `/planner`
+
+Save to:
+- `debug&cleanup/incompatibility/visual-validation/production/clean/{route-name}-1440x900.png`
+- `debug&cleanup/incompatibility/visual-validation/production/populated/{route-name}-1440x900.png`
+
+**Step 3: Compare vs Phase 0 baselines**
+
+Open each pair side-by-side (baseline vs current) and verify no unexpected diffs.
+
+> [!IMPORTANT]
+> If regressions exist, stop and fix them before spending time on sandbox parity work.
+
+---
+
 ## Task 1: Set up visual validation directory
 
 **Goal:** Create directory structure for storing comparison screenshots.
@@ -41,9 +80,10 @@ Capture at desktop resolution (1440×900) in both clean and populated states. Au
 **Step 1: Create directory structure**
 
 ```bash
-mkdir -p debug\&cleanup/incompatibility/visual-validation/{original,sandbox,diffs}
+mkdir -p debug\&cleanup/incompatibility/visual-validation/{original,sandbox,production,diffs}
 mkdir -p debug\&cleanup/incompatibility/visual-validation/original/{current,my-list-sidebar}
 mkdir -p debug\&cleanup/incompatibility/visual-validation/sandbox/{current,my-list-sidebar}
+mkdir -p debug\&cleanup/incompatibility/visual-validation/production/{clean,populated}
 ```
 
 **Step 2: Create validation README**
@@ -64,6 +104,9 @@ visual-validation/
 ├── sandbox/            # Screenshots from /sandbox/browser/*
 │   ├── current/
 │   └── my-list-sidebar/
+├── production/         # Screenshots from production routes (regression vs Phase 0 baselines)
+│   ├── clean/
+│   └── populated/
 └── diffs/              # Difference images (if using automated comparison)
 ```
 
@@ -73,6 +116,11 @@ visual-validation/
 2. Use clean state (initial load) and populated state (after interaction)
 3. Compare side-by-side using Preview, Figma, or any image viewer
 4. Document any differences in the comparison checklist below
+
+## Regression Workflow (Required)
+
+1. Compare `visual-baseline/next/*` (Phase 0) vs `visual-validation/production/*` (current)
+2. If production regressions exist, fix before continuing with sandbox parity
 
 ## Comparison Checklist
 
@@ -417,7 +465,7 @@ These require fixes in Phase 3:
 - [ ] Manual comparison completed for each design idea
 - [ ] README checklist updated with findings
 - [ ] No blocking visual differences (or documented as acceptable)
-- [ ] **Regression check:** Existing production routes (`/browser`, `/planner`, `/onboarding`) still match Phase 0 baselines (no regressions from Tailwind/styling changes)
+- [ ] **Regression check (Task 0):** Production screenshots captured to `visual-validation/production/` and match Phase 0 baselines (no regressions from Tailwind/styling changes)
 
 ---
 
@@ -429,6 +477,7 @@ These require fixes in Phase 3:
 - [ ] `current` passes visual comparison (or differences documented as acceptable)
 - [ ] `my-list-sidebar` passes visual comparison (or differences documented as acceptable)
 - [ ] README checklist completed
+- [ ] Phase 0 baseline regression check passed (Task 0)
 - [ ] No console errors on sandbox routes
 
 **Next Phase:** Phase 5 — Production Promotion
