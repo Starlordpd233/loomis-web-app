@@ -222,7 +222,46 @@ Phase 3 has been completed with full adherence to the specified plan. Both desig
 
 ---
 
+### Task 5.5: Implement SandboxErrorBoundary ✅
+
+> **Added**: January 3, 2026 (Post-review gap fill)
+
+**Files Created**:
+- `src/app/sandbox/components/SandboxErrorBoundary.tsx`
+
+**Files Updated**:
+- `src/app/sandbox/browser/current/page.tsx`
+- `src/app/sandbox/browser/my-list-sidebar/page.tsx`
+
+**Implementation Details**:
+1. **SandboxErrorBoundary Component**:
+   - React class component with error boundary pattern
+   - Catches runtime errors in sandbox experiments
+   - Displays friendly fallback UI with:
+     - Error icon and title
+     - Experiment name in error message
+     - Collapsible error details (stack trace)
+     - "Reload" and "Back to Sandbox" recovery buttons
+   - Console logging for debugging
+
+2. **Sandbox Page Wrappers**:
+   - Both `current/page.tsx` and `my-list-sidebar/page.tsx` updated
+   - Each feature component wrapped with `<SandboxErrorBoundary experimentName="...">`
+   - Prevents experiment crashes from propagating to parent routes
+
+**Framework Compliance**:
+- ✅ Uses Tailwind CSS for styling
+- ✅ Uses lucide-react icons (AlertTriangle, RefreshCw, Home)
+- ✅ Uses `@/` absolute imports
+- ✅ TypeScript types correct
+
+**Why Added**:
+This was identified as a gap during Phase 3 review. The plan recommended error boundaries to prevent sandbox failures from crashing the entire route subtree.
+
+---
+
 ### Task 6: Build Verification and Testing ✅
+
 
 **Build Command**: `npm run build`
 
@@ -350,6 +389,8 @@ src/
     │   └── gemini/
     │       └── route.ts
     └── sandbox/
+        ├── components/
+        │   └── SandboxErrorBoundary.tsx  (added post-review)
         ├── browser/
         │   ├── current/
         │   │   └── page.tsx (updated)
