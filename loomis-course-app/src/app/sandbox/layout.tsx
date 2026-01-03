@@ -22,7 +22,9 @@ export default function SandboxLayout({
 }) {
   return (
     <>
-      {children}
+      <div className="sandbox-scope">
+        {children}
+      </div>
 
       {/* Dev Toolbar - only visible in sandbox */}
       <div className="sandbox-toolbar">

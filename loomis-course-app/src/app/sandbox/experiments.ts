@@ -43,6 +43,33 @@ export const CATEGORIES: CategoryMeta[] = [
         sourceRef: 'design_ideas/browser/current',
         tags: ['ai', 'catalog', 'explorer', 'gemini'],
       },
+      {
+        name: 'My List Sidebar',
+        description: 'Drag-and-drop course list sidebar',
+        path: '/sandbox/browser/my-list-sidebar',
+        status: 'wip' as ExperimentStatus,
+        frameworks: ['Tailwind CSS', 'Lucide Icons'],
+        createdAt: '2026-01-02',
+        sourceRef: 'design_ideas/browser/my_list_sidebar',
+        tags: ['sidebar', 'dnd', 'browser'],
+      },
+    ],
+  },
+  {
+    id: 'landing',
+    name: 'Sandbox UX',
+    icon: '✨',
+    experiments: [
+      {
+        name: 'Sandbox Landing Page',
+        description: 'Enhanced landing page for the sandbox environment',
+        path: '/sandbox/landing',
+        status: 'wip' as ExperimentStatus,
+        frameworks: ['Tailwind CSS', 'React 19'],
+        createdAt: '2026-01-02',
+        sourceRef: 'design_ideas/sandbox/sandbox-landing-page',
+        tags: ['ux', 'landing', 'sandbox'],
+      },
     ],
   },
   // Add more categories here (planner, landing, etc.)

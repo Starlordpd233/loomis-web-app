@@ -34,7 +34,13 @@ export function loadPlannerState(): PlannerV2State {
     // 1. Try V2
     const v2 = localStorage.getItem(STORAGE_KEY);
     if (v2) {
-      return JSON.parse(v2);
+      const parsed = JSON.parse(v2);
+      // Sanitize: ensure required fields exist and fall back to defaults if corrupted
+      return {
+        version: 2,
+        selectedCourses: Array.isArray(parsed.selectedCourses) ? parsed.selectedCourses : [],
+        grid: (parsed.grid && typeof parsed.grid === 'object') ? parsed.grid : DEFAULT_GRID,
+      };
     }
 
     // 2. Try Migration

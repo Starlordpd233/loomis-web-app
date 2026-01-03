@@ -1,0 +1,8 @@
+/* Tailwind v4 entry (utilities-first; intentionally NO preflight) */
+@plugin "tailwindcss-animate";
+
+/* Align `dark:` with the app's theme toggle (html/body `data-theme="dark"`) */
+@custom-variant dark (&:is([data-theme="dark"] *));
+
+@import "tailwindcss/theme";
+@import "tailwindcss/utilities";

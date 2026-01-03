@@ -4,6 +4,7 @@ const config: Config = {
   // Only apply Tailwind to sandbox routes to avoid conflicts with main app CSS modules
   content: [
     './src/app/sandbox/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/features/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {

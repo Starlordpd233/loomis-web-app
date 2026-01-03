@@ -327,6 +327,59 @@ describe('load and save integration', () => {
 })
 
 // =============================================================================
+// CORRUPTED/LEGACY DATA HANDLING TESTS
+// =============================================================================
+
+describe('plannerStore - corrupted/legacy data handling', () => {
+    beforeEach(() => {
+        localStorage.clear()
+    })
+
+    it('handles invalid JSON in plannerV2 gracefully', () => {
+        localStorage.setItem('plannerV2', 'not valid json {{{')
+        const store = loadPlannerState()
+        expect(store).toBeDefined()
+        expect(store.version).toBe(2)
+    })
+
+    it('handles invalid JSON in plan gracefully', () => {
+        localStorage.setItem('plan', '[invalid array')
+        const store = loadPlannerState()
+        expect(store).toBeDefined()
+    })
+
+    it('handles wrong shape (missing required fields)', () => {
+        localStorage.setItem('plannerV2', JSON.stringify({
+            version: 2,
+        }))
+        const store = loadPlannerState()
+        expect(store.selectedCourses).toEqual([]) // defaults to empty
+        expect(store.grid).toBeDefined()
+        expect(store.grid.Freshman).toBeDefined()
+    })
+
+    it('handles legacy version numbers', () => {
+        localStorage.setItem('plannerV2', JSON.stringify({
+            version: 1, // old version in v2 key
+            courses: ['CS101'],
+        }))
+        const store = loadPlannerState()
+        expect(store.version).toBe(2) // upgraded
+    })
+
+    it('handles null/undefined values in data', () => {
+        localStorage.setItem('plannerV2', JSON.stringify({
+            version: 2,
+            selectedCourses: null,
+            grid: undefined,
+        }))
+        const store = loadPlannerState()
+        expect(Array.isArray(store.selectedCourses)).toBe(true)
+        expect(store.grid).toBeDefined()
+    })
+})
+
+// =============================================================================
 // CONSTANTS TESTS
 // =============================================================================
 

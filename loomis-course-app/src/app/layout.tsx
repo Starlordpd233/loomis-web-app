@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "./tailwind.css";
 import "./globals.css";
 
 // Fonts are defined via local @font-face in globals.css to avoid network fetches during build.
