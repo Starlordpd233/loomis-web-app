@@ -2,7 +2,6 @@
 import {
   PlannerV2State,
   PlannerState,
-  PlanItem,
   YEARS,
   SLOTS_PER_YEAR,
 } from "@/types/course";
@@ -24,6 +23,12 @@ const DEFAULT_STATE: PlannerV2State = {
   grid: DEFAULT_GRID,
 };
 
+const isValidGrid = (grid: unknown): grid is PlannerState => {
+  if (!grid || typeof grid !== "object") return false;
+  const record = grid as Record<string, unknown>;
+  return YEARS.every((year) => Array.isArray(record[year]));
+};
+
 /**
  * Load planner state from localStorage with migration support
  */
@@ -39,7 +44,7 @@ export function loadPlannerState(): PlannerV2State {
       return {
         version: 2,
         selectedCourses: Array.isArray(parsed.selectedCourses) ? parsed.selectedCourses : [],
-        grid: (parsed.grid && typeof parsed.grid === 'object') ? parsed.grid : DEFAULT_GRID,
+        grid: isValidGrid(parsed.grid) ? parsed.grid : DEFAULT_GRID,
       };
     }
 
@@ -49,11 +54,12 @@ export function loadPlannerState(): PlannerV2State {
 
     if (legacyGrid || legacyList) {
       const grid = legacyGrid ? JSON.parse(legacyGrid) : DEFAULT_GRID;
+      const safeGrid = isValidGrid(grid) ? grid : DEFAULT_GRID;
       const list = legacyList ? JSON.parse(legacyList) : [];
       
       const migrated: PlannerV2State = {
         version: 2,
-        grid: grid,
+        grid: safeGrid,
         selectedCourses: list,
       };
 
